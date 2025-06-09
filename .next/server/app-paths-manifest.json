@@ -1,0 +1,9 @@
+{
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/forgot-password/page": "app/forgot-password/page.js",
+  "/signup/page": "app/signup/page.js",
+  "/login/page": "app/login/page.js",
+  "/book/[sectionSlug]/page": "app/book/[sectionSlug]/page.js",
+  "/full-audio-player/page": "app/full-audio-player/page.js",
+  "/book/page": "app/book/page.js"
+}
