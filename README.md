@@ -1,36 +1,138 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Renewed App v2
+
+A modern Next.js application for the "Renewed: The New Man Story" digital guidebook and audiobook platform.
+
+## Features
+
+- 📖 Interactive digital guidebook with sections and chapters
+- 🎵 Full audiobook player with chapter navigation
+- 🔐 User authentication with Supabase
+- 📱 Responsive design with Tailwind CSS
+- 🎨 Modern glassmorphism UI design
+- 🔒 Secure environment variable management
+
+## Tech Stack
+
+- **Framework**: Next.js 15.3.2 with App Router
+- **Styling**: Tailwind CSS with custom brand colors
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **Icons**: React Icons
+- **Markdown**: React Markdown with GitHub Flavored Markdown
+- **Testing**: Jest with React Testing Library
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ 
+- npm, yarn, or pnpm
+- Supabase account and project
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/dramonfx/renewed-app-v2.git
+cd renewed-app-v2
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local` and add your Supabase credentials:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+4. Run the development server:
 ```bash
 npm run dev
 # or
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/                    # Next.js App Router pages
+│   ├── forgot-password/    # Password reset page
+│   ├── login/             # Login page
+│   ├── signup/            # Registration page
+│   └── ...
+├── components/            # Reusable React components
+│   ├── AudioPlayer.jsx    # Audio player component
+│   ├── Layout.jsx         # Main layout component
+│   └── LoadingSpinner.jsx # Loading spinner component
+├── contexts/              # React contexts
+├── hooks/                 # Custom React hooks
+├── lib/                   # Library configurations
+│   └── supabaseClient.js  # Supabase client setup
+├── utils/                 # Utility functions
+├── constants/             # Application constants
+├── types/                 # Type definitions
+└── __tests__/             # Test files
+```
 
-## Learn More
+## Available Scripts
 
-To learn more about Next.js, take a look at the following resources:
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run lint:fix` - Fix ESLint issues
+- `npm run test` - Run tests
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:coverage` - Run tests with coverage
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment Variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Create a `.env.local` file based on `.env.example`:
 
-## Deploy on Vercel
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anonymous key |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Database Setup
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This application uses Supabase for data storage. Ensure your Supabase project has the following tables:
+
+- `sections` - Book sections/chapters
+- User authentication is handled by Supabase Auth
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Security
+
+- Environment variables are properly configured
+- API keys are never committed to version control
+- Security headers are configured in `next.config.mjs`
+- Input validation is implemented throughout the application
+
+## License
+
+This project is private and proprietary.
