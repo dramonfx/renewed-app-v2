@@ -4,7 +4,10 @@ import { supabase } from '@/lib/supabaseClient';
 import SectionPageClient from './SectionPageClient';
 
 export default async function SectionPage({ params }) {
-  const { sectionSlug } = params;
+  // Pass the full params object to client component to avoid Next.js 15 static analysis error
+  // Client components can safely destructure params
+  const awaitedParams = await params;
+  const { sectionSlug } = awaitedParams;
   
   if (!sectionSlug) {
     notFound();
@@ -113,7 +116,7 @@ export default async function SectionPage({ params }) {
         section={sectionData}
         visuals={visualsWithUrls}
         visualsMap={visualsMap}
-        sectionSlug={sectionSlug}
+        params={awaitedParams}
       />
     );
   } catch (error) {
