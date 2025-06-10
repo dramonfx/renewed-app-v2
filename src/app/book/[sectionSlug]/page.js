@@ -33,6 +33,24 @@ export default function SectionPage({ params }) {
     console.error('Error loading visuals:', visualsError);
   }
 
+  // Helper function to normalize identifiers for consistent lookup
+  const normalizeIdentifier = (identifier) => {
+    return identifier?.toString().toUpperCase().trim() || '';
+  };
+
+  // Create a normalized lookup map for case-insensitive matching
+  const createNormalizedVisualsMap = (originalMap) => {
+    if (!originalMap) return new Map();
+    const normalizedMap = new Map();
+    originalMap.forEach((value, key) => {
+      const normalizedKey = normalizeIdentifier(key);
+      normalizedMap.set(normalizedKey, value);
+    });
+    return normalizedMap;
+  };
+
+  const normalizedVisualsMap = createNormalizedVisualsMap(visualsMap);
+
   // Debug logs for visualsMap
   console.log(`--- DEBUG for slug "${sectionSlug}": visualsMap populated. Size: ${visualsMap?.size || 0}`);
   visualsMap?.forEach((value, key) => {
@@ -48,14 +66,21 @@ export default function SectionPage({ params }) {
     },
     img: ({ node, ...props }) => {
       const imageIdentifier = props.src;
+      const normalizedIdentifier = normalizeIdentifier(imageIdentifier);
+      
       // --- THESE ARE THE DEBUG LOGS FOR THE IMG RENDERER ---
-      console.log(`--- MD IMG RENDER for slug "${sectionSlug}": Identifier from MD: "${imageIdentifier}", Alt: "${props.alt}" ---`);
-      const visual = visualsMap?.get(imageIdentifier);
+      console.log(`--- MD IMG RENDER for slug "${sectionSlug}": Identifier from MD: "${imageIdentifier}", Normalized: "${normalizedIdentifier}", Alt: "${props.alt}" ---`);
+      
+      // Use normalized lookup to find the visual
+      const visual = normalizedVisualsMap?.get(normalizedIdentifier);
 
       if (visual) {
         console.log(`--- MD IMG RENDER for slug "${sectionSlug}": Found visual in map for "${imageIdentifier}". Display URL: ${visual.displayUrl}`);
       } else {
-        console.error(`--- MD IMG RENDER ERROR for slug "${sectionSlug}": No visual found in map for identifier: "${imageIdentifier}" ---`);
+        // Only log error if the visual is truly missing from the normalized map
+        if (normalizedVisualsMap?.size > 0) {
+          console.error(`--- MD IMG RENDER ERROR for slug "${sectionSlug}": No visual found in map for identifier: "${imageIdentifier}" (normalized: "${normalizedIdentifier}") ---`);
+        }
       }
       // --- END DEBUG LOGS FOR IMG RENDERER ---
 
