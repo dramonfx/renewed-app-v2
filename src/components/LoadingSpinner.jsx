@@ -27,3 +27,4 @@ export const LoadingOverlay = ({ message = 'Loading...' }) => {
     </div>
   );
 };
+
