@@ -3,33 +3,8 @@
 import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { useSection, useVisuals } from '@/hooks';
 
-export default function SectionPageClient({ sectionSlug }) {
-  const { data: section, loading: sectionLoading, error: sectionError } = useSection(sectionSlug);
-  const { visualsMap, loading: visualsLoading, error: visualsError } = useVisuals(section?.id);
-
-  if (sectionLoading || visualsLoading) {
-    return <div className="text-center p-10 font-sans text-brand-text-main">Loading section...</div>;
-  }
-
-  if (sectionError) {
-    return (
-      <div className="text-red-500 p-6">
-        <p>Error loading section data: {sectionError}</p>
-        <p>Attempted to fetch slug: {sectionSlug}</p>
-      </div>
-    );
-  }
-
-  if (!section) {
-    return <div className="text-red-500 p-6">Section not found.</div>;
-  }
-
-  if (visualsError) {
-    console.error('Error loading visuals:', visualsError);
-  }
-
+export default function SectionPageClient({ section, visuals, visualsMap, sectionSlug }) {
   // Helper function to normalize identifiers for consistent lookup
   const normalizeIdentifier = (identifier) => {
     return identifier?.toString().toUpperCase().trim() || '';
