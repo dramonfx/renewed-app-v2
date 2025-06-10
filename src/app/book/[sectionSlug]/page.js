@@ -6,8 +6,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useSection, useVisuals } from '@/hooks';
 
-export default function SectionPage({ params }) {
-  const sectionSlug = params.sectionSlug;
+export default async function SectionPage({ params }) {
+  const { sectionSlug } = await params;
   
   const { data: section, loading: sectionLoading, error: sectionError } = useSection(sectionSlug);
   const { visualsMap, loading: visualsLoading, error: visualsError } = useVisuals(section?.id);
