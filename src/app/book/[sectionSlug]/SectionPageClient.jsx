@@ -4,7 +4,9 @@ import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-export default function SectionPageClient({ section, visuals, visualsMap, sectionSlug }) {
+export default function SectionPageClient({ section, visuals, visualsMap, params }) {
+  // Destructure sectionSlug from params in client component (safe in Next.js 15)
+  const { sectionSlug } = params;
   // Helper function to normalize identifiers for consistent lookup
   const normalizeIdentifier = (identifier) => {
     return identifier?.toString().toUpperCase().trim() || '';
