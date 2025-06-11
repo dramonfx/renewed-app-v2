@@ -22,7 +22,8 @@ export default async function SectionPage({ params }) {
       .single();
 
     if (sectionError || !section) {
-      console.error('Section fetch error:', sectionError?.message);
+      console.error('Section fetch error for slug:', sectionSlug, 'Error:', sectionError?.message);
+      console.error('Available sections:', Object.keys(require('@/lib/mockData').mockSections));
       notFound();
     }
 

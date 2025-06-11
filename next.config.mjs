@@ -44,6 +44,31 @@ const nextConfig = {
         port: '',
         pathname: '/**',
       },
+      // Allow mock image domains for development
+      {
+        protocol: 'https',
+        hostname: 'i.pinimg.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh5.googleusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.ytimg.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 's-media-cache-ak0.pinimg.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 
