@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Suspense, useMemo, useState, useCallback } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
@@ -19,56 +19,12 @@ const ReactMarkdown = dynamic(() => import('react-markdown'), {
 
 const remarkGfm = dynamic(() => import('remark-gfm'), { ssr: false });
 
-// PERFORMANCE: Chunked content component for large markdown
-function ChunkedMarkdownContent({ content, components }) {
-  const [visibleChunks, setVisibleChunks] = useState(1);
-  const CHUNK_SIZE = 2000; // Characters per chunk
-  
-  const chunks = useMemo(() => {
-    if (!content || content.length <= CHUNK_SIZE) {
-      return [content];
-    }
-    
-    const chunks = [];
-    for (let i = 0; i < content.length; i += CHUNK_SIZE) {
-      chunks.push(content.slice(i, i + CHUNK_SIZE));
-    }
-    return chunks;
-  }, [content]);
-  
-  const loadMoreChunks = useCallback(() => {
-    setVisibleChunks(prev => Math.min(prev + 2, chunks.length));
-  }, [chunks.length]);
-  
-  if (chunks.length === 1) {
-    return (
-      <ReactMarkdown components={components} remarkPlugins={[remarkGfm]}>
-        {content}
-      </ReactMarkdown>
-    );
-  }
-  
+// Simple markdown content component without chunking
+function MarkdownContent({ content, components }) {
   return (
-    <div className="space-y-4">
-      {chunks.slice(0, visibleChunks).map((chunk, index) => (
-        <div key={index}>
-          <ReactMarkdown components={components} remarkPlugins={[remarkGfm]}>
-            {chunk}
-          </ReactMarkdown>
-        </div>
-      ))}
-      
-      {visibleChunks < chunks.length && (
-        <div className="text-center py-4">
-          <button
-            onClick={loadMoreChunks}
-            className="bg-brand-gold hover:bg-yellow-400 text-brand-blue-dark font-sans font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out"
-          >
-            Load More Content ({chunks.length - visibleChunks} sections remaining)
-          </button>
-        </div>
-      )}
-    </div>
+    <ReactMarkdown components={components} remarkPlugins={[remarkGfm]}>
+      {content}
+    </ReactMarkdown>
   );
 }
 
@@ -127,13 +83,15 @@ export default function SectionPageClient({ section, visuals, visualsMap, params
     );
   }
 
-  // Simple markdown components for rendering
+  // Simple markdown components for rendering with valid HTML structure
   const markdownComponents = useMemo(() => ({
+    // Use div instead of p to avoid nesting issues with block elements
     p: ({ node, children }) => {
+      // Check if this paragraph contains only an image
       if (node.children.length === 1 && node.children[0].tagName === 'img') {
-        return <>{children}</>;
+        return <div className="mb-4">{children}</div>;
       }
-      return <p className="mb-4">{children}</p>;
+      return <div className="mb-4">{children}</div>;
     },
     img: ({ node, ...props }) => {
       const imageIdentifier = props.src;
@@ -144,31 +102,33 @@ export default function SectionPageClient({ section, visuals, visualsMap, params
 
       if (visual && visual.displayUrl) {
         return (
-          <a
-            href={visual.displayUrl}
-            download
-            target="_blank"
-            rel="noopener noreferrer"
-            title={`Download ${props.alt || visual.caption}`}
-            className="inline-block my-8"
-          >
-            <OptimizedImage 
-              visual={visual}
-              alt={props.alt}
-              className=""
-            />
+          <div className="my-8">
+            <a
+              href={visual.displayUrl}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+              title={`Download ${props.alt || visual.caption}`}
+              className="inline-block"
+            >
+              <OptimizedImage 
+                visual={visual}
+                alt={props.alt}
+                className=""
+              />
+            </a>
             {visual.caption && (
-              <span className="block text-sm text-brand-text-muted mt-2 text-center">
+              <div className="text-sm text-brand-text-muted mt-2 text-center">
                 {visual.caption}
-              </span>
+              </div>
             )}
-          </a>
+          </div>
         );
       }
       return (
-        <em className="block text-red-500 my-4 text-center">
-          [Image: {props.alt || imageIdentifier} not found or URL missing]
-        </em>
+        <div className="block text-red-500 my-4 text-center">
+          <em>[Image: {props.alt || imageIdentifier} not found or URL missing]</em>
+        </div>
       );
     },
   }), [visualsMap]);
@@ -207,7 +167,7 @@ export default function SectionPageClient({ section, visuals, visualsMap, params
                   <div className="text-center text-gray-500">Loading content...</div>
                 </div>
               }>
-                <ChunkedMarkdownContent 
+                <MarkdownContent 
                   content={section.markdownContent}
                   components={markdownComponents}
                 />
