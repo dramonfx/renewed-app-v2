@@ -7,6 +7,16 @@ import remarkGfm from 'remark-gfm';
 export default function SectionPageClient({ section, visuals, visualsMap, params }) {
   // Destructure sectionSlug from params in client component (safe in Next.js 15)
   const { sectionSlug } = params;
+  
+  // Ensure we have valid section data
+  if (!section) {
+    return (
+      <div className="text-center py-12">
+        <h1 className="text-2xl font-serif text-red-600 mb-4">Section Not Found</h1>
+        <p className="text-brand-text-muted">The requested section "{sectionSlug}" could not be loaded.</p>
+      </div>
+    );
+  }
   // Helper function to normalize identifiers for consistent lookup
   const normalizeIdentifier = (identifier) => {
     return identifier?.toString().toUpperCase().trim() || '';
