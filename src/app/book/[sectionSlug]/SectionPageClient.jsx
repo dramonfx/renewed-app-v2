@@ -139,8 +139,8 @@ export default function SectionPageClient({ section, visuals, visualsMap, params
       const imageIdentifier = props.src;
       const normalizedIdentifier = imageIdentifier?.toString().toUpperCase().trim() || '';
       
-      // Use direct lookup in visualsMap
-      const visual = visualsMap?.get(normalizedIdentifier);
+      // Use direct lookup in visualsMap (now a plain object)
+      const visual = visualsMap?.[normalizedIdentifier];
 
       if (visual && visual.displayUrl) {
         return (

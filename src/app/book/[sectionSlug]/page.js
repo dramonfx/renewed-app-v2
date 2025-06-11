@@ -164,7 +164,7 @@ export default async function SectionPage({ params }) {
 
     // Optimized visual processing with early returns
     let visualsWithUrls = [];
-    let visualsMap = new Map();
+    let visualsMap = {};
     
     if (visualsData.length > 0) {
       // Limit visual processing to prevent timeouts
@@ -175,11 +175,12 @@ export default async function SectionPage({ params }) {
         visualsWithUrls = await processVisualsOptimized(limitedVisuals);
         
         // Create visuals map for markdown rendering with normalized keys
+        // Use plain object instead of Map to avoid serialization issues
         visualsWithUrls.forEach(vis => {
           if (vis.markdown_tag && vis.displayUrl) {
             // Normalize the key on server side to avoid client-side processing
             const normalizedKey = vis.markdown_tag.toString().toUpperCase().trim();
-            visualsMap.set(normalizedKey, vis);
+            visualsMap[normalizedKey] = vis;
           }
         });
       } catch (error) {
