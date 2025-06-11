@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabaseClient';
 import SectionPageClient from './SectionPageClient';
 import { performanceCache } from '@/lib/performanceCache';
 
-// PERFORMANCE: Add request timeout wrapper
+// Add request timeout wrapper
 const withTimeout = (promise, timeoutMs = 10000) => {
   return Promise.race([
     promise,
@@ -14,7 +14,7 @@ const withTimeout = (promise, timeoutMs = 10000) => {
   ]);
 };
 
-// PERFORMANCE: Circuit breaker for failing operations
+// Circuit breaker for failing operations
 class CircuitBreaker {
   constructor(threshold = 3, timeout = 30000) {
     this.failureCount = 0;
@@ -70,11 +70,11 @@ export default async function SectionPage({ params }) {
       notFound();
     }
 
-    // PERFORMANCE: Check cache first
+    // Check cache first
     const cacheKey = `section_${sectionSlug}`;
     const cachedData = performanceCache.get(cacheKey);
+    
     if (cachedData) {
-      console.log(`Cache hit for ${sectionSlug} - served in ${Date.now() - startTime}ms`);
       return (
         <SectionPageClient 
           section={cachedData.section}
@@ -85,7 +85,7 @@ export default async function SectionPage({ params }) {
       );
     }
 
-    // PERFORMANCE: Use circuit breaker for database operations
+    // Use circuit breaker for database operations
     const sectionData = await circuitBreaker.execute(async () => {
       return await withTimeout(
         supabase
@@ -101,11 +101,10 @@ export default async function SectionPage({ params }) {
 
     if (sectionError || !section) {
       console.error('Section fetch error for slug:', sectionSlug, 'Error:', sectionError?.message);
-      console.error('Available sections:', Object.keys(require('@/lib/mockData').mockSections));
       notFound();
     }
 
-    // PERFORMANCE: Optimized parallel operations with individual timeouts
+    // Optimized parallel operations with individual timeouts
     const [audioResult, markdownResult, visualsResult] = await Promise.allSettled([
       // Audio with shorter timeout
       section.audio_file_path 
@@ -163,7 +162,7 @@ export default async function SectionPage({ params }) {
       console.error('Visuals fetch failed:', visualsResult.reason);
     }
 
-    // PERFORMANCE: Optimized visual processing with early returns
+    // Optimized visual processing with early returns
     let visualsWithUrls = [];
     let visualsMap = new Map();
     
@@ -175,10 +174,12 @@ export default async function SectionPage({ params }) {
       try {
         visualsWithUrls = await processVisualsOptimized(limitedVisuals);
         
-        // Create visuals map for markdown rendering
+        // Create visuals map for markdown rendering with normalized keys
         visualsWithUrls.forEach(vis => {
           if (vis.markdown_tag && vis.displayUrl) {
-            visualsMap.set(vis.markdown_tag, vis);
+            // Normalize the key on server side to avoid client-side processing
+            const normalizedKey = vis.markdown_tag.toString().toUpperCase().trim();
+            visualsMap.set(normalizedKey, vis);
           }
         });
       } catch (error) {
@@ -194,7 +195,7 @@ export default async function SectionPage({ params }) {
       markdownContent
     };
 
-    // PERFORMANCE: Cache the result
+    // Cache the result
     const cacheData = {
       section: finalSectionData,
       visuals: visualsWithUrls,
@@ -221,7 +222,7 @@ export default async function SectionPage({ params }) {
   }
 }
 
-// PERFORMANCE: Optimized markdown processing with chunking
+// Optimized markdown processing with chunking
 async function processMarkdownContent(textFilePath) {
   try {
     const { data: blobData, error } = await supabase.storage
@@ -236,7 +237,7 @@ async function processMarkdownContent(textFilePath) {
       return { content: 'Text content not available for this section.', error: null };
     }
 
-    // PERFORMANCE: Check file size and implement chunking
+    // Check file size and implement chunking
     const MAX_SIZE = 512 * 1024; // 512KB limit
     if (blobData.size > MAX_SIZE) {
       // For large files, read in chunks
@@ -272,7 +273,7 @@ async function processMarkdownContent(textFilePath) {
   }
 }
 
-// PERFORMANCE: Optimized visual processing with concurrency control
+// Optimized visual processing with concurrency control
 async function processVisualsOptimized(visuals) {
   const CONCURRENT_LIMIT = 3; // Process max 3 visuals at once
   const results = [];

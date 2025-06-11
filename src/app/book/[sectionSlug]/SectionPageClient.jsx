@@ -5,7 +5,7 @@ import { Suspense, useMemo, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
-// PERFORMANCE OPTIMIZATION: Lazy load ReactMarkdown with better loading state
+// Lazy load ReactMarkdown for better performance
 const ReactMarkdown = dynamic(() => import('react-markdown'), {
   loading: () => (
     <div className="animate-pulse space-y-4">
@@ -14,7 +14,7 @@ const ReactMarkdown = dynamic(() => import('react-markdown'), {
       <div className="h-4 bg-gray-200 rounded w-5/6"></div>
     </div>
   ),
-  ssr: false // Render markdown on client side to reduce server load
+  ssr: false
 });
 
 const remarkGfm = dynamic(() => import('remark-gfm'), { ssr: false });
@@ -127,101 +127,51 @@ export default function SectionPageClient({ section, visuals, visualsMap, params
     );
   }
 
-  // PERFORMANCE OPTIMIZATION: Memoize expensive computations with better error handling
-  const { normalizedVisualsMap, markdownComponents } = useMemo(() => {
-    // Helper function to normalize identifiers for consistent lookup
-    const normalizeIdentifier = (identifier) => {
-      return identifier?.toString().toUpperCase().trim() || '';
-    };
-
-    // Create a normalized lookup map for case-insensitive matching
-    const createNormalizedVisualsMap = (originalMap) => {
-      if (!originalMap) return new Map();
-      const normalizedMap = new Map();
-      try {
-        originalMap.forEach((value, key) => {
-          const normalizedKey = normalizeIdentifier(key);
-          normalizedMap.set(normalizedKey, value);
-        });
-      } catch (error) {
-        console.error('Error creating normalized visuals map:', error);
+  // Simple markdown components for rendering
+  const markdownComponents = useMemo(() => ({
+    p: ({ node, children }) => {
+      if (node.children.length === 1 && node.children[0].tagName === 'img') {
+        return <>{children}</>;
       }
-      return normalizedMap;
-    };
+      return <p className="mb-4">{children}</p>;
+    },
+    img: ({ node, ...props }) => {
+      const imageIdentifier = props.src;
+      const normalizedIdentifier = imageIdentifier?.toString().toUpperCase().trim() || '';
+      
+      // Use direct lookup in visualsMap
+      const visual = visualsMap?.get(normalizedIdentifier);
 
-    const normalizedVisualsMap = createNormalizedVisualsMap(visualsMap);
-
-    // Debug logs for visualsMap (only in development)
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`--- DEBUG for slug "${sectionSlug}": visualsMap populated. Size: ${visualsMap?.size || 0}`);
-      visualsMap?.forEach((value, key) => {
-        console.log(`--- DEBUG for slug "${sectionSlug}": visualsMap entry - Key: "${key}", Has displayUrl: ${!!value.displayUrl}`);
-      });
-    }
-
-    const markdownComponents = {
-      p: ({ node, children }) => {
-        if (node.children.length === 1 && node.children[0].tagName === 'img') {
-          return <>{children}</>;
-        }
-        return <p className="mb-4">{children}</p>;
-      },
-      img: ({ node, ...props }) => {
-        const imageIdentifier = props.src;
-        const normalizedIdentifier = normalizeIdentifier(imageIdentifier);
-        
-        // Debug logs only in development
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`--- MD IMG RENDER for slug "${sectionSlug}": Identifier from MD: "${imageIdentifier}", Normalized: "${normalizedIdentifier}", Alt: "${props.alt}" ---`);
-        }
-        
-        // Use normalized lookup to find the visual
-        const visual = normalizedVisualsMap?.get(normalizedIdentifier);
-
-        if (visual) {
-          if (process.env.NODE_ENV === 'development') {
-            console.log(`--- MD IMG RENDER for slug "${sectionSlug}": Found visual in map for "${imageIdentifier}". Display URL: ${visual.displayUrl}`);
-          }
-        } else {
-          // Only log error if the visual is truly missing from the normalized map
-          if (normalizedVisualsMap?.size > 0 && process.env.NODE_ENV === 'development') {
-            console.error(`--- MD IMG RENDER ERROR for slug "${sectionSlug}": No visual found in map for identifier: "${imageIdentifier}" (normalized: "${normalizedIdentifier}") ---`);
-          }
-        }
-
-        if (visual && visual.displayUrl) {
-          return (
-            <a
-              href={visual.displayUrl}
-              download
-              target="_blank"
-              rel="noopener noreferrer"
-              title={`Download ${props.alt || visual.caption}`}
-              className="inline-block my-8"
-            >
-              <OptimizedImage 
-                visual={visual}
-                alt={props.alt}
-                className=""
-              />
-              {visual.caption && (
-                <span className="block text-sm text-brand-text-muted mt-2 text-center">
-                  {visual.caption}
-                </span>
-              )}
-            </a>
-          );
-        }
+      if (visual && visual.displayUrl) {
         return (
-          <em className="block text-red-500 my-4 text-center">
-            [Image: {props.alt || imageIdentifier} not found or URL missing]
-          </em>
+          <a
+            href={visual.displayUrl}
+            download
+            target="_blank"
+            rel="noopener noreferrer"
+            title={`Download ${props.alt || visual.caption}`}
+            className="inline-block my-8"
+          >
+            <OptimizedImage 
+              visual={visual}
+              alt={props.alt}
+              className=""
+            />
+            {visual.caption && (
+              <span className="block text-sm text-brand-text-muted mt-2 text-center">
+                {visual.caption}
+              </span>
+            )}
+          </a>
         );
-      },
-    };
-
-    return { normalizedVisualsMap, markdownComponents };
-  }, [visualsMap, sectionSlug]);
+      }
+      return (
+        <em className="block text-red-500 my-4 text-center">
+          [Image: {props.alt || imageIdentifier} not found or URL missing]
+        </em>
+      );
+    },
+  }), [visualsMap]);
 
   return (
     <ErrorBoundary fallback={<div className="text-center py-12 text-red-600">Something went wrong loading this section.</div>}>
