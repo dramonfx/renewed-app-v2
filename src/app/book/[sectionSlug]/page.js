@@ -27,75 +27,104 @@ export default async function SectionPage({ params }) {
       notFound();
     }
 
-    // Fetch audio signed URL if audio file exists
+    // PERFORMANCE OPTIMIZATION: Use Promise.all for parallel operations
+    const [audioResult, markdownResult, visualsResult] = await Promise.all([
+      // Fetch audio signed URL if audio file exists
+      section.audio_file_path 
+        ? supabase.storage
+            .from('book-assets')
+            .createSignedUrl(section.audio_file_path, 60 * 60)
+            .then(({ data, error }) => ({ data, error }))
+        : Promise.resolve({ data: null, error: null }),
+      
+      // Fetch markdown content if text file exists - with size limit check
+      section.text_file_path && section.text_file_path.endsWith('.md')
+        ? supabase.storage
+            .from('book-assets')
+            .download(section.text_file_path)
+            .then(async ({ data: blobData, error }) => {
+              if (error) return { content: `Could not load text content. Error: ${error.message}`, error };
+              if (!blobData) return { content: 'Text content not available for this section.', error: null };
+              
+              // PERFORMANCE: Check file size before processing
+              if (blobData.size > 1024 * 1024) { // 1MB limit
+                return { content: 'Content too large to process efficiently.', error: null };
+              }
+              
+              try {
+                const content = await blobData.text();
+                return { content, error: null };
+              } catch (e) {
+                console.error('Markdown File Conversion Error:', e);
+                return { content: 'Error processing text content.', error: e };
+              }
+            })
+        : Promise.resolve({ 
+            content: section.text_file_path 
+              ? 'Content is not in Markdown format or path is incorrect.' 
+              : 'Text content not available for this section.',
+            error: null 
+          }),
+      
+      // Fetch associated visuals from visuals table
+      supabase
+        .from('visuals')
+        .select('*')
+        .eq('section_id', section.id)
+        .order('display_order', { ascending: true })
+        .then(({ data, error }) => ({ data, error }))
+    ]);
+
+    // Process results
     let audioUrl = null;
-    if (section.audio_file_path) {
-      const { data: audioData, error: audioError } = await supabase.storage
-        .from('book-assets')
-        .createSignedUrl(section.audio_file_path, 60 * 60);
-      
-      if (audioError) {
-        console.error('Audio Signed URL Error:', audioError.message);
-      } else {
-        audioUrl = audioData.signedUrl;
-      }
+    if (audioResult.error) {
+      console.error('Audio Signed URL Error:', audioResult.error.message);
+    } else if (audioResult.data) {
+      audioUrl = audioResult.data.signedUrl;
     }
 
-    // Fetch markdown content if text file exists
-    let markdownContent = 'Text content not available for this section.';
-    if (section.text_file_path && section.text_file_path.endsWith('.md')) {
-      const { data: blobData, error: mdFileDownloadError } = await supabase.storage
-        .from('book-assets')
-        .download(section.text_file_path);
-      
-      if (mdFileDownloadError) {
-        console.error('Markdown File Download Error:', mdFileDownloadError.message);
-        markdownContent = `Could not load text content. Error: ${mdFileDownloadError.message}`;
-      } else if (blobData) {
-        try {
-          markdownContent = await blobData.text();
-        } catch (e) {
-          console.error('Markdown File Conversion Error:', e);
-          markdownContent = 'Error processing text content.';
-        }
-      }
-    } else if (section.text_file_path) {
-      markdownContent = 'Content is not in Markdown format or path is incorrect.';
-      console.warn("Text file is not a .md file, plain text rendering might occur or fail if expecting markdown.");
+    const markdownContent = markdownResult.content;
+    if (markdownResult.error) {
+      console.error('Markdown processing error:', markdownResult.error);
     }
 
-    // Fetch associated visuals from visuals table
-    const { data: visualsData, error: visualsError } = await supabase
-      .from('visuals')
-      .select('*')
-      .eq('section_id', section.id)
-      .order('display_order', { ascending: true });
-
-    if (visualsError) {
-      console.error('Visuals fetch error:', visualsError.message);
+    if (visualsResult.error) {
+      console.error('Visuals fetch error:', visualsResult.error.message);
     }
 
-    // Generate signed URLs for all visual files
+    // PERFORMANCE OPTIMIZATION: Limit concurrent visual URL generations
     let visualsWithUrls = [];
     let visualsMap = new Map();
     
-    if (visualsData && visualsData.length > 0) {
-      visualsWithUrls = await Promise.all(
-        visualsData.map(async (visual) => {
-          if (visual.file_path) {
-            const { data: signedUrlData, error: signedUrlError } = await supabase.storage
-              .from('book-assets')
-              .createSignedUrl(visual.file_path, 60 * 60);
+    if (visualsResult.data && visualsResult.data.length > 0) {
+      // Process visuals in batches to avoid overwhelming the server
+      const BATCH_SIZE = 5;
+      const visualBatches = [];
+      
+      for (let i = 0; i < visualsResult.data.length; i += BATCH_SIZE) {
+        visualBatches.push(visualsResult.data.slice(i, i + BATCH_SIZE));
+      }
+      
+      for (const batch of visualBatches) {
+        const batchResults = await Promise.all(
+          batch.map(async (visual) => {
+            if (visual.file_path) {
+              const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+                .from('book-assets')
+                .createSignedUrl(visual.file_path, 60 * 60);
 
-            if (signedUrlError) {
-              console.error(`Error creating signed URL for visual ${visual.file_path}:`, signedUrlError.message);
-              return { ...visual, displayUrl: null, error: signedUrlError.message };
+              if (signedUrlError) {
+                console.error(`Error creating signed URL for visual ${visual.file_path}:`, signedUrlError.message);
+                return { ...visual, displayUrl: null, error: signedUrlError.message };
+              }
+              return { ...visual, displayUrl: signedUrlData.signedUrl };
             }
-            return { ...visual, displayUrl: signedUrlData.signedUrl };
-          }
-          return { ...visual, displayUrl: null, error: 'No file path for visual' };
-        })
-      );
+            return { ...visual, displayUrl: null, error: 'No file path for visual' };
+          })
+        );
+        
+        visualsWithUrls.push(...batchResults);
+      }
 
       // Create visuals map for markdown rendering
       visualsWithUrls.forEach(vis => {
