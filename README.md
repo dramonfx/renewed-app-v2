@@ -1,25 +1,61 @@
-# Renewed App v2
+# 🌿 RENEWED: The New Man Story – Strategic Experience Flow
 
-A modern Next.js application for the "Renewed: The New Man Story" digital guidebook and audiobook platform.
+Welcome to the official repository for **RENEWED: The New Man Story**, a spiritual transformation web application by At His Feet Productions. This project is built to guide users through a structured journey from a **natural mind** to a **spiritual mind**, based on the teachings of the book *Renewed: The New Man Story* and the **Mind Transformation Guide**.
 
-## Features
+---
 
-- 📖 Interactive digital guidebook with sections and chapters
-- 🎵 Full audiobook player with chapter navigation
-- 🔐 User authentication with Supabase
-- 📱 Responsive design with Tailwind CSS
-- 🎨 Modern glassmorphism UI design
-- 🔒 Secure environment variable management
+## 🧭 Vision
+This is not just an app. It is a **movement**:
+- From confusion → clarity
+- From fear → peace
+- From doing → being
+- From transactional life → fruit-bearing life
 
-## Tech Stack
+We are building a place where heaven meets earth—one mind at a time.
 
-- **Framework**: Next.js 15.3.2 with App Router
-- **Styling**: Tailwind CSS with custom brand colors
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth
-- **Icons**: React Icons
-- **Markdown**: React Markdown with GitHub Flavored Markdown
-- **Testing**: Jest with React Testing Library
+> "Set your mind on things above, not on earthly things." — Colossians 3:2
+
+---
+
+## 🎭 The User Journey (A Three-Act Story)
+
+### Act I: The Awakening
+**Goal:** Move the user from unconscious natural identity to conscious awareness of the possibility of transformation.
+
+1.  **Invitation / Awareness:** *"What if your mind was never meant to stay the same?"*
+2.  **Access / Entry Point:** Standard Login/Signup.
+3.  **Orientation / Grounding:** Introduce the Two Minds, Two Trees, and the *Mind Transformation Guide* as a compass.
+
+### Act II: The Workshop
+**Goal:** Equip users to practice spiritual discernment through immersive interaction.
+
+4.  **Immersive Journey:** Section-by-section audio, text, visuals, and reflection prompts.
+5.  **Flow Mode (Play All):** Passive listening for subconscious absorption.
+6.  **Turning Point Check-In:** Acknowledge growth and invite to community.
+
+### Act III: The Embodiment
+**Goal:** Transition from reflection to real-world, fruit-bearing expression.
+
+7.  **Invitation into Community:** Connect with others on the same path.
+8.  **Reflection & Renewal Loop:** A dashboard to review the user's personal transformation trail.
+9.  **Legacy & Impact:** Tools to activate and track the "fruit of the Spirit."
+10. **Re-entry into the World:** Embody the transformation in everyday life.
+
+---
+
+## 🛠️ Development Strategy (Build Phases)
+1. ✅ **Foundation:** Login / Signup
+2. 🔄 **Orientation:** Intro Screen + Compass / Mind Diagram
+3. 🎧 **Core Experience:** Section Player w/ Text + Interactions
+4. 🧪 **Journaling:** Reflection Prompts + Saving Logic
+5. 🎛️ **Flow Mode:** "Play All" Queue
+6. 🧠 **Milestone:** Midpoint Turning Point Modal
+7. 🌿 **Community:** Integration with Circle 360
+8. 🗺️ **Dashboard:** "My Story" Transformation Trail
+9. 🍎 **Application:** Legacy & Fruit Tracker
+10. 📄 **Tools:** Printables + Future AI Features
+
+---
 
 ## Getting Started
 
@@ -32,64 +68,26 @@ A modern Next.js application for the "Renewed: The New Man Story" digital guideb
 ### Installation
 
 1. Clone the repository:
-```bash
-git clone https://github.com/dramonfx/renewed-app-v2.git
-cd renewed-app-v2
-```
+   ```bash
+   git clone https://github.com/dramonfx/renewed-app-v2.git
+   cd renewed-app-v2
+   ```
 
 2. Install dependencies:
-```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
-```
+   ```bash
+   npm install
+   ```
 
 3. Set up environment variables:
-```bash
-cp .env.example .env.local
-```
-
-Edit `.env.local` and add your Supabase credentials:
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
+   ```bash
+   cp .env.example .env.local
+   ```
+   Edit `.env.local` and add your Supabase credentials.
 
 4. Run the development server:
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Project Structure
-
-```
-src/
-├── app/                    # Next.js App Router pages
-│   ├── forgot-password/    # Password reset page
-│   ├── login/             # Login page
-│   ├── signup/            # Registration page
-│   └── ...
-├── components/            # Reusable React components
-│   ├── AudioPlayer.jsx    # Audio player component
-│   ├── Layout.jsx         # Main layout component
-│   └── LoadingSpinner.jsx # Loading spinner component
-├── contexts/              # React contexts
-├── hooks/                 # Custom React hooks
-├── lib/                   # Library configurations
-│   └── supabaseClient.js  # Supabase client setup
-├── utils/                 # Utility functions
-├── constants/             # Application constants
-├── types/                 # Type definitions
-└── __tests__/             # Test files
-```
+   ```bash
+   npm run dev
+   ```
 
 ## Available Scripts
 
@@ -97,42 +95,13 @@ src/
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
 - `npm run test` - Run tests
-- `npm run test:watch` - Run tests in watch mode
-- `npm run test:coverage` - Run tests with coverage
 
-## Environment Variables
+---
 
-Create a `.env.local` file based on `.env.example`:
+## 🙌 Credits
 
-| Variable | Description |
-|----------|-------------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anonymous key |
-
-## Database Setup
-
-This application uses Supabase for data storage. Ensure your Supabase project has the following tables:
-
-- `sections` - Book sections/chapters
-- User authentication is handled by Supabase Auth
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## Security
-
-- Environment variables are properly configured
-- API keys are never committed to version control
-- Security headers are configured in `next.config.mjs`
-- Input validation is implemented throughout the application
-
-## License
-
-This project is private and proprietary.
+- **Created by:** At His Feet Productions
+- **Based on:** *Renewed: The New Man Story*
+- **Tech Stack:** Next.js, Supabase, DeepAgent
+- **Community Portal:** Circle 360 (upcoming)
