@@ -1,0 +1,269 @@
+name: Auto Move Project Cards
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  move-cards:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Move Project Cards
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            
+            // Get the commit messages from the push
+            const commits = context.payload.commits || [];
+            
+            // Define keyword mappings
+            const statusKeywords = {
+              'backlog': 'Backlog',
+              'ready to build': 'Ready to Build',
+              'ready': 'Ready to Build',
+              'in progress': 'In Progress',
+              'working on': 'In Progress',
+              'review': 'Review & Test',
+              'testing': 'Review & Test',
+              'complete': 'Complete',
+              'done': 'Complete'
+            };
+            
+            // Function to get project information
+            async function getProjectInfo() {
+              const query = `
+                query($owner: String!, $number: Int!) {
+                  organization(login: $owner) {
+                    projectV2(number: $number) {
+                      id
+                      fields(first: 20) {
+                        nodes {
+                          ... on ProjectV2Field {
+                            id
+                            name
+                          }
+                          ... on ProjectV2SingleSelectField {
+                            id
+                            name
+                            options {
+                              id
+                              name
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `;
+              
+              try {
+                const result = await github.graphql(query, {
+                  owner: owner,
+                  number: 2
+                });
+                return result.organization.projectV2;
+              } catch (error) {
+                // Try user query if organization fails
+                const userQuery = `
+                  query($owner: String!, $number: Int!) {
+                    user(login: $owner) {
+                      projectV2(number: $number) {
+                        id
+                        fields(first: 20) {
+                          nodes {
+                            ... on ProjectV2Field {
+                              id
+                              name
+                            }
+                            ... on ProjectV2SingleSelectField {
+                              id
+                              name
+                              options {
+                                id
+                                name
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                `;
+                const userResult = await github.graphql(userQuery, {
+                  owner: owner,
+                  number: 2
+                });
+                return userResult.user.projectV2;
+              }
+            }
+            
+            // Function to get project items related to commits
+            async function getProjectItems(projectId, commits) {
+              const items = [];
+              
+              for (const commit of commits) {
+                // Extract issue/PR numbers from commit message
+                const issueNumbers = commit.message.match(/#(\d+)/g);
+                
+                if (issueNumbers) {
+                  for (const issueRef of issueNumbers) {
+                    const issueNumber = parseInt(issueRef.replace('#', ''));
+                    
+                    // Get the issue/PR and its project items
+                    try {
+                      const issue = await github.rest.issues.get({
+                        owner: owner,
+                        repo: repo,
+                        issue_number: issueNumber
+                      });
+                      
+                      // Find project items for this issue
+                      const itemQuery = `
+                        query($owner: String!, $repo: String!, $issueNumber: Int!, $projectId: ID!) {
+                          repository(owner: $owner, name: $repo) {
+                            issue(number: $issueNumber) {
+                              projectItems(first: 10) {
+                                nodes {
+                                  id
+                                  project {
+                                    id
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      `;
+                      
+                      const itemResult = await github.graphql(itemQuery, {
+                        owner: owner,
+                        repo: repo,
+                        issueNumber: issueNumber,
+                        projectId: projectId
+                      });
+                      
+                      const projectItems = itemResult.repository.issue.projectItems.nodes
+                        .filter(item => item.project.id === projectId);
+                      
+                      items.push(...projectItems.map(item => ({
+                        id: item.id,
+                        commitMessage: commit.message,
+                        issueNumber: issueNumber
+                      })));
+                      
+                    } catch (error) {
+                      console.log(`Could not find issue #${issueNumber}: ${error.message}`);
+                    }
+                  }
+                }
+              }
+              
+              return items;
+            }
+            
+            // Function to update project item status
+            async function updateProjectItemStatus(projectId, itemId, fieldId, optionId) {
+              const mutation = `
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: ProjectV2FieldValue!) {
+                  updateProjectV2ItemFieldValue(input: {
+                    projectId: $projectId
+                    itemId: $itemId
+                    fieldId: $fieldId
+                    value: $value
+                  }) {
+                    projectV2Item {
+                      id
+                    }
+                  }
+                }
+              `;
+              
+              await github.graphql(mutation, {
+                projectId: projectId,
+                itemId: itemId,
+                fieldId: fieldId,
+                value: {
+                  singleSelectOptionId: optionId
+                }
+              });
+            }
+            
+            // Main execution
+            try {
+              console.log(`Processing ${commits.length} commits...`);
+              
+              // Get project information
+              const project = await getProjectInfo();
+              if (!project) {
+                console.log('Project not found');
+                return;
+              }
+              
+              console.log(`Found project: ${project.id}`);
+              
+              // Find the Status field
+              const statusField = project.fields.nodes.find(field => 
+                field.name.toLowerCase().includes('status') && field.options
+              );
+              
+              if (!statusField) {
+                console.log('Status field not found in project');
+                return;
+              }
+              
+              console.log(`Found status field: ${statusField.name}`);
+              
+              // Get project items related to commits
+              const projectItems = await getProjectItems(project.id, commits);
+              console.log(`Found ${projectItems.length} project items to update`);
+              
+              // Process each project item
+              for (const item of projectItems) {
+                const commitMessage = item.commitMessage.toLowerCase();
+                
+                // Find matching status keyword
+                let targetStatus = null;
+                for (const [keyword, status] of Object.entries(statusKeywords)) {
+                  if (commitMessage.includes(keyword.toLowerCase())) {
+                    targetStatus = status;
+                    break;
+                  }
+                }
+                
+                if (targetStatus) {
+                  // Find the corresponding option ID
+                  const statusOption = statusField.options.find(option => 
+                    option.name === targetStatus
+                  );
+                  
+                  if (statusOption) {
+                    console.log(`Moving item ${item.id} to ${targetStatus} (issue #${item.issueNumber})`);
+                    await updateProjectItemStatus(
+                      project.id,
+                      item.id,
+                      statusField.id,
+                      statusOption.id
+                    );
+                  } else {
+                    console.log(`Status option '${targetStatus}' not found`);
+                  }
+                } else {
+                  console.log(`No status keyword found in commit for issue #${item.issueNumber}`);
+                }
+              }
+              
+              console.log('Project card updates completed');
+              
+            } catch (error) {
+              console.error('Error updating project cards:', error);
+              core.setFailed(`Action failed: ${error.message}`);
+            }
