@@ -41,7 +41,7 @@ jobs:
             async function getProjectInfo() {
               const query = `
                 query($owner: String!, $number: Int!) {
-                  organization(login: $owner) {
+                  user(login: $owner) {
                     projectV2(number: $number) {
                       id
                       fields(first: 20) {
@@ -65,45 +65,11 @@ jobs:
                 }
               `;
               
-              try {
-                const result = await github.graphql(query, {
-                  owner: owner,
-                  number: 2
-                });
-                return result.organization.projectV2;
-              } catch (error) {
-                // Try user query if organization fails
-                const userQuery = `
-                  query($owner: String!, $number: Int!) {
-                    user(login: $owner) {
-                      projectV2(number: $number) {
-                        id
-                        fields(first: 20) {
-                          nodes {
-                            ... on ProjectV2Field {
-                              id
-                              name
-                            }
-                            ... on ProjectV2SingleSelectField {
-                              id
-                              name
-                              options {
-                                id
-                                name
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                `;
-                const userResult = await github.graphql(userQuery, {
-                  owner: owner,
-                  number: 2
-                });
-                return userResult.user.projectV2;
-              }
+              const result = await github.graphql(query, {
+                owner: owner,
+                number: 2
+              });
+              return result.user.projectV2;
             }
             
             // Function to get project items related to commits
