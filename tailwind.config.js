@@ -2,24 +2,64 @@
 module.exports = {
   content: [
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}", // Keep this line even if you don't have a pages dir yet
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   darkMode: 'class',
   theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
     extend: {
       colors: {
-        'brand-blue-light': '#E0E7FF',      // A very light, almost lavender blue
-        'brand-blue-sidebar': '#D6E2F3',    // Sidebar blue from mock-up
-        'brand-blue-content-bg': '#F0F5FA', // Main content area background (very light blue/off-white)
-        'brand-blue-medium': '#6B90C8',     // Calm medium blue for player, UI elements
-        'brand-blue-dark': '#3A5A8A',       // Deeper blue for text, headings (like "Conclusion")
-        'brand-cream': '#FAF7F2',           // Off-white/cream for cards
-        'brand-gold': '#FACC15',            // A nice gold/yellow for buttons/accents (Tailwind yellow-400)
-        'brand-text-main': '#1F2937',       // Dark grey for primary text (Tailwind gray-800)
-        'brand-text-muted': '#6B7280',      // Lighter grey for secondary text (Tailwind gray-500)
-        
-        // Enhanced spiritual color palette
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        'brand-blue-light': '#E0E7FF',
+        'brand-blue-sidebar': '#D6E2F3',
+        'brand-blue-content-bg': '#F0F5FA',
+        'brand-blue-medium': '#6B90C8',
+        'brand-blue-dark': '#3A5A8A',
+        'brand-cream': '#FAF7F2',
+        'brand-gold': '#FACC15',
+        'brand-text-main': '#1F2937',
+        'brand-text-muted': '#6B7280',
         'sacred': {
           'indigo': {
             50: '#eef2ff',
@@ -62,9 +102,16 @@ module.exports = {
           }
         }
       },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
       fontFamily: {
         serif: ['Merriweather', 'serif'],
         sans: ['Nunito Sans', 'sans-serif'],
+        'clean-sans': ['var(--font-clean-sans)', 'Inter', 'sans-serif'],
+        'sacred-serif': ['var(--font-sacred-serif)', 'Playfair Display', 'serif'],
       },
       backgroundImage: {
         'sacred-gradient': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -97,6 +144,7 @@ module.exports = {
     },
   },
   plugins: [
+    require("tailwindcss-animate"),
     require('@tailwindcss/typography'),
     require('@tailwindcss/aspect-ratio'),
   ],
