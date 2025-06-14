@@ -1,0 +1,173 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+ 
+@layer base {
+  :root {
+    /* Sacred Blue Light Theme */
+    --background: 210 100% 98%;           /* Soft sky blue background */
+    --foreground: 220 84% 15%;            /* Deep navy text */
+
+    --card: 210 100% 99%;                 /* Light card background */
+    --card-foreground: 220 84% 15%;       /* Deep navy card text */
+ 
+    --popover: 210 100% 99%;              /* Light popover */
+    --popover-foreground: 220 84% 15%;    /* Deep navy popover text */
+ 
+    --primary: 210 100% 55%;              /* Sacred blue primary */
+    --primary-foreground: 0 0% 100%;      /* White text on primary */
+ 
+    --secondary: 210 40% 94%;             /* Misty slate secondary */
+    --secondary-foreground: 220 84% 15%;  /* Deep navy secondary text */
+ 
+    --muted: 210 40% 96%;                 /* Light muted background */
+    --muted-foreground: 215 16% 47%;      /* Muted text */
+ 
+    --accent: 45 100% 70%;                /* Soft gold accent */
+    --accent-foreground: 220 84% 15%;     /* Deep navy accent text */
+ 
+    --destructive: 0 84% 60%;             /* Error red */
+    --destructive-foreground: 0 0% 100%;  /* White destructive text */
+
+    --border: 210 40% 88%;                /* Light border */
+    --input: 210 40% 94%;                 /* Light input background */
+    --ring: 210 100% 55%;                 /* Sacred blue focus ring */
+ 
+    --radius: 0.75rem;
+
+    /* Chart colors using Sacred Blue palette */
+    --chart-1: 210 100% 55%;              /* Sacred blue */
+    --chart-2: 45 100% 70%;               /* Soft gold */
+    --chart-3: 270 100% 70%;              /* Lavender */
+    --chart-4: 240 100% 70%;              /* Indigo */
+    --chart-5: 210 40% 70%;               /* Misty slate */
+  }
+ 
+  .dark {
+    /* Sacred Blue Dark Theme */
+    --background: 220 84% 8%;             /* Deep navy background */
+    --foreground: 210 100% 95%;           /* Soft white text */
+ 
+    --card: 220 84% 10%;                  /* Dark card background */
+    --card-foreground: 210 100% 95%;      /* Soft white card text */
+ 
+    --popover: 220 84% 10%;               /* Dark popover */
+    --popover-foreground: 210 100% 95%;   /* Soft white popover text */
+ 
+    --primary: 210 100% 65%;              /* Brighter sacred blue for dark */
+    --primary-foreground: 220 84% 8%;     /* Dark text on primary */
+ 
+    --secondary: 220 50% 15%;             /* Dark secondary */
+    --secondary-foreground: 210 100% 95%; /* Soft white secondary text */
+ 
+    --muted: 220 50% 12%;                 /* Dark muted background */
+    --muted-foreground: 215 20% 65%;      /* Muted text */
+ 
+    --accent: 45 100% 75%;                /* Brighter gold for dark */
+    --accent-foreground: 220 84% 8%;      /* Dark accent text */
+ 
+    --destructive: 0 63% 31%;             /* Dark mode error */
+    --destructive-foreground: 210 100% 95%; /* Soft white destructive text */
+ 
+    --border: 220 50% 18%;                /* Dark border */
+    --input: 220 50% 15%;                 /* Dark input background */
+    --ring: 210 100% 65%;                 /* Brighter focus ring for dark */
+
+    /* Dark mode chart colors */
+    --chart-1: 210 100% 65%;              /* Brighter sacred blue */
+    --chart-2: 45 100% 75%;               /* Brighter gold */
+    --chart-3: 270 100% 75%;              /* Brighter lavender */
+    --chart-4: 240 100% 75%;              /* Brighter indigo */
+    --chart-5: 210 40% 75%;               /* Brighter misty slate */
+  }
+}
+ 
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-clean-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sacred-serif;
+  }
+
+  /* Sacred Blue gradient backgrounds */
+  .sacred-gradient {
+    background: linear-gradient(135deg, 
+      hsl(210, 100%, 98%) 0%, 
+      hsl(210, 100%, 95%) 50%, 
+      hsl(210, 40%, 94%) 100%);
+  }
+
+  .dark .sacred-gradient {
+    background: linear-gradient(135deg, 
+      hsl(220, 84%, 8%) 0%, 
+      hsl(220, 84%, 10%) 50%, 
+      hsl(220, 50%, 12%) 100%);
+  }
+
+  /* Dreamlike background overlay */
+  .dreamlike-bg {
+    position: relative;
+  }
+
+  .dreamlike-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      hsla(210, 100%, 98%, 0.9) 0%,
+      hsla(210, 100%, 95%, 0.8) 50%,
+      hsla(210, 40%, 94%, 0.9) 100%
+    );
+    z-index: 1;
+  }
+
+  .dark .dreamlike-bg::before {
+    background: linear-gradient(
+      135deg,
+      hsla(220, 84%, 8%, 0.9) 0%,
+      hsla(220, 84%, 10%, 0.8) 50%,
+      hsla(220, 50%, 12%, 0.9) 100%
+    );
+  }
+
+  .dreamlike-bg > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Smooth transitions for theme switching */
+  * {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+@layer components {
+  .sacred-button {
+    @apply bg-sacred-blue-500 hover:bg-sacred-blue-600 text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1;
+  }
+
+  .sacred-button-secondary {
+    @apply bg-sacred-gold-400 hover:bg-sacred-gold-500 text-sacred-blue-900 font-medium px-6 py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1;
+  }
+
+  .sacred-card {
+    @apply bg-card border border-border rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 backdrop-blur-sm;
+  }
+
+  .sacred-input {
+    @apply bg-input border border-border rounded-lg px-4 py-3 focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200;
+  }
+}
