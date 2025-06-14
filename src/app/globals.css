@@ -1,56 +1,140 @@
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Nunito+Sans:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Nunito+Sans:wght@400;600;700&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Basic body styling using Tailwind theme capabilities */
+/* Global body styling with Sacred Blue theme */
 body {
   font-family: theme('fontFamily.sans');
-  color: theme('colors.brand-text-main');
-  /* You can set a default background for the whole page here if the sky image isn't covering everything,
-     or if you want a fallback. For example:
-     background-color: theme('colors.brand-blue-content-bg');
-  */
+  color: theme('colors.sacred.indigo.800');
+  background-color: theme('colors.sacred.indigo.50');
+  background-image: linear-gradient(135deg, theme('colors.sacred.indigo.50') 0%, theme('colors.sacred.indigo.100') 100%);
 }
 
-/* Example of how you might style headings globally if desired, using the theme fonts/colors */
-/*
+/* Typography - Playfair Display for headings */
 h1, h2, h3, h4, h5, h6 {
-  font-family: theme('fontFamily.serif');
-  color: theme('colors.brand-blue-dark');
-}
-*/
-
-/*
-  The :root variables below are often part of the default Next.js + Tailwind setup.
-  They are used by the default Next.js template's body background gradient.
-  We can keep them for now, or remove them if we decide on a different body background strategy.
-  If you use a full background image or a solid color from our brand palette for the body,
-  these specific CSS variables might not be directly used by your custom styles unless you call them.
-*/
-:root {
-  --foreground-rgb: 0, 0, 0; /* Default, but our body color will override */
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  font-family: 'Playfair Display', serif;
+  color: theme('colors.sacred.indigo.900');
+  font-weight: 600;
+  line-height: 1.2;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
 }
 
-/* Default Next.js body background - we might override this with a simpler one or background image */
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-  font-family: theme('fontFamily.sans'); /* Apply our default sans-serif font */
+h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0.875rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+h4 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 0.625rem;
+}
+
+h5 {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+h6 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+/* Enhanced link styling for Sacred Blue theme */
+a {
+  color: theme('colors.sacred.indigo.600');
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+a:hover {
+  color: theme('colors.sacred.indigo.800');
+}
+
+/* Accent colors for interactive elements */
+.btn-primary {
+  background-color: theme('colors.sacred.indigo.600');
+  color: white;
+  border: 1px solid theme('colors.sacred.indigo.600');
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: theme('colors.sacred.indigo.700');
+  border-color: theme('colors.sacred.indigo.700');
+}
+
+.btn-secondary {
+  background-color: theme('colors.sacred.amber.500');
+  color: theme('colors.sacred.indigo.900');
+  border: 1px solid theme('colors.sacred.amber.500');
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-secondary:hover {
+  background-color: theme('colors.sacred.amber.600');
+  border-color: theme('colors.sacred.amber.600');
+}
+
+/* Glassmorphism utility classes */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Sacred theme specific utilities */
+.sacred-text-gradient {
+  background: linear-gradient(135deg, theme('colors.sacred.indigo.600'), theme('colors.sacred.amber.500'));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sacred-bg-gradient {
+  background: linear-gradient(135deg, theme('colors.sacred.indigo.500'), theme('colors.sacred.amber.400'));
+}
+
+/* Smooth scrolling for better UX */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus styles for accessibility */
+*:focus {
+  outline: 2px solid theme('colors.sacred.amber.500');
+  outline-offset: 2px;
+}
+
+/* Selection styling */
+::selection {
+  background-color: theme('colors.sacred.indigo.200');
+  color: theme('colors.sacred.indigo.900');
+}
+
+::-moz-selection {
+  background-color: theme('colors.sacred.indigo.200');
+  color: theme('colors.sacred.indigo.900');
 }
