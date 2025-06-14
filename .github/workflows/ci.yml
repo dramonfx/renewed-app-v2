@@ -24,8 +24,13 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
+    - name: Create .env.local with defaults
+      run: |
+        echo "NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co" > .env.local
+        echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder_key" >> .env.local
+
     - name: Install dependencies
-      run: npm ci
+      run: npm install
 
     - name: Build project
       run: npm run build
