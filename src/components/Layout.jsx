@@ -16,56 +16,74 @@ async function getSidebarSections() {
 }
 
 export default async function Layout({ children }) {
-  const sereneBackgroundUrl = "https://images.unsplash.com/photo-1643661100639-de5cdf7bcb80?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+  // Sacred Blue serene background - peaceful mountain/sky scene
+  const sereneBackgroundUrl = "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
   const sections = await getSidebarSections();
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-sacred-blue-50">
       <div className="flex flex-1">
-        <aside className="w-72 bg-sacred-indigo-900/20 backdrop-blur-md border-r border-sacred-indigo-300/20 p-6 shadow-xl fixed top-0 left-0 h-full z-10 overflow-y-auto">
-          <div className="mb-8 text-center">
-            <Link href="/" className="text-sacred-indigo-800 font-serif text-2xl font-bold hover:text-sacred-indigo-600 transition-colors">
-              Renewed
-            </Link>
-            {/* Corrected Text Below */}
-            <p className="text-xs text-sacred-indigo-600/80 font-sans mt-1">THE NEW MAN STORY</p>
-          </div>
-          <nav>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/dashboard" className="block py-2 px-3 rounded-md text-sacred-indigo-700 hover:bg-sacred-indigo-100/50 hover:text-sacred-indigo-900 font-sans font-semibold text-base transition-all duration-200 backdrop-blur-sm">
-                  Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link href="/book" className="block py-2 px-3 rounded-md text-sacred-indigo-700 hover:bg-sacred-indigo-100/50 hover:text-sacred-indigo-900 font-sans font-semibold text-base transition-all duration-200 backdrop-blur-sm">
-                  Guidebook Home
-                </Link>
-              </li>
-              <hr className="my-3 border-sacred-indigo-300/30" />
-              <h3 className="px-3 text-xs font-semibold text-sacred-indigo-600/70 uppercase tracking-wider mb-1">Sections</h3>
-              {sections.map((section) => (
-                <li key={section.id}>
-                  <Link href={`/book/${section.slug}`} className="block py-1.5 px-3 rounded-md text-sacred-indigo-600 hover:bg-sacred-indigo-100/40 hover:text-sacred-indigo-800 font-sans text-sm transition-all duration-200 backdrop-blur-sm">
-                    {section.title}
+        {/* Sacred Blue Sidebar with Enhanced Glassmorphism */}
+        <aside className="w-72 glass-sidebar shadow-2xl fixed top-0 left-0 h-full z-10 overflow-y-auto border-r border-sacred-blue-200/30">
+          <div className="p-6">
+            {/* Sacred Blue Header */}
+            <div className="mb-8 text-center">
+              <Link href="/" className="text-sacred-blue-900 font-serif text-2xl font-bold hover:text-sacred-purple-600 transition-colors duration-300">
+                Renewed
+              </Link>
+              <p className="text-xs text-sacred-blue-400 font-sans mt-1 tracking-wider uppercase">THE NEW MAN STORY</p>
+            </div>
+
+            {/* Sacred Blue Navigation */}
+            <nav>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/dashboard" className="block py-3 px-4 rounded-lg text-sacred-blue-900 hover:bg-sacred-blue-100/60 hover:text-sacred-blue-900 font-sans font-semibold text-base transition-all duration-300 backdrop-blur-sm border border-transparent hover:border-sacred-blue-200/40 hover:shadow-lg">
+                    Dashboard
                   </Link>
                 </li>
-              ))}
-              <hr className="my-3 border-sacred-indigo-300/30" />
-              <li>
-                <Link href="/full-audio-player" className="block py-2 px-3 rounded-md text-sacred-indigo-700 hover:bg-sacred-amber-100/40 hover:text-sacred-amber-800 font-sans font-semibold text-base transition-all duration-200 backdrop-blur-sm border border-sacred-amber-200/30">
-                  Full Audiobook
-                </Link>
-              </li>
-            </ul>
-          </nav>
+                <li>
+                  <Link href="/book" className="block py-3 px-4 rounded-lg text-sacred-blue-900 hover:bg-sacred-blue-100/60 hover:text-sacred-blue-900 font-sans font-semibold text-base transition-all duration-300 backdrop-blur-sm border border-transparent hover:border-sacred-blue-200/40 hover:shadow-lg">
+                    Guidebook Home
+                  </Link>
+                </li>
+                
+                {/* Sacred Blue Divider */}
+                <hr className="my-4 border-sacred-blue-300/40" />
+                
+                {/* Sections Header */}
+                <h3 className="px-4 text-xs font-semibold text-sacred-blue-600 uppercase tracking-wider mb-2 font-sans">Sections</h3>
+                
+                {/* Dynamic Sections with Sacred Blue Styling */}
+                {sections.map((section) => (
+                  <li key={section.id}>
+                    <Link href={`/book/${section.slug}`} className="block py-2 px-4 rounded-lg text-sacred-blue-700 hover:bg-sacred-blue-100/50 hover:text-sacred-blue-900 font-sans text-sm transition-all duration-300 backdrop-blur-sm border border-transparent hover:border-sacred-blue-200/30 hover:shadow-md">
+                      {section.title}
+                    </Link>
+                  </li>
+                ))}
+                
+                {/* Sacred Blue Divider */}
+                <hr className="my-4 border-sacred-blue-300/40" />
+                
+                {/* Full Audiobook Link with Sacred Gold Accent */}
+                <li>
+                  <Link href="/full-audio-player" className="block py-3 px-4 rounded-lg text-sacred-blue-900 hover:bg-sacred-gold-100/50 hover:text-sacred-blue-900 font-sans font-semibold text-base transition-all duration-300 backdrop-blur-sm border border-sacred-gold-200/40 hover:border-sacred-gold-300/60 hover:shadow-lg bg-sacred-gold-50/30">
+                    🎧 Full Audiobook
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </aside>
 
+        {/* Sacred Blue Main Content Area */}
         <main
           className="flex-1 ml-72 p-6 lg:p-10 overflow-y-auto bg-cover bg-center bg-fixed"
           style={{ backgroundImage: `url('${sereneBackgroundUrl}')` }}
         >
-          <div className="bg-white/90 backdrop-blur-sm p-6 sm:p-8 md:p-10 rounded-xl shadow-xl min-h-full border border-sacred-indigo-100/50">
+          {/* Sacred Blue Content Container with Enhanced Glassmorphism */}
+          <div className="sacred-card p-6 sm:p-8 md:p-10 min-h-full">
             {children}
           </div>
         </main>
