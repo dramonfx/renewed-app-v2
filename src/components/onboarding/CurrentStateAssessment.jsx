@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiArrowLeft, FiArrowRight, FiEye, FiHeart } from 'react-icons/fi';
 import GlassCard from './GlassCard';
+import { saveReflectionsBatch } from '../../lib/reflections';
 
 const ASSESSMENT_QUESTIONS = [
   {
@@ -62,9 +63,12 @@ export default function CurrentStateAssessment({ onNext, onPrev, onDataUpdate, d
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState(data.assessmentAnswers || []);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   const handleOptionSelect = (option) => {
     setSelectedOption(option);
+    setSaveError(null); // Clear any previous errors
   };
 
   const handleNextQuestion = () => {
@@ -91,28 +95,57 @@ export default function CurrentStateAssessment({ onNext, onPrev, onDataUpdate, d
     }
   };
 
-  const calculateResult = (finalAnswers) => {
-    let naturalScore = 0;
-    let spiritualScore = 0;
-    
-    finalAnswers.forEach(answer => {
-      if (answer.mind === 'natural') {
-        naturalScore += answer.weight;
-      } else {
-        spiritualScore += answer.weight;
+  const calculateResult = async (finalAnswers) => {
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      // Calculate scores
+      let naturalScore = 0;
+      let spiritualScore = 0;
+      
+      finalAnswers.forEach(answer => {
+        if (answer.mind === 'natural') {
+          naturalScore += answer.weight;
+        } else {
+          spiritualScore += answer.weight;
+        }
+      });
+      
+      const dominantMind = naturalScore > spiritualScore ? 'natural' : 'spiritual';
+      const balance = Math.abs(naturalScore - spiritualScore);
+
+      // Prepare reflections for database
+      const reflections = finalAnswers.map((answer, index) => ({
+        question_id: ASSESSMENT_QUESTIONS[index].id,
+        question_text: ASSESSMENT_QUESTIONS[index].question,
+        answer_text: answer.text
+      }));
+
+      // Save to database
+      const { error } = await saveReflectionsBatch(reflections);
+      
+      if (error) {
+        console.error('Error saving reflections:', error);
+        setSaveError('Failed to save your responses. Please try again.');
+        setIsSaving(false);
+        return;
       }
-    });
-    
-    const dominantMind = naturalScore > spiritualScore ? 'natural' : 'spiritual';
-    const balance = Math.abs(naturalScore - spiritualScore);
-    
-    onDataUpdate({
-      assessmentAnswers: finalAnswers,
-      currentMind: dominantMind,
-      mindBalance: { natural: naturalScore, spiritual: spiritualScore, balance }
-    });
-    
-    onNext();
+
+      // Update parent component with results
+      onDataUpdate({
+        assessmentAnswers: finalAnswers,
+        currentMind: dominantMind,
+        mindBalance: { natural: naturalScore, spiritual: spiritualScore, balance }
+      });
+      
+      setIsSaving(false);
+      onNext();
+    } catch (error) {
+      console.error('Error in calculateResult:', error);
+      setSaveError('An unexpected error occurred. Please try again.');
+      setIsSaving(false);
+    }
   };
 
   const question = ASSESSMENT_QUESTIONS[currentQuestion];
@@ -178,11 +211,12 @@ export default function CurrentStateAssessment({ onNext, onPrev, onDataUpdate, d
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
                       onClick={() => handleOptionSelect(option)}
+                      disabled={isSaving}
                       className={`w-full p-4 rounded-xl text-left transition-all duration-300 border-2 ${
                         selectedOption === option
                           ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 shadow-lg'
                           : 'border-transparent bg-white/50 dark:bg-white/5 hover:bg-white/70 dark:hover:bg-white/10'
-                      }`}
+                      } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       <div className="flex items-start gap-4">
                         <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 transition-all duration-300 ${
@@ -218,10 +252,23 @@ export default function CurrentStateAssessment({ onNext, onPrev, onDataUpdate, d
                   ))}
                 </div>
 
+                {saveError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg text-red-700 dark:text-red-300 text-sm text-center"
+                  >
+                    {saveError}
+                  </motion.div>
+                )}
+
                 <div className="flex justify-between items-center">
                   <button
                     onClick={handlePrevQuestion}
-                    className="flex items-center gap-2 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-300"
+                    disabled={isSaving}
+                    className={`flex items-center gap-2 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-300 ${
+                      isSaving ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                   >
                     <FiArrowLeft />
                     Back
@@ -229,15 +276,24 @@ export default function CurrentStateAssessment({ onNext, onPrev, onDataUpdate, d
                   
                   <button
                     onClick={handleNextQuestion}
-                    disabled={!selectedOption}
+                    disabled={!selectedOption || isSaving}
                     className={`flex items-center gap-2 px-8 py-3 rounded-full font-medium transition-all duration-300 ${
-                      selectedOption
+                      selectedOption && !isSaving
                         ? 'bg-gradient-to-r from-indigo-500 to-amber-500 text-white hover:shadow-lg hover:scale-105'
                         : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-500 cursor-not-allowed'
                     }`}
                   >
-                    {currentQuestion === ASSESSMENT_QUESTIONS.length - 1 ? 'Complete Assessment' : 'Next'}
-                    <FiArrowRight />
+                    {isSaving ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        {currentQuestion === ASSESSMENT_QUESTIONS.length - 1 ? 'Complete Assessment' : 'Next'}
+                        <FiArrowRight />
+                      </>
+                    )}
                   </button>
                 </div>
               </motion.div>

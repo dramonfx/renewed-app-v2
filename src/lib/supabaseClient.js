@@ -37,6 +37,24 @@ if (supabaseUrl && supabaseAnonKey) {
         data = data.filter(item => String(item[column]) === String(value));
         return this;
       },
+      insert: function(records) {
+        // Mock insert - just return success for reflections table
+        const recordsArray = Array.isArray(records) ? records : [records];
+        const insertedData = recordsArray.map(record => ({
+          id: Math.random().toString(36).substr(2, 9),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          ...record
+        }));
+        
+        return {
+          select: () => ({
+            single: () => Promise.resolve({ data: insertedData[0], error: null }),
+            then: (resolve) => resolve({ data: insertedData, error: null })
+          }),
+          then: (resolve) => resolve({ data: insertedData, error: null })
+        };
+      },
 
       // Terminator methods: they return the final data in a promise.
       single: function() {
@@ -61,6 +79,10 @@ if (supabaseUrl && supabaseAnonKey) {
         const allVisuals = Object.values(mockVisuals).flat();
         return createMockQueryBuilder(allVisuals);
       }
+      if (table === 'reflections') {
+        // Mock reflections table
+        return createMockQueryBuilder([]);
+      }
       return createMockQueryBuilder([]);
     },
     storage: {
@@ -76,6 +98,15 @@ if (supabaseUrl && supabaseAnonKey) {
     auth: {
       onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
       getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+      getUser: () => Promise.resolve({ 
+        data: { 
+          user: { 
+            id: 'mock-user-id-12345',
+            email: 'mock@example.com'
+          } 
+        }, 
+        error: null 
+      }),
       // Add other mock auth methods as needed
     },
   };
