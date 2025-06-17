@@ -1,7 +1,6 @@
-// src/app/layout.js
-import "./globals.css"; // Your global styles
-import Layout from "@/components/Layout"; // Your main site layout component
-import { AuthProvider } from "@/contexts/AuthContext"; // Import the AuthProvider
+// src/app/layout.js - Root layout with minimal setup
+import "./globals.css";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 export const metadata = {
   title: "Renewed: The New Man Story",
@@ -12,10 +11,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <AuthProvider> {/* Wrap Layout (and thus children) with AuthProvider */}
-          <Layout>
-            {children}
-          </Layout>
+        <AuthProvider>
+          {children}
         </AuthProvider>
       </body>
     </html>
