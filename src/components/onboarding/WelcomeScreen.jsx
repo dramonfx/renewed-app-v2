@@ -34,7 +34,7 @@ const WelcomeScreen = ({ onNext }) => {
             >
               Welcome to the{' '}
               <span className="bg-sacred-gradient bg-clip-text text-transparent">
-                Threshold
+                Sacred Journey
               </span>
             </motion.h1>
 
@@ -66,7 +66,7 @@ const WelcomeScreen = ({ onNext }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              Cross the Threshold →
+              Begin Your Journey →
             </motion.button>
           </GlassCard>
         </motion.div>
