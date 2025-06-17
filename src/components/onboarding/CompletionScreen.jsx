@@ -88,10 +88,10 @@ export default function CompletionScreen({ onComplete, onPrev, data }) {
               transition={{ duration: 1, delay: 0.6 }}
               className="text-4xl md:text-6xl font-serif text-gray-800 dark:text-gray-100 mb-6"
             >
-              Sacred Threshold
+              Sacred Journey
               <br />
               <span className="bg-gradient-to-r from-indigo-600 to-amber-600 bg-clip-text text-transparent">
-                Crossed
+                Begun
               </span>
             </motion.h1>
             

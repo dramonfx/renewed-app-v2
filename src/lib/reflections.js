@@ -225,3 +225,147 @@ export async function searchReflections(searchTerm, options = {}) {
     return { data: [], error: error.message };
   }
 }
+
+/**
+ * Get reflection statistics for the current user
+ * @returns {Promise<Object>} - Statistics object or error
+ */
+export async function getReflectionStats() {
+  try {
+    // Get current user session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError) {
+      throw new Error(`Session error: ${sessionError.message}`);
+    }
+    
+    if (!session?.user) {
+      return { 
+        data: { 
+          total: 0, 
+          thisWeek: 0, 
+          thisMonth: 0,
+          averageLength: 0 
+        }, 
+        error: null 
+      };
+    }
+    
+    // Get total count
+    const { count: total, error: totalError } = await supabase
+      .from('reflections')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', session.user.id);
+    
+    if (totalError) {
+      throw new Error(`Database error: ${totalError.message}`);
+    }
+    
+    // Get this week's count
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    
+    const { count: thisWeek, error: weekError } = await supabase
+      .from('reflections')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', session.user.id)
+      .gte('created_at', oneWeekAgo.toISOString());
+    
+    if (weekError) {
+      throw new Error(`Database error: ${weekError.message}`);
+    }
+    
+    // Get this month's count
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    
+    const { count: thisMonth, error: monthError } = await supabase
+      .from('reflections')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', session.user.id)
+      .gte('created_at', oneMonthAgo.toISOString());
+    
+    if (monthError) {
+      throw new Error(`Database error: ${monthError.message}`);
+    }
+    
+    // Get average answer length
+    const { data: reflections, error: avgError } = await supabase
+      .from('reflections')
+      .select('answer_text')
+      .eq('user_id', session.user.id);
+    
+    if (avgError) {
+      throw new Error(`Database error: ${avgError.message}`);
+    }
+    
+    const averageLength = reflections && reflections.length > 0
+      ? Math.round(reflections.reduce((sum, r) => sum + (r.answer_text?.length || 0), 0) / reflections.length)
+      : 0;
+    
+    return {
+      data: {
+        total: total || 0,
+        thisWeek: thisWeek || 0,
+        thisMonth: thisMonth || 0,
+        averageLength
+      },
+      error: null
+    };
+    
+  } catch (error) {
+    console.error('Error getting reflection stats:', error);
+    return { 
+      data: { 
+        total: 0, 
+        thisWeek: 0, 
+        thisMonth: 0,
+        averageLength: 0 
+      }, 
+      error: error.message 
+    };
+  }
+}
+
+/**
+ * Get reflections by date range
+ * @param {Date} startDate - Start date for the range
+ * @param {Date} endDate - End date for the range
+ * @param {Object} options - Query options
+ * @returns {Promise<Object>} - Array of reflections or error
+ */
+export async function getReflectionsByDateRange(startDate, endDate, options = {}) {
+  const { limit = 100, orderBy = 'created_at', ascending = false } = options;
+  
+  try {
+    // Get current user session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError) {
+      throw new Error(`Session error: ${sessionError.message}`);
+    }
+    
+    if (!session?.user) {
+      return { data: [], error: null };
+    }
+    
+    const { data, error } = await supabase
+      .from('reflections')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .gte('created_at', startDate.toISOString())
+      .lte('created_at', endDate.toISOString())
+      .order(orderBy, { ascending })
+      .limit(limit);
+    
+    if (error) {
+      throw new Error(`Database error: ${error.message}`);
+    }
+    
+    return { data: data || [], error: null };
+    
+  } catch (error) {
+    console.error('Error fetching reflections by date range:', error);
+    return { data: [], error: error.message };
+  }
+}
