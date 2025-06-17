@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiArrowLeft, FiArrowRight, FiEye, FiHeart } from 'react-icons/fi';
+import { FiArrowLeft, FiArrowRight, FiEye, FiHeart, FiCheck, FiAlertCircle } from 'react-icons/fi';
 import GlassCard from './GlassCard';
+import { saveReflection } from '../../lib/reflections';
 
 const ASSESSMENT_QUESTIONS = [
   {
@@ -62,6 +63,8 @@ export default function CurrentStateAssessment({ onNext, onPrev, onDataUpdate, d
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState(data.assessmentAnswers || []);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState(null); // 'success', 'error', or null
 
   const handleOptionSelect = (option) => {
     setSelectedOption(option);
@@ -91,7 +94,43 @@ export default function CurrentStateAssessment({ onNext, onPrev, onDataUpdate, d
     }
   };
 
-  const calculateResult = (finalAnswers) => {
+  const saveAssessmentReflections = async (finalAnswers) => {
+    setIsSaving(true);
+    setSaveStatus(null);
+    
+    try {
+      // Save each question and answer as a reflection
+      const savePromises = finalAnswers.map((answer, index) => {
+        const question = ASSESSMENT_QUESTIONS[index];
+        return saveReflection(
+          question.question,
+          `${answer.text} (${answer.mind} mind, weight: ${answer.weight})`
+        );
+      });
+      
+      await Promise.all(savePromises);
+      setSaveStatus('success');
+      
+      // Brief delay to show success message
+      setTimeout(() => {
+        setIsSaving(false);
+        onNext();
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error saving assessment reflections:', error);
+      setSaveStatus('error');
+      setIsSaving(false);
+      
+      // Still proceed after showing error (graceful degradation)
+      setTimeout(() => {
+        setSaveStatus(null);
+        onNext();
+      }, 3000);
+    }
+  };
+
+  const calculateResult = async (finalAnswers) => {
     let naturalScore = 0;
     let spiritualScore = 0;
     
@@ -106,17 +145,86 @@ export default function CurrentStateAssessment({ onNext, onPrev, onDataUpdate, d
     const dominantMind = naturalScore > spiritualScore ? 'natural' : 'spiritual';
     const balance = Math.abs(naturalScore - spiritualScore);
     
+    // Update local data first
     onDataUpdate({
       assessmentAnswers: finalAnswers,
       currentMind: dominantMind,
       mindBalance: { natural: naturalScore, spiritual: spiritualScore, balance }
     });
     
-    onNext();
+    // Save reflections to database
+    await saveAssessmentReflections(finalAnswers);
   };
 
   const question = ASSESSMENT_QUESTIONS[currentQuestion];
   const progress = ((currentQuestion + 1) / ASSESSMENT_QUESTIONS.length) * 100;
+
+  // Show saving status overlay
+  if (isSaving) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 py-8">
+        <div className="max-w-md mx-auto w-full text-center">
+          <GlassCard className="p-8">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              {saveStatus === 'success' ? (
+                <>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                    className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500 flex items-center justify-center"
+                  >
+                    <FiCheck className="w-8 h-8 text-white" />
+                  </motion.div>
+                  <h3 className="text-xl font-serif text-gray-800 dark:text-gray-100 mb-2">
+                    Assessment Saved!
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Your reflections have been securely saved to your journal.
+                  </p>
+                </>
+              ) : saveStatus === 'error' ? (
+                <>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                    className="w-16 h-16 mx-auto mb-4 rounded-full bg-orange-500 flex items-center justify-center"
+                  >
+                    <FiAlertCircle className="w-8 h-8 text-white" />
+                  </motion.div>
+                  <h3 className="text-xl font-serif text-gray-800 dark:text-gray-100 mb-2">
+                    Saving Issue
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Your assessment was completed but couldn't be saved to your journal. Don't worry, your progress continues!
+                  </p>
+                </>
+              ) : (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    className="w-16 h-16 mx-auto mb-4 rounded-full border-4 border-indigo-200 border-t-indigo-500"
+                  />
+                  <h3 className="text-xl font-serif text-gray-800 dark:text-gray-100 mb-2">
+                    Saving Your Reflections
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Securely storing your assessment responses in your personal journal...
+                  </p>
+                </>
+              )}
+            </motion.div>
+          </GlassCard>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8">
