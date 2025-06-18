@@ -1,3 +1,5 @@
+--- START OF FILE tailwind.config.js ---
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -99,8 +101,8 @@ module.exports = {
             500: '#f0b90b',
             600: '#d19e0a',
             700: '#b28309',
-            800: '#936808',
-            900: '#744d07',
+            800: '#854d0e',
+            900: '#713f12',
             950: '#422006'
           }
         }
