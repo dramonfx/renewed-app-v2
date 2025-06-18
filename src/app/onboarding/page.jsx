@@ -1,5 +1,3 @@
---- START OF FILE page.jsx ---
-
 'use client';
 
 import { motion } from 'framer-motion';
