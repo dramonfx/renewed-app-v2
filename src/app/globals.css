@@ -1,31 +1,32 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Scenic Mountain/Glassmorphism Design System - Global Styles */
+/* Sacred Blue Glassmorphism Design System - Global Styles */
 
 /* Google Fonts Import */
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap");
 
 @layer base {
-  /* Full-screen scenic background for entire app */
+  /* Full-screen sacred background for entire app */
   body {
     font-family: "Inter", sans-serif;
     min-height: 100vh;
     line-height: 1.6;
     
-    /* Scenic mountain/lake background */
+    /* Soft mountain background - Sacred Blue theme */
     background-image: url("https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
     background-repeat: no-repeat;
     
-    /* Subtle overlay to ensure text readability */
+    /* Sacred Blue overlay to ensure text readability */
     position: relative;
   }
 
-  /* Scenic background overlay */
+  /* Sacred Blue background overlay */
   body::before {
     content: "";
     position: fixed;
@@ -33,12 +34,12 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.05) 100%);
+    background: linear-gradient(135deg, rgba(61, 169, 252, 0.08) 0%, rgba(37, 99, 235, 0.05) 100%);
     z-index: -1;
     pointer-events: none;
   }
 
-  /* Typography for scenic backgrounds */
+  /* Typography for sacred backgrounds */
   h1, h2, h3, h4, h5, h6 {
     font-family: "Playfair Display", serif;
     font-weight: 600;
@@ -46,7 +47,7 @@
     letter-spacing: -0.025em;
   }
 
-  /* High contrast text for scenic backgrounds */
+  /* High contrast text for sacred backgrounds */
   .scenic-text {
     color: rgba(255, 255, 255, 0.95);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -57,7 +58,7 @@
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 
-  /* Selection styling */
+  /* Selection styling - Sacred Blue */
   ::selection {
     background-color: rgba(61, 169, 252, 0.3);
     color: white;
@@ -69,7 +70,7 @@
   }
 }
 
-/* Glassmorphism Component Classes */
+/* Sacred Blue Glassmorphism Component Classes */
 @layer components {
   /* Main Glassmorphism Card */
   .glass-card {
@@ -121,7 +122,7 @@
     transform: translateY(-4px);
   }
 
-  /* Glassmorphism Button */
+  /* Sacred Blue Glassmorphism Button */
   .glass-btn {
     background: rgba(61, 169, 252, 0.8);
     backdrop-filter: blur(12px);
@@ -145,7 +146,7 @@
   .glass-btn:hover {
     transform: translateY(-2px) scale(1.05);
     box-shadow: 0 8px 30px rgba(61, 169, 252, 0.4);
-    background: #2563eb;
+    background: rgba(37, 99, 235, 0.9);
   }
 
   /* Glassmorphism Container */
@@ -158,7 +159,7 @@
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
   }
 
-  /* Icon background glassmorphism */
+  /* Sacred Blue Icon background glassmorphism */
   .glass-icon-bg {
     background: rgba(61, 169, 252, 0.15);
     backdrop-filter: blur(15px);
@@ -168,7 +169,7 @@
   }
 }
 
-/* Scenic utilities */
+/* Sacred utilities */
 @layer utilities {
   /* Smooth scrolling */
   html {

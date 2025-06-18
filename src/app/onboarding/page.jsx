@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,7 +11,7 @@ import IntentionsStep from '@/components/onboarding/IntentionsStep';
 import PathSelectionStep from '@/components/onboarding/PathSelectionStep';
 import CompletionStep from '@/components/onboarding/CompletionStep';
 
-// Define the onboarding steps
+// Define the Sacred Journey onboarding steps
 const ONBOARDING_STEPS = [
   { component: WelcomeScreen, name: 'Welcome', useWizardLayout: false },
   { component: TwoMindsStep, name: 'Two Minds', useWizardLayout: true },
@@ -94,9 +95,9 @@ export default function OnboardingPage() {
 
   if (!CurrentStepComponent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sacred-blue-50 via-sacred-blue-100 to-sacred-blue-200">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-600 animate-spin flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-blue-500 animate-spin flex items-center justify-center">
             <div className="w-8 h-8 rounded-full border-2 border-white border-t-transparent"></div>
           </div>
           <h1 className="text-2xl font-serif text-slate-800 mb-4">Loading Your Sacred Journey...</h1>
@@ -137,7 +138,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 overflow-hidden relative">
+    <div className="min-h-screen bg-gradient-to-br from-sacred-blue-50 via-sacred-blue-100 to-sacred-blue-200 overflow-hidden relative">
       {/* Main Content */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -151,10 +152,10 @@ export default function OnboardingPage() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Subtle Background Elements */}
+      {/* Sacred Blue Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <motion.div
-          className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-200/20 rounded-full blur-3xl"
+          className="absolute top-1/4 left-1/4 w-64 h-64 bg-sacred-blue-200/20 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.2, 0.3, 0.2],
@@ -166,7 +167,7 @@ export default function OnboardingPage() {
           }}
         />
         <motion.div
-          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-200/15 rounded-full blur-3xl"
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-sacred-blue-300/15 rounded-full blur-3xl"
           animate={{
             scale: [1.2, 1, 1.2],
             opacity: [0.15, 0.25, 0.15],

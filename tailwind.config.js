@@ -1,3 +1,4 @@
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -8,7 +9,7 @@ module.exports = {
   darkMode: 'class',
   theme: {
     extend: {
-      // Scenic Mountain/Glassmorphism Design System
+      // Sacred Blue Glassmorphism Design System
       colors: {
         // Glassmorphism transparency levels
         'glass': {
@@ -17,19 +18,33 @@ module.exports = {
           'white-heavy': 'rgba(255, 255, 255, 0.35)',  // Less transparent
         },
         
-        // Scenic background overlays
-        'scenic': {
-          'overlay': 'rgba(0, 0, 0, 0.1)',           // Subtle dark overlay
-          'text': 'rgba(255, 255, 255, 0.95)',       // High contrast text on scenic bg
-          'text-muted': 'rgba(255, 255, 255, 0.8)',  // Muted text on scenic bg
+        // Sacred background overlays
+        'sacred': {
+          'overlay': 'rgba(61, 169, 252, 0.08)',     // Sacred Blue overlay
+          'text': 'rgba(255, 255, 255, 0.95)',       // High contrast text on sacred bg
+          'text-muted': 'rgba(255, 255, 255, 0.8)',  // Muted text on sacred bg
         },
         
-        // Sacred Journey accent colors (keep these)
+        // Sacred Blue color palette
+        'sacred-blue': {
+          50: '#eff6ff',
+          100: '#dbeafe', 
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3da9fc',  // Primary Sacred Blue
+          600: '#2563eb',  // Darker Sacred Blue
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
+        },
+        
+        // Sacred accent colors
         'sacred-navy': '#1e293b',     // Deep navy for text
-        'sacred-blue': '#3DA9FC',     // Sky blue accent
+        'sacred-gold': '#fbbf24',     // Gold accent for special elements
       },
       
-      // Typography for scenic backgrounds
+      // Typography for sacred backgrounds
       fontFamily: {
         'heading': ['Playfair Display', 'serif'],
         'body': ['Inter', 'sans-serif'],
@@ -44,16 +59,18 @@ module.exports = {
         'glass-heavy': '30px', // Heavier blur
       },
       
-      // Glassmorphism shadows
+      // Sacred Blue glassmorphism shadows
       boxShadow: {
         'glass': '0 8px 32px rgba(0, 0, 0, 0.1)',
         'glass-hover': '0 12px 40px rgba(0, 0, 0, 0.15)',
         'glass-inset': 'inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+        'sacred-glow': '0 4px 20px rgba(61, 169, 252, 0.3)',
+        'sacred-glow-hover': '0 8px 30px rgba(61, 169, 252, 0.4)',
       },
       
       // Background image utilities
       backgroundImage: {
-        'scenic-gradient': 'linear-gradient(135deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.05) 100%)',
+        'sacred-gradient': 'linear-gradient(135deg, rgba(61, 169, 252, 0.08) 0%, rgba(37, 99, 235, 0.05) 100%)',
       },
       
       // Animation for glassmorphism
