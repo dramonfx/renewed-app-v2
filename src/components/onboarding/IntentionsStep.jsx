@@ -3,8 +3,10 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 
-const IntentionsStep = ({ onNext, onboardingData }) => {
-  const [intentions, setIntentions] = useState(onboardingData.intentions || []);
+const IntentionsStep = ({ onNext, onboardingData = {}, data = {} }) => {
+  // Use onboardingData if available, fallback to data prop, then to empty array
+  const safeData = onboardingData || data || {};
+  const [intentions, setIntentions] = useState(safeData.intentions || []);
   const [customIntention, setCustomIntention] = useState('');
 
   const predefinedIntentions = [

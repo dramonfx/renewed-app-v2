@@ -3,8 +3,10 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 
-const PathSelectionStep = ({ onNext, onboardingData }) => {
-  const [selectedPath, setSelectedPath] = useState(onboardingData.selectedPath || '');
+const PathSelectionStep = ({ onNext, onboardingData = {}, data = {} }) => {
+  // Use onboardingData if available, fallback to data prop, then to empty string
+  const safeData = onboardingData || data || {};
+  const [selectedPath, setSelectedPath] = useState(safeData.selectedPath || '');
 
   const paths = [
     {
