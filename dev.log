@@ -1,33 +1,14 @@
+
+> renewed-app-v2@0.1.0 dev
+> next dev
+
    Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+ ⚠ Port 3000 is in use, using available port 3002 instead.
    Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
    ▲ Next.js 15.3.2
-   - Local:        http://localhost:3000
-   - Network:      http://100.120.117.180:3000
+   - Local:        http://localhost:3002
+   - Network:      http://100.116.173.173:3002
    - Environments: .env.local
 
  ✓ Starting...
    Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
-   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
- ✓ Ready in 1942ms
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 6.1s (887 modules)
- ⚠ Fast Refresh had to perform a full reload due to a runtime error.
- GET /_next/static/webpack/c46bbbc0d72301d8.webpack.hot-update.json 404 in 6257ms
- ○ Compiling / ...
- ✓ Compiled / in 4s (1684 modules)
- GET / 200 in 3647ms
- ⚠ Fast Refresh had to perform a full reload due to a runtime error.
- GET /_next/static/webpack/c46bbbc0d72301d8.webpack.hot-update.json 404 in 3711ms
- GET / 200 in 229ms
- GET / 200 in 89ms
- ○ Compiling /login ...
- ✓ Compiled /login in 550ms (1697 modules)
- GET /login 200 in 657ms
- GET /login 200 in 57ms
- ✓ Compiled /signup in 422ms (1704 modules)
- GET /signup 200 in 542ms
- ✓ Compiled /dashboard in 459ms (1711 modules)
- GET /dashboard 200 in 584ms
- ○ Compiling /onboarding ...
- ✓ Compiled /onboarding in 676ms (1732 modules)
- GET /onboarding 200 in 749ms
