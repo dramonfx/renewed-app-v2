@@ -3,8 +3,8 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 
-const TwoMindsStep = ({ onNext, onboardingData }) => {
-  const [selectedMind, setSelectedMind] = useState(onboardingData.selectedMind || '');
+const TwoMindsStep = ({ onNext, data = {} }) => {
+  const [selectedMind, setSelectedMind] = useState(data.selectedMind || '');
 
   const handleNext = () => {
     onNext({ selectedMind });

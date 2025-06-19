@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
     getSession();
 
     // Listen for changes in auth state (login, logout)
-    const { data: authListener } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth event:', event, session);
         setUser(session?.user ?? null);
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
 
     // Cleanup listener on component unmount
     return () => {
-      authListener?.unsubscribe();
+      subscription?.unsubscribe();
     };
   }, [router]); // Added router to dependency array
 
