@@ -1,5 +1,24 @@
-
 'use client';
+
+import { motion } from 'framer-motion';
+import { HeartIcon, ShieldCheckIcon, SparklesIcon } from '@heroicons/react/24/outline';
+
+export default function OnboardingPage() {
+  const features = [
+    {
+      icon: HeartIcon,
+      title: "Peaceful Experience",
+      description: "Find tranquility in your daily spiritual practice with guided meditations and calming exercises."
+    },
+    {
+      icon: ShieldCheckIcon,
+      title: "Sacred Security",
+      description: "Your spiritual journey is protected with privacy-first design and secure, encrypted data."
+    },
+    {
+      icon: SparklesIcon,
+      title: "Guided Renewal",
+      description: "Experience transformation through personalized spiritual guidance and meaningful insights."
     }
   ];
 
@@ -62,6 +81,119 @@
         <div className="absolute top-60 left-1/3 w-2 h-2 bg-sacred-gold-300 rounded-full opacity-70 animate-float" style={{ animationDelay: '4s' }}></div>
         <div className="absolute bottom-40 right-20 w-5 h-5 bg-sacred-purple-300 rounded-full opacity-40 animate-float" style={{ animationDelay: '1s' }}></div>
         <div className="absolute bottom-60 left-16 w-3 h-3 bg-sacred-gold-400 rounded-full opacity-50 animate-float" style={{ animationDelay: '3s' }}></div>
+      </div>
+
+      {/* Main Content */}
+      <div className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto text-center">
+          {/* Main Heading */}
+          <motion.h1 
+            className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-sacred-blue-900 mb-6 leading-tight"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            Welcome to Your
+            <motion.span 
+              className="block bg-gradient-to-r from-sacred-blue-900 via-sacred-purple-600 to-sacred-gold-400 bg-clip-text text-transparent"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+            >
+              Sacred Journey
+            </motion.span>
+          </motion.h1>
+
+          {/* Subheading */}
+          <motion.p 
+            className="text-lg sm:text-xl lg:text-2xl text-sacred-blue-700 mb-12 max-w-3xl mx-auto font-sans leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            Discover a peaceful path to renewal, spiritual growth, and inner transformation through guided practices and sacred wisdom.
+          </motion.p>
+
+          {/* Feature Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-12 max-w-5xl mx-auto">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                className="group relative backdrop-blur-md bg-white/20 border border-white/30 rounded-2xl p-6 lg:p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-white/25"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.8 + index * 0.2 }}
+                whileHover={{ y: -5 }}
+              >
+                {/* Card Glow Effect */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-sacred-gold-400/10 to-sacred-purple-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                
+                <div className="relative z-10">
+                  {/* Icon */}
+                  <div className="flex justify-center mb-4">
+                    <motion.div 
+                      className="p-3 rounded-full bg-gradient-to-br from-sacred-blue-600 to-sacred-purple-600 shadow-lg group-hover:shadow-xl transition-shadow duration-300"
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <feature.icon className="w-8 h-8 text-white" />
+                    </motion.div>
+                  </div>
+                  
+                  {/* Title */}
+                  <h3 className="text-xl lg:text-2xl font-serif font-semibold text-sacred-blue-900 mb-3">
+                    {feature.title}
+                  </h3>
+                  
+                  {/* Description */}
+                  <p className="text-sacred-blue-700 font-sans leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* CTA Button */}
+          <motion.div 
+            className="flex justify-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.4 }}
+          >
+            <motion.button 
+              onClick={() => window.location.href = '/book'}
+              className="group relative px-8 py-4 lg:px-12 lg:py-5 bg-gradient-to-r from-sacred-blue-600 to-sacred-purple-600 hover:from-sacred-blue-700 hover:to-sacred-purple-700 text-white font-sans font-semibold text-lg lg:text-xl rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-sacred-blue-300"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {/* Button Glow */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-sacred-gold-400/20 to-sacred-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              
+              <span className="relative z-10 flex items-center">
+                Begin Your Journey
+                <SparklesIcon className="w-6 h-6 ml-2 group-hover:animate-pulse" />
+              </span>
+            </motion.button>
+          </motion.div>
+
+          {/* Subtle Footer Text */}
+          <motion.p 
+            className="mt-8 text-sacred-blue-600 font-sans text-sm opacity-75"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.75 }}
+            transition={{ duration: 0.8, delay: 1.6 }}
+          >
+            Join thousands on their path to spiritual renewal
+          </motion.p>
+        </div>
+      </div>
+
+      {/* Additional Ambient Elements */}
+      <div className="absolute inset-0 z-5 pointer-events-none">
+        {/* Subtle gradient overlays for depth */}
+        <div className="absolute top-0 left-0 w-full h-1/3 bg-gradient-to-b from-sacred-blue-50/50 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-sacred-blue-100/30 to-transparent"></div>
       </div>
     </div>
   );
