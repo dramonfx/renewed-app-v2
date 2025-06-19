@@ -79,10 +79,10 @@ const IntentionsStep = ({ onNext, onboardingData = {}, data = {} }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: index * 0.05 }}
             className={`
-              p-4 rounded-xl border-2 cursor-pointer transition-all duration-300
+              p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 shadow-sm
               ${intentions.includes(intention.id)
                 ? 'border-sacred-gold-400 bg-sacred-gold-50'
-                : 'border-gray-200 bg-white/70 hover:border-sacred-gold-200 hover:bg-white/90'
+                : 'border-gray-200 bg-white hover:border-sacred-gold-200 hover:bg-gray-50 hover:shadow-md'
               }
             `}
             onClick={() => toggleIntention(intention.id)}
@@ -113,7 +113,7 @@ const IntentionsStep = ({ onNext, onboardingData = {}, data = {} }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.4 }}
-        className="bg-white/50 rounded-2xl p-6 border border-white/30 mb-8"
+        className="bg-white rounded-2xl p-6 border border-sacred-blue-100 shadow-lg mb-8"
       >
         <h3 className="text-xl font-serif text-sacred-blue-900 mb-4">
           Add Your Own Intention
@@ -124,7 +124,7 @@ const IntentionsStep = ({ onNext, onboardingData = {}, data = {} }) => {
             value={customIntention}
             onChange={(e) => setCustomIntention(e.target.value)}
             placeholder="Write your personal intention..."
-            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:border-sacred-blue-400 focus:outline-none bg-white/80"
+            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:border-sacred-blue-400 focus:outline-none bg-white shadow-sm"
             onKeyPress={(e) => e.key === 'Enter' && addCustomIntention()}
           />
           <button

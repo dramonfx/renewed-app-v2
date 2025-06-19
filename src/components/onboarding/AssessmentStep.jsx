@@ -82,7 +82,7 @@ const AssessmentStep = ({ onNext, onboardingData = {}, data = {} }) => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: index * 0.1 }}
-            className="bg-white/85 rounded-2xl p-6 border border-white/40 shadow-lg"
+            className="bg-white rounded-2xl p-6 border border-sacred-blue-100 shadow-lg"
           >
             <h3 className="text-xl font-serif text-sacred-blue-900 mb-6">
               {question.question}
@@ -95,7 +95,7 @@ const AssessmentStep = ({ onNext, onboardingData = {}, data = {} }) => {
                     flex items-center p-4 rounded-xl cursor-pointer transition-all duration-300 shadow-sm
                     ${responses[question.id] === option.value
                       ? 'bg-sacred-blue-100 border-2 border-sacred-blue-400'
-                      : 'bg-white/85 border-2 border-transparent hover:bg-white/95'
+                      : 'bg-white border-2 border-gray-200 hover:bg-gray-50 hover:border-sacred-blue-200'
                     }
                   `}
                   whileHover={{ scale: 1.02 }}
