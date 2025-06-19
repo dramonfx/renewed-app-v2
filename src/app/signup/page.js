@@ -9,7 +9,6 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
 import SacredInput from '@/components/ui/sacred-input';
-import { UserPlusIcon } from '@heroicons/react/24/outline';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -155,7 +154,9 @@ export default function SignupPage() {
         {/* Header */}
         <div className="text-center">
           <div className="mx-auto h-16 w-16 sacred-icon-bg-gold mb-6">
-            <UserPlusIcon className="h-8 w-8" />
+            <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+            </svg>
           </div>
           <h2 className="text-3xl font-serif font-bold text-sacred mb-2">
             Begin Your Journey

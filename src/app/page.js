@@ -1,103 +1,183 @@
-import Image from "next/image";
 
-export default function Home() {
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import SacredButton from '@/components/ui/sacred-button';
+import SacredCard from '@/components/ui/sacred-card';
+
+export default function HomePage() {
+  const router = useRouter();
+  const { user } = useAuth();
+
+  // Check if user is authenticated and redirect accordingly
+  useEffect(() => {
+    if (user) {
+      // Check if onboarding is completed
+      const isCompleted = localStorage.getItem('renewedOnboardingCompleted');
+      if (!isCompleted) {
+        router.push('/onboarding');
+      } else {
+        router.push('/dashboard');
+      }
+    }
+  }, [user, router]);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div
+          className="absolute top-1/4 left-1/6 w-32 h-32 bg-sacred-gold-400/20 rounded-full blur-2xl"
+          animate={{
+            scale: [1, 1.5, 1],
+            opacity: [0.3, 0.6, 0.3],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
         />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+        <motion.div
+          className="absolute bottom-1/4 right-1/6 w-48 h-48 bg-sacred-blue-400/20 rounded-full blur-2xl"
+          animate={{
+            scale: [1.2, 1, 1.2],
+            opacity: [0.2, 0.5, 0.2],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 1,
+          }}
+        />
+      </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      <div className="w-full max-w-4xl mx-auto text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <SacredCard variant="heavy" className="p-12 md:p-16">
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mb-8"
+            >
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-sacred-blue-900 mb-4 leading-tight">
+                Renewed: The{' '}
+                <span className="bg-sacred-gradient bg-clip-text text-transparent">
+                  New Man Story
+                </span>
+              </h1>
+              <p className="text-sacred-blue-600 text-xl md:text-2xl leading-relaxed max-w-2xl mx-auto">
+                An interactive guidebook experience for spiritual transformation, personal growth, and discovering your renewed self.
+              </p>
+            </motion.div>
+
+            {/* Features */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="grid md:grid-cols-3 gap-8 mb-10"
+            >
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-gradient flex items-center justify-center shadow-lg">
+                  <span className="text-white text-2xl">📖</span>
+                </div>
+                <h3 className="text-xl font-serif text-sacred-blue-900 mb-2">Interactive Guidebook</h3>
+                <p className="text-sacred-blue-600 text-sm leading-relaxed">
+                  Navigate through spiritual principles and teachings with an immersive reading experience
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-gold-gradient flex items-center justify-center shadow-lg">
+                  <span className="text-white text-2xl">🎧</span>
+                </div>
+                <h3 className="text-xl font-serif text-sacred-blue-900 mb-2">Full Audiobook</h3>
+                <p className="text-sacred-blue-600 text-sm leading-relaxed">
+                  Listen to the complete audiobook experience with high-quality narration and reflection moments
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-purple-gradient flex items-center justify-center shadow-lg">
+                  <span className="text-white text-2xl">✨</span>
+                </div>
+                <h3 className="text-xl font-serif text-sacred-blue-900 mb-2">Personal Journey</h3>
+                <p className="text-sacred-blue-600 text-sm leading-relaxed">
+                  Track your progress and create a personalized path through your spiritual transformation
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Call to Action */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="text-center space-y-4"
+            >
+              {user ? (
+                <>
+                  <SacredButton
+                    onClick={() => router.push('/dashboard')}
+                    variant="gold"
+                    size="lg"
+                    className="px-8 py-4 text-lg mr-4"
+                  >
+                    Continue Your Journey ✨
+                  </SacredButton>
+                  <SacredButton
+                    onClick={() => router.push('/book')}
+                    variant="primary"
+                    size="lg"
+                    className="px-8 py-4 text-lg"
+                  >
+                    Open Guidebook 📖
+                  </SacredButton>
+                </>
+              ) : (
+                <>
+                  <Link href="/signup">
+                    <SacredButton
+                      variant="gold"
+                      size="lg"
+                      className="px-8 py-4 text-lg mr-4"
+                    >
+                      Begin Your Journey ✨
+                    </SacredButton>
+                  </Link>
+                  <Link href="/login">
+                    <SacredButton
+                      variant="primary"
+                      size="lg"
+                      className="px-8 py-4 text-lg"
+                    >
+                      Continue Reading 📖
+                    </SacredButton>
+                  </Link>
+                </>
+              )}
+              <p className="text-sacred-blue-600 text-sm mt-4">
+                {user 
+                  ? "Welcome back! Your spiritual transformation continues."
+                  : "Join thousands on their journey of spiritual growth and renewal."
+                }
+              </p>
+            </motion.div>
+          </SacredCard>
+        </motion.div>
+      </div>
     </div>
   );
 }
