@@ -138,7 +138,9 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sacred-blue-50 via-sacred-blue-100 to-sacred-blue-200 overflow-hidden relative">
+    <div className="min-h-screen overflow-hidden relative">
+      {/* Mountain background from globals.css shows through */}
+      
       {/* Main Content */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -151,35 +153,6 @@ export default function OnboardingPage() {
           {renderStep()}
         </motion.div>
       </AnimatePresence>
-
-      {/* Sacred Blue Background Elements */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <motion.div
-          className="absolute top-1/4 left-1/4 w-64 h-64 bg-sacred-blue-200/20 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.2, 0.3, 0.2],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-        <motion.div
-          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-sacred-blue-300/15 rounded-full blur-3xl"
-          animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.15, 0.25, 0.15],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 2,
-          }}
-        />
-      </div>
     </div>
   );
 }

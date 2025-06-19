@@ -1,29 +1,11 @@
-
-> renewed-app-v2@0.1.0 dev
-> next dev
-
-   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
-   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
-   ▲ Next.js 15.3.2
-   - Local:        http://localhost:3000
-   - Network:      http://100.124.254.24:3000
-   - Environments: .env.local
-
- ✓ Starting...
-   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
-   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
- ✓ Ready in 2.4s
- ○ Compiling /_not-found ...
- ✓ Compiled /_not-found in 7.2s (887 modules)
- ⚠ Fast Refresh had to perform a full reload due to a runtime error.
- GET /_next/static/webpack/714184fab9583f99.webpack.hot-update.json 404 in 7794ms
- ○ Compiling /onboarding ...
- ✓ Compiled /onboarding in 6.1s (1714 modules)
- GET /onboarding 200 in 5584ms
- ⚠ Fast Refresh had to perform a full reload due to a runtime error.
- GET /onboarding 200 in 150ms
- GET /_next/static/webpack/714184fab9583f99.webpack.hot-update.json 404 in 5640ms
- GET /onboarding 200 in 200ms
- ✓ Compiled /favicon.ico in 418ms (948 modules)
- GET /favicon.ico 200 in 558ms
-[?25h
+Internal Error: renewed-app-v2@workspace:.: This package doesn't seem to be present in your lockfile; run "yarn install" to update the lockfile
+    at jR.getCandidates (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:204:8149)
+    at em.getCandidates (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:141:1311)
+    at /home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:8420
+    at qE (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:140:54028)
+    at dt (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:8400)
+    at async Promise.allSettled (index 0)
+    at async Uu (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:140:53356)
+    at async /home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:9166
+    at async Yi.startProgressPromise (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:140:140548)
+    at async t.resolveEverything (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:7138)
