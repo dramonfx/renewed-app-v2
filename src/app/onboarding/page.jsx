@@ -8,10 +8,11 @@ import AssessmentStep from '@/components/onboarding/AssessmentStep';
 import PathSelectionStep from '@/components/onboarding/PathSelectionStep';
 import IntentionsStep from '@/components/onboarding/IntentionsStep';
 import CompletionStep from '@/components/onboarding/CompletionStep';
+import { INITIAL_ONBOARDING_DATA, updateOnboardingData } from '@/constants/onboardingDataSchema';
 
 export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [onboardingData, setOnboardingData] = useState({});
+  const [onboardingData, setOnboardingData] = useState(INITIAL_ONBOARDING_DATA);
 
   const steps = [
     { component: WelcomeScreen, title: 'Welcome' },
@@ -23,7 +24,7 @@ export default function OnboardingPage() {
   ];
 
   const handleNext = (data = {}) => {
-    setOnboardingData(prev => ({ ...prev, ...data }));
+    setOnboardingData(prev => updateOnboardingData(prev, data));
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
@@ -43,6 +44,7 @@ export default function OnboardingPage() {
         onNext={handleNext}
         onBack={handleBack}
         data={onboardingData}
+        onboardingData={onboardingData}
         currentStep={currentStep}
         totalSteps={steps.length}
       />

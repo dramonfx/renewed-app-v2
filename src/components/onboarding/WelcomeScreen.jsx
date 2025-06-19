@@ -1,68 +1,120 @@
 
 'use client';
+import { motion } from 'framer-motion';
 
 const WelcomeScreen = ({ onNext }) => {
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <div className="sacred-glass rounded-3xl p-12 max-w-2xl w-full text-center animate-fade-in">
-        {/* Sacred Journey Header */}
-        <div className="mb-8">
-          <h1 className="font-sacred-serif text-5xl md:text-6xl font-bold text-sacred mb-4">
-            Sacred Journey
-          </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-sacred-gold-500 to-sacred-gold-400 mx-auto rounded-full mb-6"></div>
-          <p className="text-sacred-muted text-xl font-sacred-sans leading-relaxed">
-            Welcome to your path of inner transformation and mindful growth
-          </p>
-        </div>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-sacred-blue-gradient relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div
+          className="absolute top-1/4 left-1/6 w-32 h-32 bg-sacred-gold-400/20 rounded-full blur-2xl"
+          animate={{
+            scale: [1, 1.5, 1],
+            opacity: [0.3, 0.6, 0.3],
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+        <motion.div
+          className="absolute bottom-1/4 right-1/6 w-48 h-48 bg-sacred-purple-400/20 rounded-full blur-2xl"
+          animate={{
+            scale: [1.2, 1, 1.2],
+            opacity: [0.2, 0.5, 0.2],
+          }}
+          transition={{
+            duration: 6,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 1,
+          }}
+        />
+      </div>
 
-        {/* Sacred Description */}
-        <div className="mb-10">
-          <p className="text-sacred-muted text-lg font-sacred-sans leading-relaxed mb-6">
-            Embark on a journey of self-discovery through guided reflection, 
-            mindful practices, and intentional living. Your sacred path awaits.
-          </p>
-          
-          {/* Sacred Features */}
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-sacred-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span className="text-2xl">🧘</span>
-              </div>
-              <h3 className="font-sacred-serif text-lg font-semibold text-sacred mb-2">Mindful Reflection</h3>
-              <p className="text-sacred-muted text-sm">Daily practices for inner awareness</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-sacred-gold-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span className="text-2xl">✨</span>
-              </div>
-              <h3 className="font-sacred-serif text-lg font-semibold text-sacred mb-2">Sacred Growth</h3>
-              <p className="text-sacred-muted text-sm">Transform through intentional living</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-sacred-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span className="text-2xl">🌟</span>
-              </div>
-              <h3 className="font-sacred-serif text-lg font-semibold text-sacred mb-2">Inner Wisdom</h3>
-              <p className="text-sacred-muted text-sm">Discover your authentic self</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Sacred Action Button */}
-        <button 
-          onClick={onNext}
-          className="sacred-gold-button text-lg px-8 py-4 font-sacred-sans animate-slide-up"
+      <div className="w-full max-w-4xl mx-auto text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          className="bg-white/95 backdrop-blur-xl border border-white/50 rounded-3xl p-12 md:p-16 shadow-2xl"
         >
-          Begin Your Sacred Journey
-        </button>
-        
-        {/* Sacred Subtitle */}
-        <p className="text-sacred-muted text-sm mt-6 font-sacred-sans">
-          Take the first step towards mindful transformation
-        </p>
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mb-8"
+          >
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-sacred-blue-900 mb-4 leading-tight">
+              Welcome to Your{' '}
+              <span className="bg-sacred-gradient bg-clip-text text-transparent">
+                Sacred Journey
+              </span>
+            </h1>
+            <p className="text-sacred-blue-600 text-xl md:text-2xl leading-relaxed max-w-2xl mx-auto">
+              Discover a path of transformation, peace, and renewal designed specifically for your spiritual growth and inner awakening.
+            </p>
+          </motion.div>
+
+          {/* Features */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="grid md:grid-cols-3 gap-8 mb-10"
+          >
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-gradient flex items-center justify-center shadow-lg">
+                <span className="text-white text-2xl">🕊️</span>
+              </div>
+              <h3 className="text-xl font-serif text-sacred-blue-900 mb-2">Peaceful Experience</h3>
+              <p className="text-sacred-blue-600 text-sm leading-relaxed">
+                Find tranquility through guided meditations and calming spiritual practices that nurture your soul
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-gold-gradient flex items-center justify-center shadow-lg">
+                <span className="text-white text-2xl">🛡️</span>
+              </div>
+              <h3 className="text-xl font-serif text-sacred-blue-900 mb-2">Sacred Security</h3>
+              <p className="text-sacred-blue-600 text-sm leading-relaxed">
+                Build confidence in your spiritual journey with trusted guidance and unwavering support
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-purple-gradient flex items-center justify-center shadow-lg">
+                <span className="text-white text-2xl">⭐</span>
+              </div>
+              <h3 className="text-xl font-serif text-sacred-blue-900 mb-2">Guided Renewal</h3>
+              <p className="text-sacred-blue-600 text-sm leading-relaxed">
+                Transform your life with structured pathways to personal and spiritual enlightenment
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Call to Action */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="text-center"
+          >
+            <button
+              onClick={onNext}
+              className="px-8 py-4 rounded-full font-semibold text-lg bg-sacred-gradient text-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+            >
+              Begin Your Journey ✨
+            </button>
+            <p className="text-sacred-blue-600 text-sm mt-4">
+              Embrace the transformation from your old self to your renewed self
+            </p>
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   );

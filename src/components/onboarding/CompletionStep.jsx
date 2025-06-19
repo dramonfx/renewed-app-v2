@@ -3,8 +3,11 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
-const CompletionStep = ({ onboardingData }) => {
+const CompletionStep = ({ onboardingData = {}, data = {} }) => {
   const [showConfetti, setShowConfetti] = useState(false);
+
+  // Use onboardingData if available, fallback to data prop
+  const safeData = onboardingData || data || {};
 
   useEffect(() => {
     setShowConfetti(true);
@@ -18,11 +21,11 @@ const CompletionStep = ({ onboardingData }) => {
       balanced: { name: 'The Balanced Path', icon: '⚖️', color: 'sacred-blue' },
       intensive: { name: 'The Intensive Path', icon: '🔥', color: 'sacred-purple' }
     };
-    return pathMap[onboardingData.selectedPath] || pathMap.balanced;
+    return pathMap[safeData.selectedPath] || pathMap.balanced;
   };
 
   const pathInfo = getPathInfo();
-  const intentionCount = onboardingData.intentions?.length || 0;
+  const intentionCount = safeData.intentions?.length || 0;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-sacred-blue-gradient relative overflow-hidden">
@@ -126,12 +129,12 @@ const CompletionStep = ({ onboardingData }) => {
               <div>
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-purple-gradient flex items-center justify-center">
                   <span className="text-white text-2xl">
-                    {onboardingData.selectedMind === 'new' ? '✨' : '🌫️'}
+                    {safeData.selectedMind === 'new' ? '✨' : '🌫️'}
                   </span>
                 </div>
                 <h4 className="font-serif text-lg text-sacred-blue-900 mb-2">Mind Focus</h4>
                 <p className="text-sacred-blue-600">
-                  {onboardingData.selectedMind === 'new' ? 'New Mind' : 'Old Mind'} Awareness
+                  {safeData.selectedMind === 'new' ? 'New Mind' : 'Old Mind'} Awareness
                 </p>
               </div>
             </div>

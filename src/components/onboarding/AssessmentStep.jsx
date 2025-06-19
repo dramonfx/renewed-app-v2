@@ -3,8 +3,10 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 
-const AssessmentStep = ({ onNext, onboardingData }) => {
-  const [responses, setResponses] = useState(onboardingData.assessment || {});
+const AssessmentStep = ({ onNext, onboardingData = {}, data = {} }) => {
+  // Use onboardingData if available, fallback to data prop, then to empty object
+  const safeData = onboardingData.assessment || data.assessment || {};
+  const [responses, setResponses] = useState(safeData);
 
   const questions = [
     {
