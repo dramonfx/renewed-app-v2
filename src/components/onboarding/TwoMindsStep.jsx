@@ -42,7 +42,7 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
           className={`p-8 rounded-2xl border-2 transition-all duration-300 cursor-pointer ${
             selectedMind === 'old' 
               ? 'border-sacred-purple-400 bg-sacred-purple-50' 
-              : 'border-gray-200 bg-white/50 hover:border-sacred-purple-200'
+              : 'border-gray-200 bg-white/85 hover:border-sacred-purple-200 hover:bg-white/90'
           }`}
           onClick={() => setSelectedMind('old')}
           whileHover={{ scale: 1.02 }}
@@ -69,7 +69,7 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
           className={`p-8 rounded-2xl border-2 transition-all duration-300 cursor-pointer ${
             selectedMind === 'new' 
               ? 'border-sacred-gold-400 bg-sacred-gold-50' 
-              : 'border-gray-200 bg-white/50 hover:border-sacred-gold-200'
+              : 'border-gray-200 bg-white/85 hover:border-sacred-gold-200 hover:bg-white/90'
           }`}
           onClick={() => setSelectedMind('new')}
           whileHover={{ scale: 1.02 }}

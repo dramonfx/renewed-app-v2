@@ -68,19 +68,19 @@ const PathSelectionStep = ({ onNext, onboardingData = {}, data = {} }) => {
     const baseClasses = {
       'sacred-gold': {
         border: isSelected ? 'border-sacred-gold-400' : 'border-gray-200 hover:border-sacred-gold-200',
-        bg: isSelected ? 'bg-sacred-gold-50' : 'bg-white/70 hover:bg-white/90',
+        bg: isSelected ? 'bg-sacred-gold-50' : 'bg-white/85 hover:bg-white/95',
         icon: 'bg-sacred-gold-gradient',
         accent: 'text-sacred-gold-600'
       },
       'sacred-blue': {
         border: isSelected ? 'border-sacred-blue-400' : 'border-gray-200 hover:border-sacred-blue-200',
-        bg: isSelected ? 'bg-sacred-blue-50' : 'bg-white/70 hover:bg-white/90',
+        bg: isSelected ? 'bg-sacred-blue-50' : 'bg-white/85 hover:bg-white/95',
         icon: 'bg-sacred-gradient',
         accent: 'text-sacred-blue-600'
       },
       'sacred-purple': {
         border: isSelected ? 'border-sacred-purple-400' : 'border-gray-200 hover:border-sacred-purple-200',
-        bg: isSelected ? 'bg-sacred-purple-50' : 'bg-white/70 hover:bg-white/90',
+        bg: isSelected ? 'bg-sacred-purple-50' : 'bg-white/85 hover:bg-white/95',
         icon: 'bg-sacred-purple-gradient',
         accent: 'text-sacred-purple-600'
       }
@@ -186,7 +186,7 @@ const PathSelectionStep = ({ onNext, onboardingData = {}, data = {} }) => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/50 rounded-2xl p-6 border border-white/30 mb-8"
+          className="bg-white/85 rounded-2xl p-6 border border-white/40 shadow-lg mb-8"
         >
           <h4 className="text-lg font-serif text-sacred-blue-900 mb-3">
             You've chosen: {paths.find(p => p.id === selectedPath)?.title}
