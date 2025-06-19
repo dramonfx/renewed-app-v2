@@ -66,6 +66,7 @@ module.exports = {
           800: '#3730a3',
           900: '#312e81',
         },
+        
       },
       
       // Typography for sacred backgrounds

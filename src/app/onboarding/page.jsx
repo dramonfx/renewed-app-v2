@@ -1,158 +1,68 @@
 
 'use client';
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
-import WelcomeScreen from '@/components/onboarding/WelcomeScreen';
-import WizardLayout from '@/components/onboarding/WizardLayout';
-import TwoMindsStep from '@/components/onboarding/TwoMindsStep';
-import AssessmentStep from '@/components/onboarding/AssessmentStep';
-import IntentionsStep from '@/components/onboarding/IntentionsStep';
-import PathSelectionStep from '@/components/onboarding/PathSelectionStep';
-import CompletionStep from '@/components/onboarding/CompletionStep';
-
-// Define the Sacred Journey onboarding steps
-const ONBOARDING_STEPS = [
-  { component: WelcomeScreen, name: 'Welcome', useWizardLayout: false },
-  { component: TwoMindsStep, name: 'Two Minds', useWizardLayout: true },
-  { component: AssessmentStep, name: 'Assessment', useWizardLayout: true },
-  { component: IntentionsStep, name: 'Intentions', useWizardLayout: true },
-  { component: PathSelectionStep, name: 'Path Selection', useWizardLayout: true },
-  { component: CompletionStep, name: 'Completion', useWizardLayout: false }
-];
-
-export default function OnboardingPage() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [onboardingData, setOnboardingData] = useState({});
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const router = useRouter();
-
-  // Check if onboarding is already completed
-  useEffect(() => {
-    const isCompleted = localStorage.getItem('renewedOnboardingCompleted');
-    if (isCompleted === 'true') {
-      router.push('/book');
     }
-  }, [router]);
-
-  // Navigation functions
-  const nextStep = async (stepData = {}) => {
-    if (isTransitioning) return;
-    
-    setIsTransitioning(true);
-    
-    // Save step data
-    const updatedData = { ...onboardingData, ...stepData };
-    setOnboardingData(updatedData);
-    
-    // If this is the last step, complete onboarding
-    if (currentStep >= ONBOARDING_STEPS.length - 1) {
-      localStorage.setItem('renewedOnboardingCompleted', 'true');
-      localStorage.setItem('renewedOnboardingData', JSON.stringify(updatedData));
-      
-      // Delay navigation to allow completion animation
-      setTimeout(() => {
-        router.push('/book');
-      }, 3000);
-      return;
-    }
-    
-    // Move to next step
-    setTimeout(() => {
-      setCurrentStep(prev => prev + 1);
-      setIsTransitioning(false);
-    }, 300);
-  };
-
-  const prevStep = () => {
-    if (isTransitioning || currentStep <= 0) return;
-    
-    setIsTransitioning(true);
-    
-    setTimeout(() => {
-      setCurrentStep(prev => prev - 1);
-      setIsTransitioning(false);
-    }, 300);
-  };
-
-  const goToStep = (stepIndex) => {
-    if (isTransitioning || stepIndex < 0 || stepIndex >= ONBOARDING_STEPS.length) return;
-    
-    setIsTransitioning(true);
-    
-    setTimeout(() => {
-      setCurrentStep(stepIndex);
-      setIsTransitioning(false);
-    }, 300);
-  };
-
-  // Get current step component and configuration
-  const currentStepConfig = ONBOARDING_STEPS[currentStep];
-  const CurrentStepComponent = currentStepConfig?.component;
-  const useWizardLayout = currentStepConfig?.useWizardLayout;
-  const totalSteps = ONBOARDING_STEPS.length;
-  const progress = ((currentStep + 1) / totalSteps) * 100;
-
-  if (!CurrentStepComponent) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sacred-blue-50 via-sacred-blue-100 to-sacred-blue-200">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-blue-500 animate-spin flex items-center justify-center">
-            <div className="w-8 h-8 rounded-full border-2 border-white border-t-transparent"></div>
-          </div>
-          <h1 className="text-2xl font-serif text-slate-800 mb-4">Loading Your Sacred Journey...</h1>
-        </div>
-      </div>
-    );
-  }
-
-  // Render step with or without wizard layout
-  const renderStep = () => {
-    const stepProps = {
-      onNext: nextStep,
-      onPrev: prevStep,
-      onGoToStep: goToStep,
-      currentStep,
-      totalSteps,
-      onboardingData,
-      isTransitioning
-    };
-
-    if (useWizardLayout) {
-      return (
-        <WizardLayout
-          currentStep={currentStep}
-          totalSteps={totalSteps}
-          stepName={currentStepConfig.name}
-          progress={progress}
-          onPrev={prevStep}
-          canGoBack={currentStep > 0}
-          isTransitioning={isTransitioning}
-        >
-          <CurrentStepComponent {...stepProps} />
-        </WizardLayout>
-      );
-    }
-
-    return <CurrentStepComponent {...stepProps} />;
-  };
+  ];
 
   return (
-    <div className="min-h-screen overflow-hidden relative">
-      {/* Mountain background from globals.css shows through */}
-      
-      {/* Main Content */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentStep}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.6, ease: 'easeInOut' }}
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-sacred-blue-50 via-sacred-blue-100 to-sacred-purple-100">
+      {/* Mountain Background SVG */}
+      <div className="absolute inset-0 z-0">
+        <svg
+          className="absolute bottom-0 w-full h-full"
+          viewBox="0 0 1200 800"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="xMidYEnd slice"
         >
-          {renderStep()}
-        </motion.div>
-      </AnimatePresence>
+          {/* Sky Gradient */}
+          <defs>
+            <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#e3e8f0" stopOpacity="0.8" />
+              <stop offset="50%" stopColor="#b8c7d9" stopOpacity="0.6" />
+              <stop offset="100%" stopColor="#1972be" stopOpacity="0.4" />
+            </linearGradient>
+            <linearGradient id="mountainGradient1" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#4a5b79" stopOpacity="0.9" />
+              <stop offset="100%" stopColor="#1972be" stopOpacity="0.7" />
+            </linearGradient>
+            <linearGradient id="mountainGradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#5a6b87" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#7a8ba3" stopOpacity="0.6" />
+            </linearGradient>
+            <linearGradient id="mountainGradient3" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#6a7b95" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="#8b9bb1" stopOpacity="0.5" />
+            </linearGradient>
+          </defs>
+          
+          {/* Background Mountains - Far */}
+          <path
+            d="M0 600 L200 400 L400 450 L600 350 L800 400 L1000 300 L1200 350 L1200 800 L0 800 Z"
+            fill="url(#mountainGradient3)"
+          />
+          
+          {/* Background Mountains - Mid */}
+          <path
+            d="M0 650 L150 500 L350 550 L550 450 L750 500 L950 400 L1200 450 L1200 800 L0 800 Z"
+            fill="url(#mountainGradient2)"
+          />
+          
+          {/* Foreground Mountains */}
+          <path
+            d="M0 700 L100 550 L300 600 L500 500 L700 550 L900 450 L1200 500 L1200 800 L0 800 Z"
+            fill="url(#mountainGradient1)"
+          />
+        </svg>
+      </div>
+
+      {/* Floating Light Orbs */}
+      <div className="absolute inset-0 z-10 pointer-events-none">
+        <div className="absolute top-20 left-20 w-4 h-4 bg-sacred-gold-400 rounded-full opacity-60 animate-float" style={{ animationDelay: '0s' }}></div>
+        <div className="absolute top-40 right-32 w-3 h-3 bg-sacred-purple-400 rounded-full opacity-50 animate-float" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-60 left-1/3 w-2 h-2 bg-sacred-gold-300 rounded-full opacity-70 animate-float" style={{ animationDelay: '4s' }}></div>
+        <div className="absolute bottom-40 right-20 w-5 h-5 bg-sacred-purple-300 rounded-full opacity-40 animate-float" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-60 left-16 w-3 h-3 bg-sacred-gold-400 rounded-full opacity-50 animate-float" style={{ animationDelay: '3s' }}></div>
+      </div>
     </div>
   );
 }
