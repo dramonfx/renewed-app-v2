@@ -3,19 +3,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Sacred Journey Final Design System - Sacred Blue + Gold Glassmorphism */
+/* Sacred Journey Clean Design System - Sacred Blue + Gold */
 
-/* Google Fonts Import - Playfair Display + Nunito Sans */
+/* Google Fonts Import */
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Nunito+Sans:wght@300;400;500;600;700&display=swap");
 
 @layer base {
-  /* Full-screen Sacred Mountain Background */
+  /* Sacred Mountain Background */
   body {
     font-family: "Nunito Sans", sans-serif;
     min-height: 100vh;
     line-height: 1.6;
     
-    /* Soft Mountain Landscape Background - Always visible through glass */
+    /* Mountain Landscape Background */
     background-image: url("https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80");
     background-size: cover;
     background-position: center;
@@ -25,7 +25,7 @@
     position: relative;
   }
 
-  /* Sacred Blue Overlay - Subtle to let mountain background show through */
+  /* Sacred Blue Overlay */
   body::before {
     content: "";
     position: fixed;
@@ -46,201 +46,59 @@
     letter-spacing: -0.025em;
   }
 
-  /* High Contrast Text for Sacred Mountain Background */
-  .scenic-text {
-    color: rgba(255, 255, 255, 0.98);
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.1);
-    font-weight: 600;
+  /* High Contrast Text */
+  .text-sacred {
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   }
 
-  .scenic-text-muted {
-    color: rgba(255, 255, 255, 0.85);
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-  }
-
-  /* Sacred Blue Selection */
-  ::selection {
-    background-color: rgba(14, 165, 233, 0.3);
-    color: white;
-  }
-
-  ::-moz-selection {
-    background-color: rgba(14, 165, 233, 0.3);
-    color: white;
+  .text-sacred-muted {
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 }
 
-/* Sacred Journey Glassmorphism Components */
 @layer components {
-  /* Main Sacred Glassmorphism Card */
-  .glass-card {
-    background: rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 1.5rem;
-    box-shadow: 
-      0 12px 40px rgba(0, 0, 0, 0.12),
-      0 4px 16px rgba(0, 0, 0, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* Glass Card Ethereal Glow */
-  .glass-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
-    border-radius: inherit;
-    pointer-events: none;
-  }
-
-  .glass-card:hover {
-    transform: translateY(-12px) scale(1.02);
-    box-shadow: 
-      0 20px 60px rgba(0, 0, 0, 0.18),
-      0 8px 24px rgba(0, 0, 0, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  /* Sacred Glass Card */
+  .sacred-glass {
     background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(32px) saturate(200%);
-    -webkit-backdrop-filter: blur(32px) saturate(200%);
-    border-color: rgba(255, 255, 255, 0.35);
-  }
-
-  /* Sacred Blue Glassmorphism Button with Gold Accents */
-  .glass-btn {
-    background: linear-gradient(135deg, rgba(14, 165, 233, 0.85) 0%, rgba(2, 132, 199, 0.9) 100%);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(14, 165, 233, 0.4);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 1rem 2.5rem;
-    border-radius: 2rem;
-    font-weight: 600;
-    font-family: "Nunito Sans", sans-serif;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    color: white;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    box-shadow: 
-      0 8px 32px rgba(14, 165, 233, 0.4),
-      0 4px 16px rgba(14, 165, 233, 0.2);
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* Sacred Button Hover with Gold Glow */
-  .glass-btn:hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 
-      0 12px 48px rgba(14, 165, 233, 0.5),
-      0 6px 24px rgba(250, 207, 81, 0.3);
-    background: linear-gradient(135deg, rgba(2, 132, 199, 0.9) 0%, rgba(3, 105, 161, 0.95) 100%);
-    border-color: rgba(250, 207, 81, 0.6);
-  }
-
-  /* Sacred Gold Icon Background */
-  .glass-icon-bg {
-    background: linear-gradient(135deg, rgba(250, 207, 81, 0.2) 0%, rgba(245, 158, 11, 0.15) 100%);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(250, 207, 81, 0.3);
-    box-shadow: 
-      0 8px 24px rgba(250, 207, 81, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    transition: all 0.3s ease;
-  }
-
-  .glass-icon-bg:hover {
-    background: linear-gradient(135deg, rgba(250, 207, 81, 0.3) 0%, rgba(245, 158, 11, 0.25) 100%);
-    box-shadow: 0 12px 32px rgba(250, 207, 81, 0.25);
-    transform: scale(1.05);
-  }
-
-  /* Glassmorphism Container */
-  .glass-container {
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border-radius: 2rem;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 
-      0 24px 80px rgba(0, 0, 0, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  }
-}
-
-/* Sacred Utilities */
-@layer utilities {
-  /* Smooth Sacred Scrolling */
-  html {
-    scroll-behavior: smooth;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   }
 
-  /* Enhanced Glassmorphism Browser Support */
-  @supports not (backdrop-filter: blur(20px)) {
-    .glass-card {
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-    }
-    .glass-btn {
-      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-    }
-    .glass-container {
-      background: rgba(255, 255, 255, 0.9);
-    }
-    .glass-icon-bg {
-      background: linear-gradient(135deg, rgba(250, 207, 81, 0.4) 0%, rgba(245, 158, 11, 0.3) 100%);
-    }
+  /* Sacred Button */
+  .sacred-button {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(14, 165, 233, 0.3);
   }
 
-  /* Sacred Animation Utilities */
-  .animate-sacred-float {
-    animation: sacredFloat 8s ease-in-out infinite;
+  .sacred-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
   }
 
-  .animate-sacred-glow {
-    animation: sacredGlow 4s ease-in-out infinite;
+  /* Sacred Gold Button */
+  .sacred-gold-button {
+    background: linear-gradient(135deg, #FACF51 0%, #f59e0b 100%);
+    color: #1f2937;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(250, 207, 81, 0.3);
   }
 
-  .animate-sacred-rise {
-    animation: sacredRise 1s ease-out;
-  }
-}
-
-/* Sacred Journey Keyframes */
-@keyframes sacredFloat {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  25% { transform: translateY(-8px) rotate(0.5deg); }
-  50% { transform: translateY(-4px) rotate(0deg); }
-  75% { transform: translateY(-12px) rotate(-0.5deg); }
-}
-
-@keyframes sacredGlow {
-  0%, 100% { 
-    box-shadow: 0 8px 32px rgba(14, 165, 233, 0.4);
-  }
-  50% { 
-    box-shadow: 0 12px 48px rgba(14, 165, 233, 0.6), 0 4px 16px rgba(250, 207, 81, 0.3);
-  }
-}
-
-@keyframes sacredRise {
-  0% { 
-    opacity: 0; 
-    transform: translateY(40px) scale(0.95); 
-  }
-  100% { 
-    opacity: 1; 
-    transform: translateY(0) scale(1); 
+  .sacred-gold-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(250, 207, 81, 0.4);
   }
 }
