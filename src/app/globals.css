@@ -1,4 +1,5 @@
 
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -15,7 +16,7 @@
     min-height: 100vh;
     line-height: 1.6;
     
-    /* Mountain Landscape Background */
+    /* Sacred Mountain Landscape Background - Peaceful Sunrise/Sunset */
     background-image: url("https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80");
     background-size: cover;
     background-position: center;
@@ -257,3 +258,4 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
