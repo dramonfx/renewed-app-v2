@@ -1,0 +1,14 @@
+
+> renewed-app-v2@0.1.0 dev
+> next dev
+
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+ ⚠ Port 3000 is in use, using available port 3002 instead.
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+   ▲ Next.js 15.3.2
+   - Local:        http://localhost:3002
+   - Network:      http://100.116.173.173:3002
+   - Environments: .env.local
+
+ ✓ Starting...
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs

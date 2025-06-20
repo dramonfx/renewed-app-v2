@@ -39,6 +39,9 @@ module.exports = {
           900: '#0c4a6e',  // Deep Sacred Blue
         },
         
+        // Brand specific colors
+        'brand-blue-sidebar': '#D6E2F3',  // Stable Sacred Blue for sidebar
+        
         // Sacred Gold accent color
         'sacred-gold': {
           50: '#fffef7',
