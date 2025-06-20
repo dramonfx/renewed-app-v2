@@ -36,7 +36,16 @@ export default function Layout({ children }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div 
+      className="min-h-screen flex flex-col"
+      style={{
+        backgroundImage: 'url("https://images.pexels.com/photos/1531660/pexels-photo-1531660.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       <div className="flex flex-1">
         {/* Sacred Journey Sidebar with Solid Background for Readability */}
         <aside className="w-72 bg-sacred-blue-800 fixed top-0 left-0 h-full z-10 overflow-y-auto border-r border-sacred-blue-700 shadow-2xl">
