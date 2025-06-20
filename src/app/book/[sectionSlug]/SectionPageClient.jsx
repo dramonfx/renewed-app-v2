@@ -136,14 +136,14 @@ export default function SectionPageClient({ section, visuals, visualsMap, params
   return (
     <ErrorBoundary fallback={<div className="text-center py-12 text-red-600">Something went wrong loading this section.</div>}>
       <div className="space-y-8">
-        <h1 className="text-4xl font-serif text-brand-blue-dark text-center mb-10">
+        <h1 className="text-4xl font-serif text-sacred-blue-900 text-center mb-10">
           {section.title || 'Untitled Section'}
         </h1>
 
         {section.audioUrl && (
           <ErrorBoundary fallback={<div className="text-red-500 text-center">Audio player unavailable</div>}>
-            <div className="bg-brand-cream p-6 rounded-xl shadow-lg">
-              <h2 className="text-2xl font-sans font-semibold text-brand-blue-dark mb-4">
+            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+              <h2 className="text-2xl font-sans font-semibold text-sacred-blue-900 mb-4">
                 Listen: {section.title || 'Audio Guide'}
               </h2>
               <audio controls controlsList="nodownload" src={section.audioUrl} className="w-full">
@@ -153,11 +153,11 @@ export default function SectionPageClient({ section, visuals, visualsMap, params
           </ErrorBoundary>
         )}
 
-        <div className="bg-brand-cream p-6 rounded-xl shadow-lg">
-          <h2 className="text-2xl font-sans font-semibold text-brand-blue-dark mb-4">
+        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+          <h2 className="text-2xl font-sans font-semibold text-sacred-blue-900 mb-4">
             Read-Along Text
           </h2>
-          <div className="prose max-w-none prose-p:text-brand-text-main prose-strong:text-brand-text-main font-sans text-brand-text-main">
+          <div className="prose max-w-none prose-p:text-gray-700 prose-strong:text-gray-700 font-sans text-gray-700">
             <ErrorBoundary fallback={<div className="text-red-500">Content temporarily unavailable</div>}>
               <Suspense fallback={
                 <div className="animate-pulse space-y-4">
@@ -176,19 +176,19 @@ export default function SectionPageClient({ section, visuals, visualsMap, params
           </div>
         </div>
 
-        <div className="bg-brand-cream p-6 rounded-xl shadow-lg">
-          <h2 className="text-2xl font-sans font-semibold text-brand-blue-dark mb-4">
+        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+          <h2 className="text-2xl font-sans font-semibold text-sacred-blue-900 mb-4">
             Guidebook Exercises
           </h2>
           <div className="flex items-center space-x-3 mb-4">
-            <span className="text-brand-gold text-2xl">☀️</span>
-            <p className="text-brand-text-muted font-sans">
+            <span className="text-sacred-gold-500 text-2xl">☀️</span>
+            <p className="text-gray-600 font-sans">
               View exercises to complete this section.
             </p>
           </div>
           <button
             type="button"
-            className="bg-brand-gold hover:bg-yellow-400 text-brand-blue-dark font-sans font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150 ease-in-out"
+            className="bg-sacred-gold-500 hover:bg-sacred-gold-600 text-white font-sans font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150 ease-in-out"
           >
             View Exercises
           </button>

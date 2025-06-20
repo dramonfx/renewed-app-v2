@@ -47,52 +47,52 @@ export default function Layout({ children }) {
       }}
     >
       <div className="flex flex-1">
-        {/* Sacred Journey Sidebar with Solid Background for Readability */}
-        <aside className="w-72 bg-sacred-blue-800 fixed top-0 left-0 h-full z-10 overflow-y-auto border-r border-sacred-blue-700 shadow-2xl">
+        {/* Sacred Journey Sidebar with Stable Sacred Blue Background */}
+        <aside className="w-72 bg-brand-blue-sidebar fixed top-0 left-0 h-full z-10 overflow-y-auto border-r border-sacred-blue-200 shadow-2xl">
           <div className="p-6">
             {/* Sacred Journey Header */}
             <div className="mb-8 text-center">
-              <Link href="/" className="text-white font-serif text-2xl font-bold hover:text-sacred-gold-300 transition-colors duration-300">
+              <Link href="/" className="text-sacred-blue-900 font-serif text-2xl font-bold hover:text-sacred-gold-600 transition-colors duration-300">
                 Renewed
               </Link>
-              <p className="text-xs text-white/80 font-sans mt-1 tracking-wider uppercase">THE NEW MAN STORY</p>
+              <p className="text-xs text-sacred-blue-700 font-sans mt-1 tracking-wider uppercase">THE NEW MAN STORY</p>
             </div>
 
             {/* Sacred Journey Navigation */}
             <nav>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/dashboard" className="block py-3 px-4 rounded-lg text-white hover:bg-sacred-blue-700 hover:text-white font-sans font-semibold text-base transition-all duration-300 border border-transparent hover:border-sacred-blue-600 hover:shadow-lg">
+                  <Link href="/dashboard" className="block py-3 px-4 rounded-lg text-sacred-blue-900 hover:bg-white/50 hover:text-sacred-blue-900 font-sans font-semibold text-base transition-all duration-300 border border-transparent hover:border-sacred-blue-300 hover:shadow-lg">
                     Dashboard
                   </Link>
                 </li>
                 <li>
-                  <Link href="/book" className="block py-3 px-4 rounded-lg text-white hover:bg-sacred-blue-700 hover:text-white font-sans font-semibold text-base transition-all duration-300 border border-transparent hover:border-sacred-blue-600 hover:shadow-lg">
+                  <Link href="/book" className="block py-3 px-4 rounded-lg text-sacred-blue-900 hover:bg-white/50 hover:text-sacred-blue-900 font-sans font-semibold text-base transition-all duration-300 border border-transparent hover:border-sacred-blue-300 hover:shadow-lg">
                     Guidebook Home
                   </Link>
                 </li>
                 
                 {/* Sacred Divider */}
-                <hr className="my-4 border-white/20" />
+                <hr className="my-4 border-sacred-blue-300" />
                 
                 {/* Sections Header */}
-                <h3 className="px-4 text-xs font-semibold text-white/70 uppercase tracking-wider mb-2 font-sans">Sections</h3>
+                <h3 className="px-4 text-xs font-semibold text-sacred-blue-700 uppercase tracking-wider mb-2 font-sans">Sections</h3>
                 
                 {/* Dynamic Sections with Sacred Journey Styling */}
                 {sections.map((section) => (
                   <li key={section.id}>
-                    <Link href={`/book/${section.slug}`} className="block py-2 px-4 rounded-lg text-white/90 hover:bg-sacred-blue-700 hover:text-white font-sans text-sm transition-all duration-300 border border-transparent hover:border-sacred-blue-600 hover:shadow-md">
+                    <Link href={`/book/${section.slug}`} className="block py-2 px-4 rounded-lg text-sacred-blue-800 hover:bg-white/50 hover:text-sacred-blue-900 font-sans text-sm transition-all duration-300 border border-transparent hover:border-sacred-blue-300 hover:shadow-md">
                       {section.title}
                     </Link>
                   </li>
                 ))}
                 
                 {/* Sacred Divider */}
-                <hr className="my-4 border-white/20" />
+                <hr className="my-4 border-sacred-blue-300" />
                 
                 {/* Full Audiobook Link with Sacred Gold Accent */}
                 <li>
-                  <Link href="/full-audio-player" className="block py-3 px-4 rounded-lg text-white hover:bg-sacred-gold-600 hover:text-white font-sans font-semibold text-base transition-all duration-300 border border-sacred-gold-500/50 hover:border-sacred-gold-400 hover:shadow-lg bg-sacred-gold-500/20">
+                  <Link href="/full-audio-player" className="block py-3 px-4 rounded-lg text-sacred-blue-900 hover:bg-sacred-gold-200 hover:text-sacred-blue-900 font-sans font-semibold text-base transition-all duration-300 border border-sacred-gold-300 hover:border-sacred-gold-400 hover:shadow-lg bg-sacred-gold-100">
                     🎧 Full Audiobook
                   </Link>
                 </li>
@@ -103,8 +103,8 @@ export default function Layout({ children }) {
 
         {/* Sacred Journey Main Content Area */}
         <main className="flex-1 ml-72 p-6 lg:p-10 overflow-y-auto">
-          {/* Sacred Journey Content Container with Enhanced Glassmorphism */}
-          <div className="sacred-glass-heavy p-6 sm:p-8 md:p-10 min-h-full">
+          {/* Sacred Journey Content Container with Solid Background */}
+          <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 md:p-10 min-h-full">
             {children}
           </div>
         </main>
