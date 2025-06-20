@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Source Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .audio-player { background: #2a2a2a; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #4caf50; }
+        .error { background: #f44336; }
+        .info { background: #2196f3; }
+        audio { width: 100%; margin: 10px 0; }
+        button { padding: 10px 20px; margin: 5px; background: #4caf50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #45a049; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Audio Source Testing</h1>
+        <p>Testing different audio sources to resolve "NotSupportedError: The element has no supported sources"</p>
+
+        <!-- Test 1: External URL -->
+        <div class="audio-player">
+            <h3>Test 1: External Audio URL</h3>
+            <div id="status1" class="status info">Testing external audio source...</div>
+            <audio id="audio1" controls>
+                <source src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            <div>
+                <button onclick="testAudio('audio1', 'status1')">Test Play</button>
+                <button onclick="checkSource('audio1', 'status1')">Check Source</button>
+            </div>
+        </div>
+
+        <!-- Test 2: Alternative URL -->
+        <div class="audio-player">
+            <h3>Test 2: Alternative Audio URL</h3>
+            <div id="status2" class="status info">Testing alternative audio source...</div>
+            <audio id="audio2" controls>
+                <source src="https://www.kozco.com/tech/piano2.wav" type="audio/wav">
+                Your browser does not support the audio element.
+            </audio>
+            <div>
+                <button onclick="testAudio('audio2', 'status2')">Test Play</button>
+                <button onclick="checkSource('audio2', 'status2')">Check Source</button>
+            </div>
+        </div>
+
+        <!-- Test 3: MP3 from sample audio library -->
+        <div class="audio-player">
+            <h3>Test 3: Sample Audio Library</h3>
+            <div id="status3" class="status info">Testing sample audio...</div>
+            <audio id="audio3" controls>
+                <source src="https://sample-audio-files.s3.amazonaws.com/mp3/sample-3s.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            <div>
+                <button onclick="testAudio('audio3', 'status3')">Test Play</button>
+                <button onclick="checkSource('audio3', 'status3')">Check Source</button>
+            </div>
+        </div>
+
+        <div id="console-log" style="background: #000; padding: 10px; border-radius: 5px; margin-top: 20px; font-family: monospace; font-size: 12px;">
+            <strong>Console Log:</strong><br>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const consoleLog = document.getElementById('console-log');
+            consoleLog.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '<br>';
+            console.log(message);
+        }
+
+        function updateStatus(statusId, message, type = 'info') {
+            const statusEl = document.getElementById(statusId);
+            statusEl.className = `status ${type}`;
+            statusEl.textContent = message;
+        }
+
+        function testAudio(audioId, statusId) {
+            const audio = document.getElementById(audioId);
+            log(`Testing audio element: ${audioId}`);
+            
+            audio.addEventListener('loadstart', () => {
+                log(`${audioId}: Load started`);
+                updateStatus(statusId, 'Loading audio...', 'info');
+            });
+
+            audio.addEventListener('canplaythrough', () => {
+                log(`${audioId}: Can play through`);
+                updateStatus(statusId, 'Audio loaded successfully!', 'success');
+            });
+
+            audio.addEventListener('error', (e) => {
+                log(`${audioId}: Error - ${e.target.error ? e.target.error.message : 'Unknown error'}`);
+                updateStatus(statusId, `Error: ${e.target.error ? e.target.error.message : 'Unknown error'}`, 'error');
+            });
+
+            audio.load();
+            
+            audio.play().then(() => {
+                log(`${audioId}: Playing successfully`);
+                updateStatus(statusId, 'Playing audio!', 'success');
+            }).catch(e => {
+                log(`${audioId}: Play failed - ${e.message}`);
+                updateStatus(statusId, `Play failed: ${e.message}`, 'error');
+            });
+        }
+
+        function checkSource(audioId, statusId) {
+            const audio = document.getElementById(audioId);
+            const source = audio.querySelector('source');
+            log(`${audioId}: Checking source - ${source.src}`);
+            updateStatus(statusId, `Source: ${source.src}`, 'info');
+            
+            fetch(source.src, { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        log(`${audioId}: Source accessible (${response.status})`);
+                        updateStatus(statusId, `Source accessible (${response.status})`, 'success');
+                    } else {
+                        log(`${audioId}: Source not accessible (${response.status})`);
+                        updateStatus(statusId, `Source not accessible (${response.status})`, 'error');
+                    }
+                })
+                .catch(e => {
+                    log(`${audioId}: Source check failed - ${e.message}`);
+                    updateStatus(statusId, `Source check failed: ${e.message}`, 'error');
+                });
+        }
+
+        // Auto-test all sources when page loads
+        window.addEventListener('load', () => {
+            log('Page loaded, testing all audio sources...');
+            setTimeout(() => checkSource('audio1', 'status1'), 1000);
+            setTimeout(() => checkSource('audio2', 'status2'), 2000);
+            setTimeout(() => checkSource('audio3', 'status3'), 3000);
+        });
+    </script>
+</body>
+</html>
