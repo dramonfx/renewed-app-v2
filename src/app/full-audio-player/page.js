@@ -9,12 +9,26 @@ import AudioPlayer from '@/components/AudioPlayer';
 import { useAudioTracks } from '@/hooks';
 
 export default function FullAudioPlayerPage() {
+  // Temporarily bypass chart visual loading to test
   const [chartVisual, setChartVisual] = useState(null);
-  const [chartLoading, setChartLoading] = useState(true);
+  const [chartLoading, setChartLoading] = useState(false); // Set to false for testing
   const [chartError, setChartError] = useState(null);
 
-  const { data: tracks, loading: tracksLoading, error: tracksError } = useAudioTracks();
+  // Temporarily use hardcoded working data while we investigate the loading issue
+  const tracks = [
+    { id: 1, title: "Prologue", slug: "00_prologue", audioUrl: "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAASDs90hvAAAAAAAAAAAAAAAAAAAA//OEZAAAAAGkAAAAAAAAA0gAAAAATEFN//OEZAMAAAGkAAAAAAAAA0gAAAAARTMu//OEZAYAAAGkAAAAAAAAA0gAAAAAOTku//OEZAkAAAGkAAAAAAAAA0gAAAAANVVV" },
+    { id: 2, title: "Introduction Through Next Steps", slug: "01_intro_through_next_steps", audioUrl: "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAASDs90hvAAAAAAAAAAAAAAAAAAAA//OEZAAAAAGkAAAAAAAAA0gAAAAATEFN//OEZAMAAAGkAAAAAAAAA0gAAAAARTMu//OEZAYAAAGkAAAAAAAAA0gAAAAAOTku//OEZAkAAAGkAAAAAAAAA0gAAAAANVVV" },
+    { id: 3, title: "Kingdom Government", slug: "02_kingdom_government", audioUrl: "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAASDs90hvAAAAAAAAAAAAAAAAAAAA//OEZAAAAAGkAAAAAAAAA0gAAAAATEFN//OEZAMAAAGkAAAAAAAAA0gAAAAARTMu//OEZAYAAAGkAAAAAAAAA0gAAAAAOTku//OEZAkAAAGkAAAAAAAAA0gAAAAANVVV" },
+    { id: 4, title: "Elephant in the Kingdom", slug: "03_elephant_in_the_kingdom", audioUrl: "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAASDs90hvAAAAAAAAAAAAAAAAAAAA//OEZAAAAAGkAAAAAAAAA0gAAAAATEFN//OEZAMAAAGkAAAAAAAAA0gAAAAARTMu//OEZAYAAAGkAAAAAAAAA0gAAAAAOTku//OEZAkAAAGkAAAAAAAAA0gAAAAANVVV" },
+    { id: 5, title: "Characteristics of Principles", slug: "04_characteristics_of_principles", audioUrl: "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAASDs90hvAAAAAAAAAAAAAAAAAAAA//OEZAAAAAGkAAAAAAAAA0gAAAAATEFN//OEZAMAAAGkAAAAAAAAA0gAAAAARTMu//OEZAYAAAGkAAAAAAAAA0gAAAAAOTku//OEZAkAAAGkAAAAAAAAA0gAAAAANVVV" }
+  ];
+  const tracksLoading = false;
+  const tracksError = null;
+  
+  // const { data: tracks, loading: tracksLoading, error: tracksError } = useAudioTracks();
 
+  // Temporarily comment out chart visual loading for testing
+  /*
   useEffect(() => {
     async function fetchChartVisual() {
       setChartLoading(true);
@@ -47,6 +61,7 @@ export default function FullAudioPlayerPage() {
     }
     fetchChartVisual();
   }, []);
+  */
 
   const isLoading = tracksLoading || chartLoading;
   const error = tracksError || chartError;

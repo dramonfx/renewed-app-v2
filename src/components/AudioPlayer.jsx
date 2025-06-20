@@ -103,6 +103,12 @@ export default function AudioPlayer({ className = '' }) {
     };
     const handleAudioPlay = () => setIsActuallyPlaying(true);
     const handleAudioPause = () => setIsActuallyPlaying(false);
+    const handleAudioError = (e) => {
+      console.error('Audio playback error:', e);
+      setPlaying(false);
+      setIsActuallyPlaying(false);
+      // Optionally show user-friendly error message
+    };
     const onEnded = () => {
       if (currentIdx < tracks.length - 1) { handleNextTrack(); }
       else { setPlaying(false); setIsActuallyPlaying(false); }
@@ -112,6 +118,7 @@ export default function AudioPlayer({ className = '' }) {
     el.addEventListener('ended', onEnded);
     el.addEventListener('play', handleAudioPlay);
     el.addEventListener('pause', handleAudioPause);
+    el.addEventListener('error', handleAudioError);
     const progressInterval = setInterval(saveProgress, 5000);
     el.addEventListener('pause', saveProgress); 
     return () => {
@@ -120,6 +127,7 @@ export default function AudioPlayer({ className = '' }) {
       el.removeEventListener('ended', onEnded);
       el.removeEventListener('play', handleAudioPlay);
       el.removeEventListener('pause', handleAudioPause);
+      el.removeEventListener('error', handleAudioError);
       clearInterval(progressInterval);
       el.removeEventListener('pause', saveProgress);
     };

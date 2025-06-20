@@ -17,7 +17,7 @@ if (supabaseUrl && supabaseAnonKey) {
   const createMockQueryBuilder = (initialData) => {
     let data = [...initialData]; // Create a mutable copy
 
-    const builder = {
+    return {
       // Chaining methods: they modify the data and return the builder itself.
       select: function() { return this; }, // Mock doesn't need to filter columns
       order: function(column, options) {
@@ -43,18 +43,23 @@ if (supabaseUrl && supabaseAnonKey) {
         return Promise.resolve({ data: data[0] || null, error: null });
       },
 
-      // This allows the builder to be awaited directly
-      then: function(resolve) {
-        resolve({ data, error: null });
+      // Make this thenable for direct await
+      then: function(onFulfilled, onRejected) {
+        return Promise.resolve({ data, error: null }).then(onFulfilled, onRejected);
+      },
+
+      catch: function(onRejected) {
+        return Promise.resolve({ data, error: null }).catch(onRejected);
       }
     };
-    return builder;
   };
 
   supabase = {
     from: (table) => {
       if (table === 'sections') {
-        return createMockQueryBuilder(Object.values(mockSections));
+        const sectionsArray = Object.values(mockSections).sort((a, b) => a.order - b.order);
+        // Return a simple thenable object that resolves to the sections data
+        return Promise.resolve({ data: sectionsArray, error: null });
       }
       if (table === 'visuals') {
         // For visuals, we start with all of them and let .eq() filter by section_id
@@ -65,7 +70,20 @@ if (supabaseUrl && supabaseAnonKey) {
     },
     storage: {
       from: () => ({
-        createSignedUrl: (path, expiresIn) => Promise.resolve({ data: { signedUrl: `/mock-assets/${path}` }, error: null }),
+        createSignedUrl: (path, expiresIn) => {
+          // For audio files, return a working sample audio URL
+          if (path && path.includes('audio.mp3')) {
+            // Create a simple base64-encoded silent audio file (1 second of silence)
+            // This is a minimal MP3 file that all browsers can play
+            const silentAudioDataUrl = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAEAAABIADAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDV1dXV1dXV1dXV1dXV1dXV1dXV1dXV1dXV6urq6urq6urq6urq6urq6urq6urq6urq6v////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAASDs90hvAAAAAAAAAAAAAAAAAAAA//OEZAAAAAGkAAAAAAAAA0gAAAAATEFN//OEZAMAAAGkAAAAAAAAA0gAAAAARTMu//OEZAYAAAGkAAAAAAAAA0gAAAAAOTku//OEZAkAAAGkAAAAAAAAA0gAAAAANVVV';
+            
+            console.log(`Mock audio URL for ${path}: Using silent audio data URL`);
+            return Promise.resolve({ data: { signedUrl: silentAudioDataUrl }, error: null });
+          }
+          
+          // For other files, return the original mock path
+          return Promise.resolve({ data: { signedUrl: `/mock-assets/${path}` }, error: null });
+        },
         download: (path) => {
           const content = mockMarkdownContent[path] || 'Mock content not found.';
           const blob = new Blob([content], { type: 'text/plain' });
