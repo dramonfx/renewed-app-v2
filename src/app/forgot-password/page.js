@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
             Forgot Password?
           </h1>
           <p className="text-sacred-muted text-sm leading-relaxed">
-            No worries! Enter your email address and we'll send you a link to reset your password.
+            No worries! Enter your email address and we&apos;ll send you a link to reset your password.
           </p>
         </div>
 
@@ -154,7 +154,7 @@ export default function ForgotPasswordPage() {
             </Link>
             
             <div className="text-sm text-sacred-blue-600">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link
                 href="/signup"
                 className="text-sacred-blue-700 hover:text-sacred-blue-800 font-medium transition-colors duration-200"
@@ -169,7 +169,7 @@ export default function ForgotPasswordPage() {
         <div className="text-center">
           <p className="text-xs text-sacred-muted leading-relaxed">
             Having trouble? The reset link will expire in 24 hours for security reasons.
-            If you don't receive an email, please check your spam folder or try again.
+            If you don&apos;t receive an email, please check your spam folder or try again.
           </p>
         </div>
       </div>
