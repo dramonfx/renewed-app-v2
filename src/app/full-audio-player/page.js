@@ -2,18 +2,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabaseClient';
 import Image from 'next/image';
-import { PlaylistProvider } from '@/contexts/PlaylistContext';
-import AudioPlayer from '@/components/AudioPlayer';
-import { useAudioTracks } from '@/hooks';
+import SacredCard from '@/components/ui/sacred-card';
+import FullAudiobookPlayer from '@/components/FullAudiobookPlayer';
 
 export default function FullAudioPlayerPage() {
   const [chartVisual, setChartVisual] = useState(null);
   const [chartLoading, setChartLoading] = useState(true);
   const [chartError, setChartError] = useState(null);
-
-  const { data: tracks, loading: tracksLoading, error: tracksError } = useAudioTracks();
 
   useEffect(() => {
     async function fetchChartVisual() {
@@ -48,52 +46,94 @@ export default function FullAudioPlayerPage() {
     fetchChartVisual();
   }, []);
 
-  const isLoading = tracksLoading || chartLoading;
-  const error = tracksError || chartError;
-
-  if (isLoading) {
-    return <div className="text-center p-10 font-sans text-brand-text-main">Loading Audiobook Experience...</div>;
-  }
-  if (error) {
-    return <div className="text-center p-10 font-sans text-red-500">Error loading data: {error}</div>;
-  }
-  if (tracks.length === 0) {
-    return <div className="text-center p-10 font-sans text-brand-text-main">No audio tracks found for the guidebook.</div>;
-  }
-
   return (
-    <PlaylistProvider initialTracks={tracks}>
-      <div className="space-y-8">
-        <h1 className="text-4xl font-serif text-brand-blue-dark text-center mb-6">
-          Full Audiobook Player
-        </h1>
-        <p className="text-brand-text-muted text-center font-sans -mt-6 mb-10">
-          Listen to the entire guidebook from beginning to end.
-        </p>
-
-        <div className="rounded-xl shadow-lg"> {/* Player component now has its own padding and background */}
-          <AudioPlayer className="text-brand-cream" />
-        </div>
-
-        {chartVisual && chartVisual.src && (
-          <div className="mt-12 bg-brand-cream p-6 rounded-xl shadow-lg flex flex-col items-center">
-            <h2 className="text-2xl font-sans font-semibold text-brand-blue-dark mb-6 text-center">
-              Mind Transformation Chart
-            </h2>
-            <div className="relative w-full max-w-3xl">
-              <Image
-                src={chartVisual.src}
-                alt={chartVisual.alt}
-                width={1200}
-                height={800}
-                style={{ objectFit: 'contain', maxWidth: '100%', height: 'auto' }}
-                className="rounded-md"
-                priority
-              />
+    <div className="min-h-screen p-6 lg:p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Page Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mb-8"
+        >
+          <SacredCard variant="heavy" className="p-8">
+            <div className="text-center">
+              <h1 className="text-3xl md:text-4xl font-serif text-sacred-blue-900 mb-4">
+                Full Audiobook Experience
+              </h1>
+              <p className="text-sacred-blue-600 text-lg max-w-2xl mx-auto">
+                Immerse yourself in the complete spiritual journey. Listen to the entire guidebook 
+                with advanced playback controls, bookmarks, and progress tracking.
+              </p>
             </div>
-          </div>
+          </SacredCard>
+        </motion.div>
+
+        {/* Main Audio Player */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mb-12"
+        >
+          <FullAudiobookPlayer />
+        </motion.div>
+
+        {/* Mind Transformation Chart */}
+        {chartVisual && chartVisual.src && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <SacredCard variant="heavy" className="p-8">
+              <div className="text-center">
+                <h2 className="text-2xl font-serif text-sacred-blue-900 mb-6">
+                  Mind Transformation Chart
+                </h2>
+                <div className="relative w-full max-w-4xl mx-auto">
+                  <Image
+                    src={chartVisual.src}
+                    alt={chartVisual.alt}
+                    width={1200}
+                    height={800}
+                    style={{ objectFit: 'contain', maxWidth: '100%', height: 'auto' }}
+                    className="rounded-lg shadow-lg"
+                    priority
+                  />
+                </div>
+                <p className="text-sacred-blue-600 mt-4 text-sm">
+                  Reference this chart as you progress through your spiritual transformation journey
+                </p>
+              </div>
+            </SacredCard>
+          </motion.div>
+        )}
+
+        {chartLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-8"
+          >
+            <SacredCard variant="glass" className="p-6">
+              <div className="text-sacred-blue-600">Loading transformation chart...</div>
+            </SacredCard>
+          </motion.div>
+        )}
+
+        {chartError && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-8"
+          >
+            <SacredCard variant="glass" className="p-6">
+              <div className="text-red-600">Error loading chart: {chartError}</div>
+            </SacredCard>
+          </motion.div>
         )}
       </div>
-    </PlaylistProvider>
+    </div>
   );
 }
