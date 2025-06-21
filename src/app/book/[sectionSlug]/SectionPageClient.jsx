@@ -1,10 +1,11 @@
+
 'use client';
 
-import ImmersiveSectionPlayer from '@/components/ImmersiveSectionPlayer';
+import SingleSectionPlayer from '@/components/SingleSectionPlayer';
 
 export default function SectionPageClient({ section, visuals, visualsMap, params }) {
   return (
-    <ImmersiveSectionPlayer 
+    <SingleSectionPlayer 
       section={section}
       visuals={visuals}
       visualsMap={visualsMap}
