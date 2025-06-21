@@ -1,359 +1,411 @@
 
 'use client';
 
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Play, Pause, SkipBack, SkipForward, Bookmark, BookmarkCheck, Gauge } from 'lucide-react';
+import { 
+  Play, 
+  Pause, 
+  SkipBack, 
+  SkipForward, 
+  Volume2, 
+  VolumeX,
+  Bookmark,
+  BookmarkCheck,
+  RotateCcw,
+  FastForward
+} from 'lucide-react';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
-import { useAdvancedAudioPlayer } from '@/hooks/useAdvancedAudioPlayer';
+import useAdvancedAudioPlayer from '@/hooks/useAdvancedAudioPlayer';
 
-export default function FullAudiobookPlayer() {
-  // Get all state and functions from the hook - this component is purely presentational
+/**
+ * FullAudiobookPlayer - Pure UI Component
+ * 
+ * A "dumb" component that provides a complete audiobook player interface
+ * powered by the useAdvancedAudioPlayer hook. Serves as the definitive
+ * design standard for all future audio players.
+ * 
+ * Features:
+ * - Complete hook integration for state management
+ * - Sacred design system consistency  
+ * - Standardized control buttons
+ * - Interactive progress bar
+ * - Track list with current highlighting
+ * - Responsive design matching Dashboard layout
+ */
+export default function FullAudiobookPlayer({ className = '' }) {
+  // Hook integration - all state and logic comes from here
   const {
     // State values
     tracks,
     currentTrack,
     currentTrackIndex,
     isPlaying,
-    isActuallyPlaying,
     currentTime,
     duration,
     speed,
+    volume,
+    isMuted,
     isLoading,
     error,
     hasBookmark,
-    
-    // Audio element ref
-    audioRef,
-    
+
     // Control functions
     playPause,
     nextTrack,
     previousTrack,
     playTrackAtIndex,
     seek,
+    skip,
+    restart,
     changeSpeed,
+    setVolume,
+    toggleMute,
+
+    // Bookmark functions
     toggleBookmark,
     jumpToBookmark,
-    
+
     // Utility functions
+    loadTracks,
     formatTime
   } = useAdvancedAudioPlayer({
     autoLoad: true,
     autoPlay: false
   });
 
-  // Handle progress bar click for seeking
-  const handleProgressClick = (e) => {
-    if (!duration || !currentTrack) return;
-    
-    const progressBar = e.currentTarget;
-    const rect = progressBar.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const percentClicked = clickX / rect.width;
-    const newTime = percentClicked * duration;
-    
-    seek(newTime);
-  };
+  // Load tracks on component mount
+  useEffect(() => {
+    loadTracks();
+  }, [loadTracks]);
 
-  // Loading state
+  // Handle loading state
   if (isLoading) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex items-center justify-center min-h-[400px]"
-      >
-        <SacredCard variant="heavy" className="p-8 text-center">
-          <div className="space-y-4">
-            <div className="w-16 h-16 mx-auto rounded-full bg-sacred-gradient flex items-center justify-center animate-pulse">
-              <span className="text-white text-2xl">🎧</span>
-            </div>
-            <h3 className="text-xl font-serif text-sacred-blue-900">Loading Audiobook...</h3>
-            <p className="text-sacred-blue-600">Preparing your spiritual journey</p>
-          </div>
-        </SacredCard>
-      </motion.div>
+      <SacredCard variant="heavy" className={`p-8 ${className}`}>
+        <div className="text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-sacred-blue-200 border-t-sacred-blue-600 rounded-full mx-auto mb-4"></div>
+          <p className="text-sacred-blue-600 font-medium">Loading audiobook experience...</p>
+        </div>
+      </SacredCard>
     );
   }
 
-  // Error state
+  // Handle error state
   if (error) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex items-center justify-center min-h-[400px]"
-      >
-        <SacredCard variant="heavy" className="p-8 text-center">
-          <div className="space-y-4">
-            <div className="w-16 h-16 mx-auto rounded-full bg-red-100 flex items-center justify-center">
-              <span className="text-red-600 text-2xl">⚠️</span>
-            </div>
-            <h3 className="text-xl font-serif text-red-700">Audio Error</h3>
-            <p className="text-red-600">{error}</p>
-            <SacredButton variant="primary" onClick={() => window.location.reload()}>
-              Try Again
-            </SacredButton>
+      <SacredCard variant="heavy" className={`p-8 ${className}`}>
+        <div className="text-center">
+          <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+            <span className="text-red-600 text-xl">⚠️</span>
           </div>
-        </SacredCard>
-      </motion.div>
+          <p className="text-red-600 font-medium mb-4">Audio Error</p>
+          <p className="text-red-500 text-sm">{error}</p>
+          <SacredButton
+            variant="primary"
+            onClick={() => window.location.reload()}
+            className="mt-4"
+          >
+            Reload Player
+          </SacredButton>
+        </div>
+      </SacredCard>
     );
   }
 
-  // No tracks state
-  if (!tracks.length) {
+  // Handle empty tracks
+  if (!tracks || tracks.length === 0) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex items-center justify-center min-h-[400px]"
-      >
-        <SacredCard variant="heavy" className="p-8 text-center">
-          <div className="space-y-4">
-            <div className="w-16 h-16 mx-auto rounded-full bg-sacred-blue-100 flex items-center justify-center">
-              <span className="text-sacred-blue-600 text-2xl">📚</span>
-            </div>
-            <h3 className="text-xl font-serif text-sacred-blue-900">No Audio Tracks</h3>
-            <p className="text-sacred-blue-600">No audio tracks found for the guidebook</p>
+      <SacredCard variant="heavy" className={`p-8 ${className}`}>
+        <div className="text-center">
+          <div className="w-12 h-12 rounded-full bg-sacred-blue-100 flex items-center justify-center mx-auto mb-4">
+            <span className="text-sacred-blue-600 text-xl">🎧</span>
           </div>
-        </SacredCard>
-      </motion.div>
+          <p className="text-sacred-blue-600 font-medium">No audio tracks available</p>
+          <p className="text-sacred-blue-500 text-sm mt-2">Please check back later for audiobook content.</p>
+        </div>
+      </SacredCard>
     );
   }
 
-  const progressPercent = duration ? (currentTime / duration) * 100 : 0;
-  const canGoBack = currentTrackIndex > 0;
-  const canGoForward = currentTrackIndex < tracks.length - 1;
+  // Helper function to format progress percentage
+  const getProgressPercentage = () => {
+    if (!duration || duration === 0) return 0;
+    return Math.min(100, (currentTime / duration) * 100);
+  };
+
+  // Helper function to handle progress bar click
+  const handleProgressClick = (e) => {
+    if (!duration) return;
+    
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const percentage = clickX / rect.width;
+    const seekTime = percentage * duration;
+    
+    seek(seekTime);
+  };
+
+  // Speed options for cycling
+  const speedOptions = [1, 1.25, 1.5, 2];
+  const getNextSpeed = () => {
+    const currentIndex = speedOptions.indexOf(speed);
+    const nextIndex = (currentIndex + 1) % speedOptions.length;
+    return speedOptions[nextIndex];
+  };
 
   return (
-    <div className="space-y-8">
-      {/* Hidden audio element */}
-      <audio ref={audioRef} />
+    <div className={`space-y-6 ${className}`}>
+      {/* Main Player Card */}
+      <SacredCard variant="heavy" className="p-8">
+        {/* Current Track Info */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-8"
+        >
+          <h2 className="text-2xl font-serif text-sacred-blue-900 mb-2">
+            {currentTrack?.title || 'No Track Selected'}
+          </h2>
+          <p className="text-sacred-blue-600">
+            Track {currentTrackIndex + 1} of {tracks.length}
+          </p>
+        </motion.div>
 
-      {/* Track Information */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <SacredCard variant="heavy" className="p-8">
-          <div className="text-center space-y-4">
-            <div className="flex items-center justify-center space-x-4">
-              <div className="w-20 h-20 rounded-full bg-sacred-gradient flex items-center justify-center shadow-lg">
-                <span className="text-white text-3xl">🎧</span>
-              </div>
-              <div className="text-left">
-                <h2 className="text-2xl md:text-3xl font-serif text-sacred-blue-900 mb-2">
-                  {currentTrack?.title || 'Loading...'}
-                </h2>
-                <p className="text-sacred-blue-600">
-                  Track {currentTrackIndex + 1} of {tracks.length}
-                </p>
-              </div>
-            </div>
-
-            {/* Time Display */}
-            <div className="flex items-center justify-center space-x-4 text-lg">
-              <span className="font-mono text-sacred-blue-900">{formatTime(currentTime)}</span>
-              <span className="text-sacred-blue-400">/</span>
-              <span className="font-mono text-sacred-blue-600">{formatTime(duration)}</span>
-            </div>
+        {/* Progress Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="mb-8"
+        >
+          <div className="flex items-center justify-between text-sm text-sacred-blue-600 mb-2">
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(duration)}</span>
           </div>
-        </SacredCard>
-      </motion.div>
-
-      {/* Progress Bar */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
-        <SacredCard variant="glass" className="p-6">
-          <div className="space-y-4">
-            <h3 className="text-lg font-serif text-sacred-blue-900 text-center">Progress</h3>
-            
-            {/* Interactive Progress Bar */}
+          <div 
+            className="w-full h-3 bg-sacred-blue-100 rounded-full cursor-pointer group"
+            onClick={handleProgressClick}
+          >
             <div 
-              className="relative w-full h-3 bg-sacred-blue-100 rounded-full cursor-pointer hover:bg-sacred-blue-200 transition-colors"
-              onClick={handleProgressClick}
-            >
-              <motion.div
-                className="absolute top-0 left-0 h-full bg-sacred-gradient rounded-full"
-                style={{ width: `${progressPercent}%` }}
-                transition={{ duration: 0.1 }}
-              />
-              
-              {/* Progress Handle */}
-              <motion.div
-                className="absolute top-1/2 transform -translate-y-1/2 w-5 h-5 bg-white border-2 border-sacred-blue-300 rounded-full shadow-lg cursor-pointer"
-                style={{ left: `${progressPercent}%`, marginLeft: '-10px' }}
-                whileHover={{ scale: 1.2 }}
-                whileTap={{ scale: 0.9 }}
-              />
-            </div>
+              className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-200 group-hover:from-blue-600 group-hover:to-blue-700"
+              style={{ width: `${getProgressPercentage()}%` }}
+            />
           </div>
-        </SacredCard>
-      </motion.div>
+        </motion.div>
 
-      {/* Main Controls */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-      >
-        <SacredCard variant="glass" className="p-8">
-          <div className="flex items-center justify-center space-x-6">
-            {/* Previous Track */}
-            <SacredButton
-              variant="ghost"
-              size="lg"
-              onClick={previousTrack}
-              disabled={!canGoBack}
-              className="w-16 h-16 rounded-full"
-            >
-              <SkipBack size={24} />
-            </SacredButton>
+        {/* Main Controls */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex items-center justify-center space-x-4 mb-8"
+        >
+          {/* Previous Track */}
+          <SacredButton
+            variant="ghost"
+            size="lg"
+            onClick={previousTrack}
+            disabled={currentTrackIndex === 0}
+            className="w-14 h-14 rounded-full"
+          >
+            <SkipBack className="w-6 h-6" />
+          </SacredButton>
 
-            {/* Play/Pause */}
-            <SacredButton
-              variant="primary"
-              size="lg"
-              onClick={playPause}
-              disabled={!currentTrack?.audioUrl}
-              className="w-20 h-20 rounded-full"
-            >
-              {isActuallyPlaying ? <Pause size={32} /> : <Play size={32} />}
-            </SacredButton>
+          {/* Skip Backward */}
+          <SacredButton
+            variant="ghost"
+            size="lg"
+            onClick={() => skip(-10)}
+            className="w-12 h-12 rounded-full"
+          >
+            <RotateCcw className="w-5 h-5" />
+          </SacredButton>
 
-            {/* Next Track */}
-            <SacredButton
-              variant="ghost"
-              size="lg"
-              onClick={nextTrack}
-              disabled={!canGoForward}
-              className="w-16 h-16 rounded-full"
-            >
-              <SkipForward size={24} />
-            </SacredButton>
-          </div>
-        </SacredCard>
-      </motion.div>
+          {/* Play/Pause */}
+          <SacredButton
+            variant="primary"
+            size="lg"
+            onClick={playPause}
+            className="w-16 h-16 rounded-full"
+          >
+            {isPlaying ? (
+              <Pause className="w-8 h-8" />
+            ) : (
+              <Play className="w-8 h-8 ml-1" />
+            )}
+          </SacredButton>
 
-      {/* Advanced Controls */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-      >
-        <div className="grid md:grid-cols-2 gap-6">
+          {/* Skip Forward */}
+          <SacredButton
+            variant="ghost"
+            size="lg"
+            onClick={() => skip(15)}
+            className="w-12 h-12 rounded-full"
+          >
+            <FastForward className="w-5 h-5" />
+          </SacredButton>
+
+          {/* Next Track */}
+          <SacredButton
+            variant="ghost"
+            size="lg"
+            onClick={nextTrack}
+            disabled={currentTrackIndex === tracks.length - 1}
+            className="w-14 h-14 rounded-full"
+          >
+            <SkipForward className="w-6 h-6" />
+          </SacredButton>
+        </motion.div>
+
+        {/* Secondary Controls */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="flex items-center justify-center space-x-6"
+        >
           {/* Speed Control */}
-          <SacredCard variant="glass" className="p-6">
-            <div className="text-center space-y-4">
-              <h4 className="text-lg font-serif text-sacred-blue-900">Playback Speed</h4>
-              <SacredButton
-                variant="gold"
-                size="lg"
-                onClick={changeSpeed}
-                className="w-full"
-              >
-                <Gauge size={20} className="mr-2" />
-                {speed}x Speed
-              </SacredButton>
-            </div>
-          </SacredCard>
+          <SacredButton
+            variant="ghost"
+            size="sm"
+            onClick={() => changeSpeed(getNextSpeed())}
+            className="min-w-[60px]"
+          >
+            {speed}x
+          </SacredButton>
 
-          {/* Bookmark Control */}
-          <SacredCard variant="glass" className="p-6">
-            <div className="text-center space-y-4">
-              <h4 className="text-lg font-serif text-sacred-blue-900">Bookmark</h4>
-              <div className="flex space-x-3">
-                <SacredButton
-                  variant={hasBookmark ? "gold" : "ghost"}
-                  size="md"
-                  onClick={toggleBookmark}
-                  className="flex-1"
-                >
-                  {hasBookmark ? <BookmarkCheck size={20} className="mr-2" /> : <Bookmark size={20} className="mr-2" />}
-                  {hasBookmark ? 'Saved' : 'Save'}
-                </SacredButton>
-                
-                {hasBookmark && (
-                  <SacredButton
-                    variant="primary"
-                    size="md"
-                    onClick={jumpToBookmark}
-                    className="flex-1"
-                  >
-                    Jump to Bookmark
-                  </SacredButton>
-                )}
-              </div>
-            </div>
-          </SacredCard>
-        </div>
-      </motion.div>
+          {/* Bookmark */}
+          <SacredButton
+            variant="ghost"
+            size="sm"
+            onClick={toggleBookmark}
+            className="w-10 h-10 rounded-full"
+          >
+            {hasBookmark ? (
+              <BookmarkCheck className="w-5 h-5 text-yellow-600" />
+            ) : (
+              <Bookmark className="w-5 h-5" />
+            )}
+          </SacredButton>
 
-      {/* Track List Preview */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-      >
-        <SacredCard variant="heavy" className="p-6">
-          <h3 className="text-xl font-serif text-sacred-blue-900 mb-6 text-center">
-            Audiobook Chapters
-          </h3>
-          
-          <div className="space-y-2 max-h-64 overflow-y-auto">
-            {tracks.map((track, index) => (
-              <motion.div
-                key={track.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-                className={`p-3 rounded-lg cursor-pointer transition-all duration-200 ${
-                  index === currentTrackIndex 
-                    ? 'bg-sacred-gradient text-white shadow-lg' 
-                    : 'bg-white/50 hover:bg-white/70 text-sacred-blue-900'
-                }`}
-                onClick={() => {
-                  if (index !== currentTrackIndex) {
-                    playTrackAtIndex(index);
-                  }
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h4 className="font-semibold">{track.title}</h4>
-                    <p className={`text-sm ${
-                      index === currentTrackIndex 
-                        ? 'text-white/80' 
-                        : 'text-sacred-blue-600'
-                    }`}>
-                      Chapter {index + 1}
-                    </p>
-                  </div>
-                  
+          {/* Volume Control */}
+          <div className="flex items-center space-x-2">
+            <SacredButton
+              variant="ghost"
+              size="sm"
+              onClick={toggleMute}
+              className="w-10 h-10 rounded-full"
+            >
+              {isMuted ? (
+                <VolumeX className="w-5 h-5" />
+              ) : (
+                <Volume2 className="w-5 h-5" />
+              )}
+            </SacredButton>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={isMuted ? 0 : volume}
+              onChange={(e) => setVolume(parseFloat(e.target.value))}
+              className="w-20 h-2 bg-sacred-blue-100 rounded-lg appearance-none cursor-pointer"
+            />
+          </div>
+
+          {/* Restart Track */}
+          <SacredButton
+            variant="ghost"
+            size="sm"
+            onClick={restart}
+            className="w-10 h-10 rounded-full"
+          >
+            <RotateCcw className="w-5 h-5" />
+          </SacredButton>
+        </motion.div>
+
+        {/* Bookmark Jump Button */}
+        {hasBookmark && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="mt-6 text-center"
+          >
+            <SacredButton
+              variant="gold"
+              size="sm"
+              onClick={jumpToBookmark}
+            >
+              Jump to Bookmark
+            </SacredButton>
+          </motion.div>
+        )}
+      </SacredCard>
+
+      {/* Track List */}
+      <SacredCard variant="glass" className="p-6">
+        <h3 className="text-xl font-serif text-sacred-blue-900 mb-6 text-center">
+          Audiobook Chapters
+        </h3>
+        <div className="space-y-3 max-h-96 overflow-y-auto">
+          {tracks.map((track, index) => (
+            <motion.div
+              key={track.id || track.slug || index}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.05 }}
+              className={`p-4 rounded-lg transition-all duration-200 cursor-pointer ${
+                index === currentTrackIndex
+                  ? 'bg-sacred-blue-100 border-2 border-sacred-blue-300 shadow-md'
+                  : 'bg-white/50 hover:bg-white/70 border border-transparent hover:border-sacred-blue-200'
+              }`}
+              onClick={() => playTrackAtIndex(index)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <h4 className={`font-medium mb-1 ${
+                    index === currentTrackIndex 
+                      ? 'text-sacred-blue-900' 
+                      : 'text-sacred-blue-700'
+                  }`}>
+                    {track.title}
+                  </h4>
+                  <p className="text-sm text-sacred-blue-500">
+                    Chapter {index + 1}
+                  </p>
+                </div>
+                <div className="flex items-center space-x-3">
                   {index === currentTrackIndex && (
-                    <div className="flex items-center space-x-2">
-                      {isActuallyPlaying ? (
+                    <div className="flex items-center space-x-1">
+                      {isPlaying ? (
                         <div className="flex space-x-1">
-                          <div className="w-1 h-4 bg-white animate-pulse"></div>
-                          <div className="w-1 h-4 bg-white animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                          <div className="w-1 h-4 bg-white animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                          <div className="w-1 h-4 bg-sacred-blue-600 animate-pulse"></div>
+                          <div className="w-1 h-4 bg-sacred-blue-600 animate-pulse" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-1 h-4 bg-sacred-blue-600 animate-pulse" style={{ animationDelay: '0.2s' }}></div>
                         </div>
                       ) : (
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                        <div className="w-6 h-6 rounded-full bg-sacred-blue-600 flex items-center justify-center">
+                          <Pause className="w-3 h-3 text-white" />
+                        </div>
                       )}
                     </div>
                   )}
+                  <SacredButton
+                    variant={index === currentTrackIndex ? "primary" : "ghost"}
+                    size="sm"
+                  >
+                    {index === currentTrackIndex ? 'Playing' : 'Play'}
+                  </SacredButton>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        </SacredCard>
-      </motion.div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </SacredCard>
     </div>
   );
 }
