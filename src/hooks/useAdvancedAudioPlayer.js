@@ -4,24 +4,174 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 
+// === ROBUSTNESS INFRASTRUCTURE ===
+
 /**
- * Advanced Audio Player Hook - Consolidated audio functionality
+ * Timeout wrapper for promises with configurable timeout
+ */
+const withTimeout = (promise, timeoutMs = 15000, operation = 'Operation') => {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => 
+      setTimeout(() => reject(new Error(`${operation} timeout after ${timeoutMs}ms`)), timeoutMs)
+    )
+  ]);
+};
+
+/**
+ * Circuit Breaker Pattern Implementation
+ * Prevents cascading failures by temporarily blocking operations after repeated failures
+ */
+class CircuitBreaker {
+  constructor(threshold = 5, timeout = 60000, name = 'CircuitBreaker') {
+    this.failureThreshold = threshold;
+    this.timeout = timeout;
+    this.name = name;
+    this.failureCount = 0;
+    this.lastFailureTime = null;
+    this.state = 'CLOSED'; // CLOSED, OPEN, HALF_OPEN
+  }
+
+  async execute(operation) {
+    if (this.state === 'OPEN') {
+      if (Date.now() - this.lastFailureTime > this.timeout) {
+        this.state = 'HALF_OPEN';
+        console.log(`[${this.name}] Circuit breaker transitioning to HALF_OPEN`);
+      } else {
+        throw new Error(`[${this.name}] Circuit breaker is OPEN - operation blocked`);
+      }
+    }
+
+    try {
+      const result = await operation();
+      
+      if (this.state === 'HALF_OPEN') {
+        this.state = 'CLOSED';
+        this.failureCount = 0;
+        console.log(`[${this.name}] Circuit breaker reset to CLOSED`);
+      }
+      
+      return result;
+    } catch (error) {
+      this.failureCount++;
+      this.lastFailureTime = Date.now();
+      
+      if (this.failureCount >= this.failureThreshold) {
+        this.state = 'OPEN';
+        console.warn(`[${this.name}] Circuit breaker OPENED after ${this.failureCount} failures`);
+      }
+      
+      throw error;
+    }
+  }
+
+  getState() {
+    return {
+      state: this.state,
+      failureCount: this.failureCount,
+      lastFailureTime: this.lastFailureTime
+    };
+  }
+
+  reset() {
+    this.state = 'CLOSED';
+    this.failureCount = 0;
+    this.lastFailureTime = null;
+    console.log(`[${this.name}] Circuit breaker manually reset`);
+  }
+}
+
+/**
+ * Retry logic with exponential backoff
+ */
+const withRetry = async (fn, maxRetries = 3, baseDelay = 1000, operation = 'Operation') => {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await fn();
+      if (attempt > 0) {
+        console.log(`[${operation}] Succeeded on attempt ${attempt + 1}`);
+      }
+      return result;
+    } catch (error) {
+      if (attempt === maxRetries) {
+        console.error(`[${operation}] Failed after ${maxRetries + 1} attempts:`, error.message);
+        throw error;
+      }
+      
+      const delay = baseDelay * Math.pow(2, attempt);
+      console.warn(`[${operation}] Attempt ${attempt + 1} failed, retrying in ${delay}ms:`, error.message);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+};
+
+/**
+ * Error categorization for better user experience
+ */
+const categorizeError = (error) => {
+  const message = error.message?.toLowerCase() || '';
+  
+  if (message.includes('timeout') || message.includes('network')) {
+    return {
+      type: 'NETWORK',
+      userMessage: 'Connection issue. Please check your internet and try again.',
+      isRetryable: true,
+      suggestedAction: 'Retry'
+    };
+  }
+  
+  if (message.includes('unauthorized') || message.includes('forbidden')) {
+    return {
+      type: 'AUTH',
+      userMessage: 'Authentication issue. Please refresh the page.',
+      isRetryable: false,
+      suggestedAction: 'Refresh Page'
+    };
+  }
+  
+  if (message.includes('not found') || message.includes('404')) {
+    return {
+      type: 'NOT_FOUND',
+      userMessage: 'Audio file not found. Some content may be unavailable.',
+      isRetryable: false,
+      suggestedAction: 'Skip'
+    };
+  }
+  
+  if (message.includes('circuit breaker')) {
+    return {
+      type: 'CIRCUIT_BREAKER',
+      userMessage: 'Service temporarily unavailable. Please wait a moment and try again.',
+      isRetryable: true,
+      suggestedAction: 'Wait and Retry'
+    };
+  }
+  
+  return {
+    type: 'UNKNOWN',
+    userMessage: 'An unexpected error occurred. Please try again.',
+    isRetryable: true,
+    suggestedAction: 'Retry'
+  };
+};
+
+/**
+ * Advanced Audio Player Hook - Enhanced with Robustness Patterns
  * 
- * Features:
- * - Supabase track loading with signed URLs
- * - Playlist management with automatic progression
- * - Playback speed control (1x, 1.25x, 1.5x, 2x)
- * - Bookmark system with persistence
- * - Progress tracking and restoration
- * - Volume control with mute functionality
- * - Comprehensive error handling
- * - Performance optimized state management
+ * Enhanced Features:
+ * - Circuit breaker pattern for failure prevention
+ * - Timeout wrappers for all Supabase operations
+ * - Retry logic with exponential backoff
+ * - Network status monitoring and auto-recovery
+ * - Comprehensive error categorization
+ * - Graceful degradation under adverse conditions
+ * - Progressive enhancement for unstable networks
  * 
  * @param {Object} options - Configuration options
  * @param {Array} options.initialTracks - Pre-loaded tracks array
  * @param {boolean} options.autoLoad - Whether to auto-load tracks from Supabase
  * @param {boolean} options.autoPlay - Whether to auto-play when track loads
- * @returns {Object} Complete audio player API
+ * @returns {Object} Complete audio player API with robustness features
  */
 export function useAdvancedAudioPlayer(options = {}) {
   const {
@@ -29,6 +179,16 @@ export function useAdvancedAudioPlayer(options = {}) {
     autoLoad = true,
     autoPlay = false
   } = options;
+
+  // === ROBUSTNESS STATE ===
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
+  const [circuitBreakerState, setCircuitBreakerState] = useState('CLOSED');
+  const [retryCount, setRetryCount] = useState(0);
+  const [lastError, setLastError] = useState(null);
+
+  // === CIRCUIT BREAKERS ===
+  const supabaseQueryBreaker = useRef(new CircuitBreaker(5, 60000, 'SupabaseQuery'));
+  const audioUrlBreaker = useRef(new CircuitBreaker(3, 30000, 'AudioURL'));
 
   // === CORE STATE MANAGEMENT ===
   const [tracks, setTracks] = useState(initialTracks);
@@ -48,6 +208,7 @@ export function useAdvancedAudioPlayer(options = {}) {
   // === REFS ===
   const audioRef = useRef(null);
   const progressIntervalRef = useRef(null);
+  const networkRetryTimeoutRef = useRef(null);
 
   // === COMPUTED VALUES ===
   const currentTrack = useMemo(() => {
@@ -60,6 +221,44 @@ export function useAdvancedAudioPlayer(options = {}) {
 
   const globalBookmarkKey = 'audio-bookmark-global';
 
+  // === NETWORK STATUS MONITORING ===
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log('[Network] Connection restored');
+      setIsOnline(true);
+      setError(null);
+      
+      // Auto-retry failed operations after network recovery
+      if (lastError && lastError.isRetryable) {
+        console.log('[Network] Auto-retrying after connection restore');
+        if (tracks.length === 0) {
+          loadTracks();
+        }
+      }
+    };
+
+    const handleOffline = () => {
+      console.warn('[Network] Connection lost');
+      setIsOnline(false);
+      setError({
+        type: 'NETWORK',
+        userMessage: 'Connection lost. Please check your internet connection.',
+        isRetryable: true,
+        suggestedAction: 'Check Connection'
+      });
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', handleOnline);
+      window.addEventListener('offline', handleOffline);
+      
+      return () => {
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+      };
+    }
+  }, [lastError, tracks.length]);
+
   // === UTILITY FUNCTIONS ===
   const formatTime = useCallback((time) => {
     if (isNaN(time) || time === Infinity) return '0:00';
@@ -68,75 +267,176 @@ export function useAdvancedAudioPlayer(options = {}) {
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   }, []);
 
-  // === SUPABASE INTEGRATION ===
+  // === ROBUST SUPABASE OPERATIONS ===
+  const robustSupabaseQuery = useCallback(async (queryFn, operation = 'Database Query') => {
+    return await supabaseQueryBreaker.current.execute(async () => {
+      return await withTimeout(
+        withRetry(queryFn, 3, 1000, operation),
+        15000,
+        operation
+      );
+    });
+  }, []);
+
+  const robustSignedUrl = useCallback(async (bucket, path, operation = 'Signed URL') => {
+    return await audioUrlBreaker.current.execute(async () => {
+      return await withTimeout(
+        withRetry(() => supabase.storage.from(bucket).createSignedUrl(path, 3600), 3, 500, operation),
+        10000,
+        operation
+      );
+    });
+  }, []);
+
+  // === ENHANCED SUPABASE INTEGRATION ===
   const loadTracks = useCallback(async (fetchAll = true) => {
     try {
       setIsLoading(true);
       setError(null);
+      setRetryCount(0);
 
-      const { data: sectionsData, error: sectionsError } = await supabase
-        .from('sections')
-        .select('id, title, slug, order, audio_file_path')
-        .order('order', { ascending: true });
-
-      if (sectionsError) {
-        throw new Error(sectionsError.message);
+      if (!isOnline) {
+        throw new Error('No internet connection');
       }
 
+      console.log('[Audio] Loading tracks from Supabase...');
+
+      // Robust database query
+      const sectionsData = await robustSupabaseQuery(
+        async () => {
+          const { data, error } = await supabase
+            .from('sections')
+            .select('id, title, slug, order, audio_file_path')
+            .order('order', { ascending: true });
+
+          if (error) throw new Error(error.message);
+          return data;
+        },
+        'Sections Query'
+      );
+
       const fetchedTracks = [];
-      if (sectionsData) {
-        for (const section of sectionsData) {
-          if (section.audio_file_path) {
+      if (sectionsData && sectionsData.length > 0) {
+        console.log(`[Audio] Processing ${sectionsData.length} sections for audio URLs...`);
+        
+        // Process sections in batches to avoid overwhelming the service
+        const batchSize = 3;
+        for (let i = 0; i < sectionsData.length; i += batchSize) {
+          const batch = sectionsData.slice(i, i + batchSize);
+          
+          const batchPromises = batch.map(async (section) => {
+            if (!section.audio_file_path) {
+              return {
+                id: section.id,
+                title: section.title,
+                slug: section.slug || String(section.id),
+                audioUrl: null,
+                error: 'No audio file path'
+              };
+            }
+
             try {
-              const { data: signedUrlData, error: audioError } = await supabase.storage
-                .from('book-assets')
-                .createSignedUrl(section.audio_file_path, 60 * 60);
-              
-              if (audioError) {
-                console.error(`Error creating signed URL for audio ${section.audio_file_path}:`, audioError.message);
-                fetchedTracks.push({ 
-                  id: section.id, 
-                  title: section.title, 
-                  slug: section.slug || String(section.id), 
-                  audioUrl: null 
-                });
-              } else {
-                fetchedTracks.push({ 
-                  id: section.id, 
-                  title: section.title, 
-                  slug: section.slug || String(section.id), 
-                  audioUrl: signedUrlData.signedUrl 
-                });
-              }
+              const signedUrlData = await robustSignedUrl(
+                'book-assets',
+                section.audio_file_path,
+                `Audio URL for ${section.title}`
+              );
+
+              return {
+                id: section.id,
+                title: section.title,
+                slug: section.slug || String(section.id),
+                audioUrl: signedUrlData.signedUrl
+              };
             } catch (urlError) {
-              console.error(`Error processing audio for section ${section.id}:`, urlError);
-              fetchedTracks.push({ 
-                id: section.id, 
-                title: section.title, 
-                slug: section.slug || String(section.id), 
-                audioUrl: null 
+              console.warn(`[Audio] Failed to get URL for section ${section.id}:`, urlError.message);
+              return {
+                id: section.id,
+                title: section.title,
+                slug: section.slug || String(section.id),
+                audioUrl: null,
+                error: urlError.message
+              };
+            }
+          });
+
+          const batchResults = await Promise.allSettled(batchPromises);
+          
+          batchResults.forEach((result, index) => {
+            if (result.status === 'fulfilled') {
+              fetchedTracks.push(result.value);
+            } else {
+              const section = batch[index];
+              console.error(`[Audio] Batch processing failed for section ${section.id}:`, result.reason);
+              fetchedTracks.push({
+                id: section.id,
+                title: section.title,
+                slug: section.slug || String(section.id),
+                audioUrl: null,
+                error: result.reason?.message || 'Batch processing failed'
               });
             }
-          } else {
-            fetchedTracks.push({ 
-              id: section.id, 
-              title: section.title, 
-              slug: section.slug || String(section.id), 
-              audioUrl: null 
-            });
+          });
+
+          // Small delay between batches to prevent overwhelming the service
+          if (i + batchSize < sectionsData.length) {
+            await new Promise(resolve => setTimeout(resolve, 200));
           }
         }
       }
 
+      console.log(`[Audio] Successfully loaded ${fetchedTracks.length} tracks`);
       setTracks(fetchedTracks);
       setIsLoading(false);
+      setLastError(null);
+      
+      // Update circuit breaker states
+      setCircuitBreakerState(supabaseQueryBreaker.current.getState().state);
+      
       return fetchedTracks;
     } catch (err) {
-      setError(err.message);
+      const categorizedError = categorizeError(err);
+      console.error('[Audio] Track loading failed:', err.message);
+      
+      setError(categorizedError);
+      setLastError(categorizedError);
       setIsLoading(false);
-      console.error('Error fetching audio tracks:', err);
+      setRetryCount(prev => prev + 1);
+      
+      // Update circuit breaker states
+      setCircuitBreakerState(supabaseQueryBreaker.current.getState().state);
+      
       return [];
     }
+  }, [isOnline, robustSupabaseQuery, robustSignedUrl]);
+
+  // === ENHANCED ERROR RECOVERY ===
+  const retryOperation = useCallback(async () => {
+    if (!isOnline) {
+      setError({
+        type: 'NETWORK',
+        userMessage: 'Please check your internet connection and try again.',
+        isRetryable: true,
+        suggestedAction: 'Check Connection'
+      });
+      return;
+    }
+
+    console.log('[Audio] Manual retry requested');
+    setRetryCount(prev => prev + 1);
+    
+    if (tracks.length === 0) {
+      await loadTracks();
+    }
+  }, [isOnline, tracks.length, loadTracks]);
+
+  const resetCircuitBreakers = useCallback(() => {
+    console.log('[Audio] Resetting circuit breakers');
+    supabaseQueryBreaker.current.reset();
+    audioUrlBreaker.current.reset();
+    setCircuitBreakerState('CLOSED');
+    setError(null);
+    setLastError(null);
   }, []);
 
   // === BOOKMARK SYSTEM ===
@@ -201,7 +501,12 @@ export function useAdvancedAudioPlayer(options = {}) {
       }
     } catch (err) {
       console.error("Error jumping to bookmark:", err);
-      setError("Unable to jump to bookmark");
+      setError({
+        type: 'BOOKMARK',
+        userMessage: "Unable to jump to bookmark. The bookmark may be invalid.",
+        isRetryable: false,
+        suggestedAction: 'Clear Bookmark'
+      });
     }
   }, [tracks, currentTrackIndex]);
 
@@ -365,14 +670,19 @@ export function useAdvancedAudioPlayer(options = {}) {
     setVolume(0.8);
     setIsMuted(false);
     setError(null);
+    setLastError(null);
     setHasBookmark(false);
+    setRetryCount(0);
+    
+    // Reset circuit breakers
+    resetCircuitBreakers();
     
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
       audioRef.current.volume = 0.8;
     }
-  }, []);
+  }, [resetCircuitBreakers]);
 
   // === AUDIO ELEMENT LIFECYCLE ===
   useEffect(() => {
@@ -406,12 +716,20 @@ export function useAdvancedAudioPlayer(options = {}) {
 
     if (isPlaying) {
       audioElement.play()
-        .then(() => setIsActuallyPlaying(true))
+        .then(() => {
+          setIsActuallyPlaying(true);
+          setError(null); // Clear any previous playback errors
+        })
         .catch(e => {
           console.error("Error attempting to play audio:", e);
           setIsPlaying(false);
           setIsActuallyPlaying(false);
-          setError("Playback failed");
+          
+          const categorizedError = categorizeError(e);
+          setError({
+            ...categorizedError,
+            userMessage: "Playback failed. Please try again or select a different track."
+          });
         });
     } else {
       audioElement.pause();
@@ -444,8 +762,12 @@ export function useAdvancedAudioPlayer(options = {}) {
     };
     
     const handleError = (e) => {
-      console.error("Audio error:", e);
-      setError("Audio playback error");
+      console.error("Audio playback error:", e);
+      const categorizedError = categorizeError(e.target?.error || e);
+      setError({
+        ...categorizedError,
+        userMessage: "Audio playback error. Please try a different track."
+      });
       setIsPlaying(false);
       setIsActuallyPlaying(false);
     };
@@ -496,7 +818,19 @@ export function useAdvancedAudioPlayer(options = {}) {
     }
   }, [autoPlay, currentTrack, isPlaying]);
 
-  // === RETURN COMPREHENSIVE API ===
+  // === CLEANUP ===
+  useEffect(() => {
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+      if (networkRetryTimeoutRef.current) {
+        clearTimeout(networkRetryTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // === RETURN COMPREHENSIVE API WITH ROBUSTNESS FEATURES ===
   return {
     // State values
     tracks,
@@ -512,6 +846,12 @@ export function useAdvancedAudioPlayer(options = {}) {
     isLoading,
     error,
     hasBookmark,
+
+    // Robustness state
+    isOnline,
+    circuitBreakerState,
+    retryCount,
+    lastError,
 
     // Audio element ref (for advanced usage)
     audioRef,
@@ -538,6 +878,10 @@ export function useAdvancedAudioPlayer(options = {}) {
     loadTracks,
     resetPlayer,
     formatTime,
+
+    // Robustness functions
+    retryOperation,
+    resetCircuitBreakers,
 
     // Progress key for external access
     progressKey,
