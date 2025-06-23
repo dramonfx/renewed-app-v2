@@ -2,7 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Play, Pause, SkipBack, SkipForward, Bookmark, BookmarkCheck, Gauge, Trash2 } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, RotateCcw, RotateCw, Bookmark, BookmarkCheck, Gauge, Trash2 } from 'lucide-react';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
@@ -32,6 +32,8 @@ export default function NewFullAudiobookPlayer() {
     previousTrack,
     playTrackAtIndex,
     seek,
+    skipForward10,
+    skipBackward10,
     changeSpeed,
     saveBookmark,
     jumpToBookmark,
@@ -207,7 +209,20 @@ export default function NewFullAudiobookPlayer() {
         transition={{ duration: 0.6, delay: 0.2 }}
       >
         <SacredCard variant="glass" className="p-8">
-          <div className="flex items-center justify-center space-x-6">
+          <div className="flex items-center justify-center space-x-4">
+            {/* Skip Backward 10s */}
+            <SacredButton
+              variant="ghost"
+              size="md"
+              onClick={skipBackward10}
+              disabled={!currentTrack?.audioUrl}
+              className="w-12 h-12 rounded-full relative"
+              title="Skip backward 10 seconds"
+            >
+              <RotateCcw size={18} />
+              <span className="absolute -bottom-1 text-xs font-bold">10s</span>
+            </SacredButton>
+
             {/* Previous Track */}
             <SacredButton
               variant="ghost"
@@ -215,6 +230,7 @@ export default function NewFullAudiobookPlayer() {
               onClick={previousTrack}
               disabled={!canGoBack}
               className="w-16 h-16 rounded-full"
+              title="Previous track"
             >
               <SkipBack size={24} />
             </SacredButton>
@@ -226,6 +242,7 @@ export default function NewFullAudiobookPlayer() {
               onClick={playPause}
               disabled={!currentTrack?.audioUrl}
               className="w-20 h-20 rounded-full"
+              title={isActuallyPlaying ? "Pause" : "Play"}
             >
               {isActuallyPlaying ? <Pause size={32} /> : <Play size={32} />}
             </SacredButton>
@@ -237,8 +254,22 @@ export default function NewFullAudiobookPlayer() {
               onClick={nextTrack}
               disabled={!canGoForward}
               className="w-16 h-16 rounded-full"
+              title="Next track"
             >
               <SkipForward size={24} />
+            </SacredButton>
+
+            {/* Skip Forward 10s */}
+            <SacredButton
+              variant="ghost"
+              size="md"
+              onClick={skipForward10}
+              disabled={!currentTrack?.audioUrl}
+              className="w-12 h-12 rounded-full relative"
+              title="Skip forward 10 seconds"
+            >
+              <RotateCw size={18} />
+              <span className="absolute -bottom-1 text-xs font-bold">10s</span>
             </SacredButton>
           </div>
         </SacredCard>

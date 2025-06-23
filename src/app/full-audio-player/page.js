@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { createClient } from '@supabase/supabase-js';
 import Image from 'next/image';
 import SacredCard from '@/components/ui/sacred-card';
 import FullAudiobookPlayer from '@/components/FullAudiobookPlayer';
@@ -19,80 +18,29 @@ export default function FullAudioPlayerPageNew() {
       setChartError(null);
       
       try {
-        console.log('🔍 Loading Mind Transformation Chart using golden snippet pattern...');
+        console.log('🔍 Loading Mind Transformation Chart via Golden Snippet API...');
         
-        // Golden snippet Supabase client setup
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+        // Fetch from our golden snippet API route (matches audio-tracks pattern)
+        const response = await fetch('/api/chart-visual');
+        const data = await response.json();
 
-        if (!supabaseUrl || !supabaseAnonKey) {
-          throw new Error('Missing Supabase environment variables for chart loading');
+        if (!response.ok) {
+          throw new Error(data.error || `API request failed with status ${response.status}`);
         }
 
-        const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-        // Query visuals table using golden snippet pattern
-        const { data: visualData, error: visualError } = await supabase
-          .from('visuals')
-          .select('file_path, caption')
-          .eq('markdown_tag', 'NEXT_STEPS_CHART')
-          .single();
-
-        if (visualError) {
-          if (visualError.code === 'PGRST116') {
-            console.log('ℹ️ No NEXT_STEPS_CHART visual found, trying alternative tags...');
-            
-            // Try alternative chart tags
-            const alternativeTags = ['![MTC]', 'MTC', 'CHART', 'TRANSFORMATION_CHART'];
-            
-            for (const tag of alternativeTags) {
-              const { data: altData, error: altError } = await supabase
-                .from('visuals')
-                .select('file_path, caption')
-                .eq('markdown_tag', tag)
-                .single();
-                
-              if (!altError && altData) {
-                console.log(`✅ Found chart with tag: ${tag}`);
-                visualData = altData;
-                break;
-              }
-            }
-            
-            if (!visualData) {
-              throw new Error('No transformation chart found with any known tags');
-            }
-          } else {
-            console.error('❌ Database query error:', visualError);
-            throw new Error(`Database query failed: ${visualError.message}`);
-          }
+        if (!data.success) {
+          throw new Error(data.error || 'API returned unsuccessful response');
         }
 
-        if (!visualData?.file_path) {
-          throw new Error('Chart visual found but no file_path available');
+        if (!data.chart?.src) {
+          throw new Error('Chart data received but no image URL available');
         }
 
-        console.log('✅ Found chart visual, generating signed URL...');
-
-        // Create signed URL using golden snippet pattern
-        const { data: signedUrlData, error: urlError } = await supabase.storage
-          .from('book-assets')
-          .createSignedUrl(visualData.file_path, 3600); // 1 hour expiry
-
-        if (urlError) {
-          console.error('❌ Signed URL generation error:', urlError);
-          throw new Error(`Signed URL generation failed: ${urlError.message}`);
-        }
-
-        if (!signedUrlData?.signedUrl) {
-          throw new Error('Signed URL generation succeeded but no URL returned');
-        }
-
-        console.log('✅ Successfully generated signed URL for chart');
-
-        setChartVisual({ 
-          src: signedUrlData.signedUrl, 
-          alt: visualData.caption || 'Mind Transformation Chart' 
+        console.log('✅ Successfully loaded chart via Golden Snippet API');
+        
+        setChartVisual({
+          src: data.chart.src,
+          alt: data.chart.alt || 'Mind Transformation Chart'
         });
 
       } catch (e) {

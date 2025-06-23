@@ -243,6 +243,14 @@ export function useAudioPlayer(options = {}) {
     seek(newTime);
   }, [currentTime, duration, seek]);
 
+  const skipForward10 = useCallback(() => {
+    skip(10);
+  }, [skip]);
+
+  const skipBackward10 = useCallback(() => {
+    skip(-10);
+  }, [skip]);
+
   const restart = useCallback(() => {
     seek(0);
   }, [seek]);
@@ -461,6 +469,8 @@ export function useAudioPlayer(options = {}) {
     playTrackAtIndex,
     seek,
     skip,
+    skipForward10,
+    skipBackward10,
     restart,
     changeSpeed,
     setVolume: setVolumeLevel,
