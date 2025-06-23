@@ -44,6 +44,7 @@ export default function UnifiedAudioPlayer({
   const hookOptions = {
     autoLoad: true,
     autoPlay: false,
+    mode: mode,
     ...(mode === 'single' && singleTrackSlug && { singleTrackSlug })
   };
 
@@ -78,6 +79,7 @@ export default function UnifiedAudioPlayer({
     changeSpeed,
     saveBookmark,
     jumpToBookmark,
+    deleteBookmark,
     clearBookmarks,
     setVolume,
     toggleMute,
@@ -113,25 +115,7 @@ export default function UnifiedAudioPlayer({
     setVolume(newVolume);
   };
 
-  // Handle individual bookmark deletion
-  const deleteBookmark = (bookmarkId) => {
-    const updatedBookmarks = bookmarks.filter(bookmark => bookmark.id !== bookmarkId);
-    
-    // Update local state through the hook (if it provides a way) or handle locally
-    // Since we're using the hook's bookmarks, we need to work with localStorage directly
-    try {
-      const storageKey = mode === 'single' && singleTrackSlug 
-        ? `audioBookmarks_${singleTrackSlug}` 
-        : 'audioBookmarks';
-      localStorage.setItem(storageKey, JSON.stringify(updatedBookmarks));
-      
-      // Trigger a re-render by calling the hook's bookmark management
-      // This is a workaround - ideally the hook would provide deleteBookmark
-      window.dispatchEvent(new Event('storage'));
-    } catch (error) {
-      console.error('Failed to delete bookmark:', error);
-    }
-  };
+
 
   // Error state
   if (error) {

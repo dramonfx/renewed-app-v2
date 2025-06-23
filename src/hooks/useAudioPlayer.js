@@ -28,7 +28,8 @@ export function useAudioPlayer(options = {}) {
   const {
     autoLoad = true,
     autoPlay = false,
-    singleTrackSlug = null
+    singleTrackSlug = null,
+    mode = 'full' // Add mode for context-aware bookmarks
   } = options;
 
   // === CORE STATE MANAGEMENT ===
@@ -57,6 +58,14 @@ export function useAudioPlayer(options = {}) {
   const progressKey = useMemo(() => {
     return currentTrack ? `audio-progress-${currentTrack.slug || currentTrack.id}` : null;
   }, [currentTrack]);
+
+  // Context-aware bookmark storage key
+  const bookmarkStorageKey = useMemo(() => {
+    if (mode === 'single' && singleTrackSlug) {
+      return `audio-bookmarks-section-${singleTrackSlug}`;
+    }
+    return 'audio-bookmarks'; // Global for full audiobook mode
+  }, [mode, singleTrackSlug]);
 
   const globalBookmarkKey = 'audio-bookmark-global';
 
@@ -115,14 +124,14 @@ export function useAudioPlayer(options = {}) {
   // === BOOKMARK SYSTEM ===
   const loadBookmarks = useCallback(() => {
     try {
-      const stored = localStorage.getItem('audio-bookmarks');
+      const stored = localStorage.getItem(bookmarkStorageKey);
       const parsed = stored ? JSON.parse(stored) : [];
       setBookmarks(Array.isArray(parsed) ? parsed : []);
     } catch (err) {
       console.error('Error loading bookmarks:', err);
       setBookmarks([]);
     }
-  }, []);
+  }, [bookmarkStorageKey]);
 
   const saveBookmark = useCallback(() => {
     if (!audioRef.current || !currentTrack) return;
@@ -133,15 +142,17 @@ export function useAudioPlayer(options = {}) {
       time: audioRef.current.currentTime,
       trackTitle: currentTrack.title,
       trackSlug: currentTrack.slug,
+      sectionSlug: mode === 'single' ? singleTrackSlug : null, // Add section context
+      mode: mode, // Store the mode for context reference
       timestamp: new Date().toISOString()
     };
 
     const newBookmarks = [...bookmarks, bookmark];
     setBookmarks(newBookmarks);
-    localStorage.setItem('audio-bookmarks', JSON.stringify(newBookmarks));
+    localStorage.setItem(bookmarkStorageKey, JSON.stringify(newBookmarks));
     
     console.log('✅ Bookmark saved:', bookmark);
-  }, [currentTrack, currentTrackIndex, bookmarks]);
+  }, [currentTrack, currentTrackIndex, bookmarks, bookmarkStorageKey, mode, singleTrackSlug]);
 
   const jumpToBookmark = useCallback((bookmark) => {
     if (!bookmark) return;
@@ -175,11 +186,27 @@ export function useAudioPlayer(options = {}) {
     }
   }, [tracks, currentTrackIndex]);
 
+  const deleteBookmark = useCallback((bookmarkId) => {
+    try {
+      const updatedBookmarks = bookmarks.filter(bookmark => bookmark.id !== bookmarkId);
+      setBookmarks(updatedBookmarks);
+      localStorage.setItem(bookmarkStorageKey, JSON.stringify(updatedBookmarks));
+      console.log('✅ Bookmark deleted:', bookmarkId);
+    } catch (err) {
+      console.error('Error deleting bookmark:', err);
+    }
+  }, [bookmarks, bookmarkStorageKey]);
+
   const clearBookmarks = useCallback(() => {
     setBookmarks([]);
-    localStorage.removeItem('audio-bookmarks');
+    localStorage.removeItem(bookmarkStorageKey);
     console.log('✅ All bookmarks cleared');
-  }, []);
+  }, [bookmarkStorageKey]);
+
+  // === BOOKMARK CONTEXT LOADING ===
+  useEffect(() => {
+    loadBookmarks();
+  }, [loadBookmarks]);
 
   // === PROGRESS PERSISTENCE ===
   const saveProgress = useCallback(() => {
@@ -479,6 +506,7 @@ export function useAudioPlayer(options = {}) {
     // Bookmark functions
     saveBookmark,
     jumpToBookmark,
+    deleteBookmark,
     clearBookmarks,
     loadBookmarks,
 
