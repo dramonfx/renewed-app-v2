@@ -1,0 +1,229 @@
+
+> renewed-app-v2@0.1.0 dev
+> next dev
+
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+ ⚠ Port 3000 is in use, using available port 3001 instead.
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+   ▲ Next.js 15.3.2
+   - Local:        http://localhost:3001
+   - Network:      http://100.120.114.151:3001
+   - Environments: .env.local
+
+ ✓ Starting...
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+ ✓ Ready in 4.1s
+ ○ Compiling /test-new-audio ...
+ ✓ Compiled /test-new-audio in 9.5s (1731 modules)
+ GET /test-new-audio 200 in 10217ms
+ ✓ Compiled in 718ms (795 modules)
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 660ms (952 modules)
+ GET /favicon.ico 200 in 780ms
+ GET /test-new-audio 200 in 110ms
+ GET /test-new-audio 200 in 59ms
+ ✓ Compiled in 877ms (1731 modules)
+ ✓ Compiled /test-golden-simple in 491ms (1726 modules)
+ GET /test-golden-simple 200 in 687ms
+ ✓ Compiled /favicon.ico in 189ms (957 modules)
+ GET /favicon.ico 200 in 278ms
+ GET /test-golden-simple 200 in 104ms
+ ✓ Compiled in 721ms (1718 modules)
+ GET /test-golden-simple 200 in 480ms
+ GET /test-golden-simple 200 in 32ms
+ GET /favicon.ico 200 in 17ms
+ ✓ Compiled in 619ms (1718 modules)
+ GET /test-golden-simple 200 in 381ms
+ GET /test-golden-simple 200 in 23ms
+ GET /favicon.ico 200 in 19ms
+ ✓ Compiled in 261ms (797 modules)
+ GET /test-golden-simple 200 in 33ms
+ ⨯ ./src/components/NewFullAudiobookPlayer.jsx
+Error: Failed to read source code from /home/ubuntu/renewed-app-v2/src/components/NewFullAudiobookPlayer.jsx
+
+Caused by:
+    No such file or directory (os error 2)
+
+Import trace for requested module:
+./src/components/NewFullAudiobookPlayer.jsx
+./src/app/test-new-audio/page.js
+ ○ Compiling /full-audio-player ...
+ ⨯ ./src/app/full-audio-player/page.js
+Module not found: Can't resolve '@/components/NewFullAudiobookPlayer'
+
+https://nextjs.org/docs/messages/module-not-found
+ ⨯ ./src/app/full-audio-player/page.js
+Module not found: Can't resolve '@/components/NewFullAudiobookPlayer'
+
+https://nextjs.org/docs/messages/module-not-found
+ ⨯ ./src/app/full-audio-player/page.js
+Module not found: Can't resolve '@/components/NewFullAudiobookPlayer'
+
+https://nextjs.org/docs/messages/module-not-found
+ GET /full-audio-player 500 in 6515ms
+ GET /test-golden-simple 200 in 1628ms
+ GET /favicon.ico 500 in 9ms
+ ⨯ ./src/components/NewFullAudiobookPlayer.jsx
+Error: Failed to read source code from /home/ubuntu/renewed-app-v2/src/components/NewFullAudiobookPlayer.jsx
+
+Caused by:
+    No such file or directory (os error 2)
+
+Import trace for requested module:
+./src/components/NewFullAudiobookPlayer.jsx
+./src/app/test-new-audio/page.js
+ ⨯ ./src/components/NewFullAudiobookPlayer.jsx
+Error: Failed to read source code from /home/ubuntu/renewed-app-v2/src/components/NewFullAudiobookPlayer.jsx
+
+Caused by:
+    No such file or directory (os error 2)
+
+Import trace for requested module:
+./src/components/NewFullAudiobookPlayer.jsx
+./src/app/test-new-audio/page.js
+ GET /full-audio-player 500 in 22ms
+ ✓ Compiled /_error in 417ms (1065 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /full-audio-player 200 in 248ms
+ GET /_next/static/webpack/b8b334339439e2c1.webpack.hot-update.json 404 in 316ms
+ GET /full-audio-player 200 in 126ms
+ GET /favicon.ico 200 in 27ms
+ ✓ Compiled in 293ms (1065 modules)
+ GET /full-audio-player 200 in 32ms
+ GET /favicon.ico 200 in 12ms
+ GET /full-audio-player 200 in 45ms
+ GET /favicon.ico 200 in 17ms
+ GET /full-audio-player 200 in 51ms
+ GET /favicon.ico 200 in 13ms
+ ✓ Compiled in 1094ms (2120 modules)
+ GET /full-audio-player 200 in 831ms
+ GET /full-audio-player 200 in 20ms
+ GET /favicon.ico 200 in 14ms
+ ✓ Compiled in 329ms (2108 modules)
+ ○ Compiling /api/audio-tracks ...
+ ⚠ ./node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js
+./node_modules/@supabase/realtime-js/dist/main/index.js
+./node_modules/@supabase/supabase-js/dist/module/index.js
+./src/app/api/audio-tracks/route.js
+🔍 API: Loading audio tracks using golden snippet pattern...
+🔍 API: Querying sections table for all audio tracks...
+❌ API: Database query error: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column sections.display_order does not exist'
+}
+❌ API: Golden snippet audio tracks error: Error: Database query failed: column sections.display_order does not exist
+    at GET (.next/server/app/api/audio-tracks/route.js:128:19)
+ GET /api/audio-tracks 500 in 1329ms
+ ⚠ ./node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js
+./node_modules/@supabase/realtime-js/dist/main/index.js
+./node_modules/@supabase/supabase-js/dist/module/index.js
+./src/app/api/audio-tracks/route.js
+ ⚠ ./node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js
+./node_modules/@supabase/realtime-js/dist/main/index.js
+./node_modules/@supabase/supabase-js/dist/module/index.js
+./src/app/api/audio-tracks/route.js
+ ⚠ ./node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js
+./node_modules/@supabase/realtime-js/dist/main/index.js
+./node_modules/@supabase/supabase-js/dist/module/index.js
+./src/app/api/audio-tracks/route.js
+🔍 API: Loading audio tracks using golden snippet pattern...
+🔍 API: Querying sections table for all audio tracks...
+❌ API: Database query error: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column sections.display_order does not exist'
+}
+❌ API: Golden snippet audio tracks error: Error: Database query failed: column sections.display_order does not exist
+    at GET (.next/server/app/api/audio-tracks/route.js:128:19)
+ GET /api/audio-tracks 500 in 659ms
+ GET /favicon.ico 200 in 22ms
+ GET /full-audio-player 200 in 119ms
+ GET /favicon.ico 200 in 16ms
+🔍 API: Loading audio tracks using golden snippet pattern...
+🔍 API: Querying sections table for all audio tracks...
+❌ API: Database query error: {
+  code: '42703',
+  details: null,
+  hint: null,
+  message: 'column sections.display_order does not exist'
+}
+❌ API: Golden snippet audio tracks error: Error: Database query failed: column sections.display_order does not exist
+    at GET (.next/server/app/api/audio-tracks/route.js:128:19)
+ GET /api/audio-tracks 500 in 453ms
+ ⚠ ./node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js
+./node_modules/@supabase/realtime-js/dist/main/index.js
+./node_modules/@supabase/supabase-js/dist/module/index.js
+./src/app/api/audio-tracks/route.js
+ GET /full-audio-player 200 in 36ms
+ GET /favicon.ico 200 in 17ms
+ ⚠ ./node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js
+./node_modules/@supabase/realtime-js/dist/main/index.js
+./node_modules/@supabase/supabase-js/dist/module/index.js
+./src/app/api/audio-tracks/route.js
+ GET /full-audio-player 200 in 41ms
+ GET /favicon.ico 200 in 15ms
+🔍 API: Loading audio tracks using golden snippet pattern...
+🔍 API: Querying sections table for all audio tracks...
+✅ API: Found 10 sections, generating signed URLs...
+✅ API: Generated signed URL for "Introduction Through Next Steps"
+✅ API: Generated signed URL for "30 Key Principles (11–20)"
+✅ API: Generated signed URL for "Characteristics of Principles"
+✅ API: Generated signed URL for "30 Key Principles (01–10)"
+✅ API: Generated signed URL for "30 Key Principles (21–30)"
+✅ API: Generated signed URL for "Prologue"
+✅ API: Generated signed URL for "Kingdom Government
+"
+✅ API: Generated signed URL for "Elephant in the Kingdom"
+✅ API: Generated signed URL for "Conclusion"
+✅ API: Generated signed URL for "Approved
+"
+✅ API: Successfully processed 10 tracks with signed URLs
+ GET /api/audio-tracks 200 in 656ms
+ GET /full-audio-player 200 in 65ms
+ GET /favicon.ico 200 in 13ms
+🔍 API: Loading audio tracks using golden snippet pattern...
+🔍 API: Querying sections table for all audio tracks...
+✅ API: Found 10 sections, generating signed URLs...
+✅ API: Generated signed URL for "Introduction Through Next Steps"
+✅ API: Generated signed URL for "Kingdom Government
+"
+✅ API: Generated signed URL for "Prologue"
+✅ API: Generated signed URL for "30 Key Principles (21–30)"
+✅ API: Generated signed URL for "Characteristics of Principles"
+✅ API: Generated signed URL for "Approved
+"
+✅ API: Generated signed URL for "Conclusion"
+✅ API: Generated signed URL for "30 Key Principles (11–20)"
+✅ API: Generated signed URL for "Elephant in the Kingdom"
+✅ API: Generated signed URL for "30 Key Principles (01–10)"
+✅ API: Successfully processed 10 tracks with signed URLs
+ GET /api/audio-tracks 200 in 608ms
+ GET /full-audio-player 200 in 45ms

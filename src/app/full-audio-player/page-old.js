@@ -1,13 +1,14 @@
-
+// src/app/full-audio-player/page.js
 'use client';
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { supabase } from '@/lib/supabaseClient';
 import Image from 'next/image';
 import SacredCard from '@/components/ui/sacred-card';
 import FullAudiobookPlayer from '@/components/FullAudiobookPlayer';
 
-export default function FullAudioPlayerPageNew() {
+export default function FullAudioPlayerPage() {
   const [chartVisual, setChartVisual] = useState(null);
   const [chartLoading, setChartLoading] = useState(true);
   const [chartError, setChartError] = useState(null);
@@ -16,41 +17,32 @@ export default function FullAudioPlayerPageNew() {
     async function fetchChartVisual() {
       setChartLoading(true);
       setChartError(null);
-      
       try {
-        console.log('🔍 Loading Mind Transformation Chart via Golden Snippet API...');
-        
-        // Fetch from our golden snippet API route (matches audio-tracks pattern)
-        const response = await fetch('/api/chart-visual');
-        const data = await response.json();
+        const { data: visualData, error: visualError } = await supabase
+          .from('visuals')
+          .select('file_path, caption')
+          .eq('markdown_tag', 'NEXT_STEPS_CHART')
+          .single();
 
-        if (!response.ok) {
-          throw new Error(data.error || `API request failed with status ${response.status}`);
+        if (visualError && visualError.code !== 'PGRST116') {
+          console.error("Error fetching 'NEXT_STEPS_CHART' visual:", visualError.message);
+        } else if (visualData && visualData.file_path) {
+          const { data: chartUrlData, error: chartUrlError } = await supabase.storage
+            .from('book-assets')
+            .createSignedUrl(visualData.file_path, 60 * 60);
+          if (chartUrlError) {
+            console.error("Error creating signed URL for chart visual:", chartUrlError.message);
+          } else {
+            setChartVisual({ src: chartUrlData.signedUrl, alt: visualData.caption || 'Base Exercise Template Chart' });
+          }
         }
-
-        if (!data.success) {
-          throw new Error(data.error || 'API returned unsuccessful response');
-        }
-
-        if (!data.chart?.src) {
-          throw new Error('Chart data received but no image URL available');
-        }
-
-        console.log('✅ Successfully loaded chart via Golden Snippet API');
-        
-        setChartVisual({
-          src: data.chart.src,
-          alt: data.chart.alt || 'Mind Transformation Chart'
-        });
-
       } catch (e) {
-        console.error('❌ Failed to load chart visual:', e);
-        setChartError(e.message || 'An unexpected error occurred.');
+        console.error("Failed to load chart visual:", e);
+        setChartError(e.message || "An unexpected error occurred.");
       } finally {
         setChartLoading(false);
       }
     }
-
     fetchChartVisual();
   }, []);
 
@@ -69,12 +61,9 @@ export default function FullAudioPlayerPageNew() {
               <h1 className="text-3xl md:text-4xl font-serif text-sacred-blue-900 mb-4">
                 Full Audiobook Experience
               </h1>
-              <p className="text-sacred-blue-600 text-lg max-w-2xl mx-auto mb-2">
+              <p className="text-sacred-blue-600 text-lg max-w-2xl mx-auto">
                 Immerse yourself in the complete spiritual journey. Listen to the entire guidebook 
-                with advanced playbook controls, bookmarks, and progress tracking.
-              </p>
-              <p className="text-xs text-sacred-blue-500">
-                🌟 Powered by Golden Snippet Integration - Real Supabase URLs
+                with advanced playback controls, bookmarks, and progress tracking.
               </p>
             </div>
           </SacredCard>
@@ -116,9 +105,6 @@ export default function FullAudioPlayerPageNew() {
                 <p className="text-sacred-blue-600 mt-4 text-sm">
                   Reference this chart as you progress through your spiritual transformation journey
                 </p>
-                <p className="text-xs text-sacred-blue-400 mt-2">
-                  ✨ Chart loaded using Golden Snippet pattern
-                </p>
               </div>
             </SacredCard>
           </motion.div>
@@ -131,10 +117,7 @@ export default function FullAudioPlayerPageNew() {
             className="text-center py-8"
           >
             <SacredCard variant="glass" className="p-6">
-              <div className="space-y-2">
-                <div className="text-sacred-blue-600">Loading transformation chart...</div>
-                <div className="text-xs text-sacred-blue-400">Using golden snippet pattern</div>
-              </div>
+              <div className="text-sacred-blue-600">Loading transformation chart...</div>
             </SacredCard>
           </motion.div>
         )}
@@ -146,10 +129,7 @@ export default function FullAudioPlayerPageNew() {
             className="text-center py-8"
           >
             <SacredCard variant="glass" className="p-6">
-              <div className="space-y-2">
-                <div className="text-red-600">Chart Error: {chartError}</div>
-                <div className="text-xs text-red-400">Golden snippet pattern failed</div>
-              </div>
+              <div className="text-red-600">Error loading chart: {chartError}</div>
             </SacredCard>
           </motion.div>
         )}
