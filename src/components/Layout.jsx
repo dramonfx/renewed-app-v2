@@ -67,6 +67,11 @@ export default function Layout({ children }) {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/journal" className="block py-3 px-4 rounded-lg text-sacred-blue-900 hover:bg-white/50 hover:text-sacred-blue-900 font-sans font-semibold text-base transition-all duration-300 border border-transparent hover:border-sacred-blue-300 hover:shadow-lg">
+                    📖 Sacred Journal
+                  </Link>
+                </li>
+                <li>
                   <Link href="/book" className="block py-3 px-4 rounded-lg text-sacred-blue-900 hover:bg-white/50 hover:text-sacred-blue-900 font-sans font-semibold text-base transition-all duration-300 border border-transparent hover:border-sacred-blue-300 hover:shadow-lg">
                     Guidebook Home
                   </Link>

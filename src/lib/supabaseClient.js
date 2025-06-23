@@ -73,10 +73,27 @@ if (supabaseUrl && supabaseAnonKey) {
         },
       }),
     },
+    from: (table) => {
+      if (table === 'sections') {
+        return createMockQueryBuilder(Object.values(mockSections));
+      }
+      if (table === 'visuals') {
+        const allVisuals = Object.values(mockVisuals).flat();
+        return createMockQueryBuilder(allVisuals);
+      }
+      if (table === 'reflections') {
+        // Mock reflections table for development
+        return createMockQueryBuilder([]);
+      }
+      return createMockQueryBuilder([]);
+    },
     auth: {
       onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
       getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-      // Add other mock auth methods as needed
+      signUp: () => Promise.resolve({ data: { user: null, session: null }, error: { message: 'Mock mode - no real authentication' } }),
+      signInWithPassword: () => Promise.resolve({ data: { user: null, session: null }, error: { message: 'Mock mode - no real authentication' } }),
+      signOut: () => Promise.resolve({ error: null }),
+      getUser: () => Promise.resolve({ data: { user: null }, error: { message: 'Mock mode - no real authentication' } }),
     },
   };
 }

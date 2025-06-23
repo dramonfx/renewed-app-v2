@@ -3,21 +3,52 @@
 > next dev
 
    Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
- ⚠ Port 3000 is in use, using available port 3002 instead.
+ ⚠ Port 3000 is in use, using available port 3001 instead.
    Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
    ▲ Next.js 15.3.2
-   - Local:        http://localhost:3002
-   - Network:      http://100.124.254.122:3002
+   - Local:        http://localhost:3001
+   - Network:      http://100.124.254.34:3001
    - Environments: .env.local
 
  ✓ Starting...
    Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
    Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
- ✓ Ready in 1919ms
- ○ Compiling /full-audio-player ...
- ✓ Compiled /full-audio-player in 6.2s (1756 modules)
- GET /full-audio-player 200 in 6758ms
- ✓ Compiled in 627ms (807 modules)
+ ✓ Ready in 3.3s
+ ○ Compiling / ...
+ ✓ Compiled / in 6.4s (1695 modules)
+ GET / 200 in 7072ms
+ ✓ Compiled in 702ms (777 modules)
  ○ Compiling /favicon.ico ...
- ✓ Compiled /favicon.ico in 771ms (965 modules)
- GET /favicon.ico 200 in 893ms
+ ✓ Compiled /favicon.ico in 609ms (934 modules)
+ GET /favicon.ico 200 in 740ms
+ ○ Compiling /journal ...
+ ✓ Compiled /journal in 1796ms (2126 modules)
+ GET /journal 200 in 1992ms
+ GET /journal 200 in 54ms
+ GET /favicon.ico 200 in 28ms
+ ✓ Compiled /login in 445ms (2139 modules)
+ GET /login 200 in 497ms
+ GET /favicon.ico 200 in 18ms
+ GET /login 200 in 58ms
+ GET /favicon.ico 200 in 28ms
+ GET /login 200 in 63ms
+ GET /favicon.ico 200 in 17ms
+ ✓ Compiled /signup in 496ms (2146 modules)
+ GET /signup 200 in 594ms
+ GET /favicon.ico 200 in 19ms
+ GET / 200 in 58ms
+ GET /login 200 in 53ms
+ GET /signup 200 in 53ms
+ GET /journal 200 in 53ms
+ GET / 200 in 53ms
+ GET /favicon.ico 200 in 14ms
+ ⚠ Cross origin request detected from 8a826a1cb-3001.preview.abacusai.app to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ GET /journal 200 in 50ms
+ GET /login 200 in 20ms
+ GET /login 200 in 18ms
+ ○ Compiling /book ...
+ ✓ Compiled /book in 861ms (2132 modules)
+ GET /book 200 in 970ms
+ GET /book 200 in 17ms
+ GET /journal 200 in 35ms
