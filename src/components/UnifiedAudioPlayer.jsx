@@ -15,7 +15,8 @@ import {
   Gauge,
   Trash2,
   Volume2,
-  VolumeX
+  VolumeX,
+  X
 } from 'lucide-react';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
@@ -112,6 +113,26 @@ export default function UnifiedAudioPlayer({
     setVolume(newVolume);
   };
 
+  // Handle individual bookmark deletion
+  const deleteBookmark = (bookmarkId) => {
+    const updatedBookmarks = bookmarks.filter(bookmark => bookmark.id !== bookmarkId);
+    
+    // Update local state through the hook (if it provides a way) or handle locally
+    // Since we're using the hook's bookmarks, we need to work with localStorage directly
+    try {
+      const storageKey = mode === 'single' && singleTrackSlug 
+        ? `audioBookmarks_${singleTrackSlug}` 
+        : 'audioBookmarks';
+      localStorage.setItem(storageKey, JSON.stringify(updatedBookmarks));
+      
+      // Trigger a re-render by calling the hook's bookmark management
+      // This is a workaround - ideally the hook would provide deleteBookmark
+      window.dispatchEvent(new Event('storage'));
+    } catch (error) {
+      console.error('Failed to delete bookmark:', error);
+    }
+  };
+
   // Error state
   if (error) {
     return (
@@ -183,7 +204,7 @@ export default function UnifiedAudioPlayer({
       </div>
 
       {/* Progress Bar */}
-      <div>
+      <div className="mb-2">
         <div 
           className="w-full h-2 bg-sacred-blue-100 rounded-full cursor-pointer relative overflow-hidden"
           onClick={handleProgressClick}
@@ -277,36 +298,37 @@ export default function UnifiedAudioPlayer({
 
       {/* Secondary Controls Row */}
       <div className="flex items-center justify-between space-x-4">
-        {/* Speed Control */}
-        <SacredButton
-          variant="ghost"
-          size="sm"
-          onClick={changeSpeed}
-          className="flex items-center space-x-1"
-          title="Change playback speed"
-        >
-          <Gauge className="w-4 h-4" />
-          <span className="text-sm font-semibold">{speed}x</span>
-        </SacredButton>
+        {/* Speed and Save Controls Group */}
+        <div className="flex items-center space-x-2">
+          <SacredButton
+            variant="ghost"
+            size="sm"
+            onClick={changeSpeed}
+            className="flex items-center space-x-1"
+            title="Change playback speed"
+          >
+            <Gauge className="w-4 h-4" />
+            <span className="text-sm font-semibold">{speed}x</span>
+          </SacredButton>
 
-        {/* Bookmark Control */}
-        <SacredButton
-          variant="ghost"
-          size="sm"
-          onClick={saveBookmark}
-          disabled={!currentTrack}
-          className="flex items-center space-x-1"
-          title="Save bookmark at current position"
-        >
-          <Bookmark className="w-4 h-4" />
-          <span className="text-sm">Save</span>
-        </SacredButton>
+          <SacredButton
+            variant="ghost"
+            size="sm"
+            onClick={saveBookmark}
+            disabled={!currentTrack}
+            className="flex items-center space-x-1 bg-sacred-gold-gradient text-gray-800 hover:shadow-lg hover:shadow-sacred-gold-500/25 font-semibold"
+            title="Save bookmark at current position"
+          >
+            <Bookmark className="w-4 h-4" />
+            <span className="text-sm">Save</span>
+          </SacredButton>
+        </div>
 
-        {/* Volume Control */}
-        <div className="flex items-center space-x-2 flex-1 max-w-[120px]">
+        {/* Volume Control - Fixed alignment */}
+        <div className="flex items-center space-x-3 flex-1 max-w-[140px] mr-2">
           <motion.button
             onClick={toggleMute}
-            className="text-sacred-blue-600 hover:text-sacred-blue-800 transition-colors"
+            className="text-sacred-blue-600 hover:text-sacred-blue-800 transition-colors flex-shrink-0"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             title={isMuted ? "Unmute" : "Mute"}
@@ -354,9 +376,9 @@ export default function UnifiedAudioPlayer({
                 key={bookmark.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex items-center justify-between p-2 bg-white/50 rounded-lg text-sm"
+                className="flex items-center justify-between p-2 bg-white/50 rounded-lg text-sm group"
               >
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 mr-2">
                   <p className="font-medium text-sacred-blue-900 truncate">
                     {bookmark.trackTitle}
                   </p>
@@ -364,14 +386,27 @@ export default function UnifiedAudioPlayer({
                     {formatTime(bookmark.time)}
                   </p>
                 </div>
-                <SacredButton
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => jumpToBookmark(bookmark)}
-                  className="text-xs"
-                >
-                  Jump
-                </SacredButton>
+                
+                <div className="flex items-center space-x-1">
+                  <SacredButton
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => jumpToBookmark(bookmark)}
+                    className="text-xs px-2 py-1"
+                  >
+                    Jump
+                  </SacredButton>
+                  
+                  <motion.button
+                    onClick={() => deleteBookmark(bookmark.id)}
+                    className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors opacity-60 group-hover:opacity-100"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    title="Delete this bookmark"
+                  >
+                    <X className="w-3 h-3" />
+                  </motion.button>
+                </div>
               </motion.div>
             ))}
           </div>
