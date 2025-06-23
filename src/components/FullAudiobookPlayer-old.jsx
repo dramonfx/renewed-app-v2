@@ -2,13 +2,13 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Play, Pause, SkipBack, SkipForward, Bookmark, BookmarkCheck, Gauge, Trash2 } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Bookmark, BookmarkCheck, Gauge } from 'lucide-react';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { useAdvancedAudioPlayer } from '@/hooks/useAdvancedAudioPlayer';
 
-export default function NewFullAudiobookPlayer() {
-  // Get all state and functions from the new golden snippet hook
+export default function FullAudiobookPlayer() {
+  // Get all state and functions from the hook - this component is purely presentational
   const {
     // State values
     tracks,
@@ -21,7 +21,7 @@ export default function NewFullAudiobookPlayer() {
     speed,
     isLoading,
     error,
-    bookmarks,
+    hasBookmark,
     
     // Audio element ref
     audioRef,
@@ -33,13 +33,12 @@ export default function NewFullAudiobookPlayer() {
     playTrackAtIndex,
     seek,
     changeSpeed,
-    saveBookmark,
+    toggleBookmark,
     jumpToBookmark,
-    clearBookmarks,
     
     // Utility functions
     formatTime
-  } = useAudioPlayer({
+  } = useAdvancedAudioPlayer({
     autoLoad: true,
     autoPlay: false
   });
@@ -71,7 +70,7 @@ export default function NewFullAudiobookPlayer() {
               <span className="text-white text-2xl">🎧</span>
             </div>
             <h3 className="text-xl font-serif text-sacred-blue-900">Loading Audiobook...</h3>
-            <p className="text-sacred-blue-600">Connecting to Supabase using golden snippet pattern</p>
+            <p className="text-sacred-blue-600">Preparing your spiritual journey</p>
           </div>
         </SacredCard>
       </motion.div>
@@ -116,7 +115,7 @@ export default function NewFullAudiobookPlayer() {
               <span className="text-sacred-blue-600 text-2xl">📚</span>
             </div>
             <h3 className="text-xl font-serif text-sacred-blue-900">No Audio Tracks</h3>
-            <p className="text-sacred-blue-600">No audio tracks found with valid signed URLs</p>
+            <p className="text-sacred-blue-600">No audio tracks found for the guidebook</p>
           </div>
         </SacredCard>
       </motion.div>
@@ -150,9 +149,6 @@ export default function NewFullAudiobookPlayer() {
                 </h2>
                 <p className="text-sacred-blue-600">
                   Track {currentTrackIndex + 1} of {tracks.length}
-                </p>
-                <p className="text-xs text-sacred-blue-400 mt-1">
-                  Powered by Golden Snippet Integration ✨
                 </p>
               </div>
             </div>
@@ -270,79 +266,39 @@ export default function NewFullAudiobookPlayer() {
           {/* Bookmark Control */}
           <SacredCard variant="glass" className="p-6">
             <div className="text-center space-y-4">
-              <h4 className="text-lg font-serif text-sacred-blue-900">Quick Bookmark</h4>
-              <SacredButton
-                variant="primary"
-                size="lg"
-                onClick={saveBookmark}
-                disabled={!currentTrack}
-                className="w-full"
-              >
-                <Bookmark size={20} className="mr-2" />
-                Save Position
-              </SacredButton>
+              <h4 className="text-lg font-serif text-sacred-blue-900">Bookmark</h4>
+              <div className="flex space-x-3">
+                <SacredButton
+                  variant={hasBookmark ? "gold" : "ghost"}
+                  size="md"
+                  onClick={toggleBookmark}
+                  className="flex-1"
+                >
+                  {hasBookmark ? <BookmarkCheck size={20} className="mr-2" /> : <Bookmark size={20} className="mr-2" />}
+                  {hasBookmark ? 'Saved' : 'Save'}
+                </SacredButton>
+                
+                {hasBookmark && (
+                  <SacredButton
+                    variant="primary"
+                    size="md"
+                    onClick={jumpToBookmark}
+                    className="flex-1"
+                  >
+                    Jump to Bookmark
+                  </SacredButton>
+                )}
+              </div>
             </div>
           </SacredCard>
         </div>
       </motion.div>
 
-      {/* Bookmarks Management */}
-      {bookmarks.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <SacredCard variant="heavy" className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-serif text-sacred-blue-900">
-                  Saved Bookmarks ({bookmarks.length})
-                </h3>
-                <SacredButton
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearBookmarks}
-                >
-                  <Trash2 size={16} className="mr-2" />
-                  Clear All
-                </SacredButton>
-              </div>
-              
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {bookmarks.slice(-5).reverse().map((bookmark) => ( // Show latest 5
-                  <motion.div
-                    key={bookmark.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center justify-between p-3 bg-white/50 rounded-lg"
-                  >
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-sacred-blue-900">{bookmark.trackTitle}</h4>
-                      <p className="text-sm text-sacred-blue-600">
-                        {formatTime(bookmark.time)} • {new Date(bookmark.timestamp).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <SacredButton
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => jumpToBookmark(bookmark)}
-                    >
-                      Jump
-                    </SacredButton>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </SacredCard>
-        </motion.div>
-      )}
-
       {/* Track List Preview */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.5 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
       >
         <SacredCard variant="heavy" className="p-6">
           <h3 className="text-xl font-serif text-sacred-blue-900 mb-6 text-center">
@@ -355,7 +311,7 @@ export default function NewFullAudiobookPlayer() {
                 key={track.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
                 className={`p-3 rounded-lg cursor-pointer transition-all duration-200 ${
                   index === currentTrackIndex 
                     ? 'bg-sacred-gradient text-white shadow-lg' 
@@ -375,7 +331,7 @@ export default function NewFullAudiobookPlayer() {
                         ? 'text-white/80' 
                         : 'text-sacred-blue-600'
                     }`}>
-                      Chapter {index + 1} • {track.slug}
+                      Chapter {index + 1}
                     </p>
                   </div>
                   
