@@ -1,23 +1,26 @@
-
-> renewed-app-v2@0.1.0 dev
-> next dev
-
    Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
- ⚠ Port 3000 is in use, using available port 3002 instead.
+ ⚠ Port 3000 is in use, using available port 3001 instead.
    Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
    ▲ Next.js 15.3.2
-   - Local:        http://localhost:3002
-   - Network:      http://100.124.254.122:3002
+   - Local:        http://localhost:3001
+   - Network:      http://100.120.117.196:3001
    - Environments: .env.local
 
  ✓ Starting...
    Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
    Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
- ✓ Ready in 1919ms
- ○ Compiling /full-audio-player ...
- ✓ Compiled /full-audio-player in 6.2s (1756 modules)
- GET /full-audio-player 200 in 6758ms
- ✓ Compiled in 627ms (807 modules)
- ○ Compiling /favicon.ico ...
- ✓ Compiled /favicon.ico in 771ms (965 modules)
- GET /favicon.ico 200 in 893ms
+ ✓ Ready in 1936ms
+ ○ Compiling / ...
+ ✓ Compiled / in 6s (1695 modules)
+ HEAD / 200 in 6370ms
+ ✓ Compiled in 613ms (777 modules)
+ GET / 200 in 74ms
+ ✓ Compiled /favicon.ico in 402ms (934 modules)
+ GET /favicon.ico 200 in 516ms
+ ○ Compiling /journal ...
+ ✓ Compiled /journal in 2.3s (2112 modules)
+ GET /journal 200 in 2578ms
+ GET /favicon.ico 200 in 24ms
+ ✓ Compiled /login in 424ms (2125 modules)
+ GET /login 200 in 474ms
+ GET /favicon.ico 200 in 20ms

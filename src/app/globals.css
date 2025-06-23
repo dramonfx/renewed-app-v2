@@ -259,3 +259,126 @@
   display: none;
 }
 
+/* Sacred Journal Editor Styles */
+.sacred-editor-content {
+  font-family: "Inter", "Nunito Sans", sans-serif;
+}
+
+.sacred-editor-content .ProseMirror {
+  outline: none;
+  padding: 1.5rem;
+  min-height: 300px;
+  line-height: 1.7;
+  color: #0c4a6e;
+  font-size: 1rem;
+}
+
+.sacred-editor-content .ProseMirror p {
+  margin: 0.75rem 0;
+}
+
+.sacred-editor-content .ProseMirror h1,
+.sacred-editor-content .ProseMirror h2,
+.sacred-editor-content .ProseMirror h3 {
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+  color: #075985;
+  margin: 1.5rem 0 0.75rem 0;
+}
+
+.sacred-editor-content .ProseMirror h1 {
+  font-size: 1.875rem;
+}
+
+.sacred-editor-content .ProseMirror h2 {
+  font-size: 1.5rem;
+}
+
+.sacred-editor-content .ProseMirror h3 {
+  font-size: 1.25rem;
+}
+
+.sacred-editor-content .ProseMirror ul,
+.sacred-editor-content .ProseMirror ol {
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+}
+
+.sacred-editor-content .ProseMirror li {
+  margin: 0.25rem 0;
+}
+
+.sacred-editor-content .ProseMirror blockquote {
+  border-left: 4px solid #0ea5e9;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: #075985;
+  font-style: italic;
+  background: rgba(14, 165, 233, 0.05);
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.sacred-editor-content .ProseMirror strong {
+  font-weight: 600;
+  color: #075985;
+}
+
+.sacred-editor-content .ProseMirror em {
+  color: #0284c7;
+}
+
+.sacred-editor-content .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #94a3b8;
+  pointer-events: none;
+  height: 0;
+}
+
+/* Sacred Journal Prose Styles for Reading Mode */
+.prose {
+  color: #0c4a6e;
+  line-height: 1.7;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+  color: #075985;
+}
+
+.prose p {
+  margin: 0.75rem 0;
+}
+
+.prose blockquote {
+  border-left: 4px solid #0ea5e9;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: #075985;
+  font-style: italic;
+  background: rgba(14, 165, 233, 0.05);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border-left-width: 4px;
+}
+
+.prose ul, .prose ol {
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+}
+
+.prose li {
+  margin: 0.25rem 0;
+}
+
+.prose strong {
+  font-weight: 600;
+  color: #075985;
+}
+
+.prose em {
+  color: #0284c7;
+}
+
