@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabaseClient';
 import JournalHeader from '@/components/journal/JournalHeader';
 import JournalEntryList from '@/components/journal/JournalEntryList';
 import NewJournalEntry from '@/components/journal/NewJournalEntry';
@@ -32,26 +33,62 @@ export default function JournalPage() {
     }
   }, [user, loading, router]);
 
-  // Fetch journal entries
+  // Fetch journal entries using Supabase client directly
   const fetchEntries = async () => {
     try {
       setEntriesLoading(true);
-      const params = new URLSearchParams();
       
-      if (searchQuery) params.append('search', searchQuery);
-      if (filterType !== 'all') params.append('type', filterType);
-      if (selectedTags.length > 0) params.append('tags', selectedTags.join(','));
-      
-      const response = await fetch(`/api/journal?${params.toString()}`);
-      
-      if (response.ok) {
-        const data = await response.json();
-        setEntries(data.entries || []);
-      } else {
-        console.error('Failed to fetch journal entries');
+      if (!user) {
+        setEntries([]);
+        return;
       }
+
+      // Build Supabase query
+      let query = supabase
+        .from('reflections')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      // Add reflection type filter
+      if (filterType && filterType !== 'all') {
+        query = query.eq('reflection_type', filterType);
+      }
+
+      // Add search functionality
+      if (searchQuery) {
+        query = query.or(`question_text.ilike.%${searchQuery}%,answer_text.ilike.%${searchQuery}%`);
+      }
+
+      // Add tag filtering
+      if (selectedTags.length > 0) {
+        query = query.overlaps('tags', selectedTags);
+      }
+
+      // Execute query
+      const { data: reflections, error } = await query;
+
+      if (error) {
+        console.error('Error fetching journal entries:', error);
+        setEntries([]);
+        return;
+      }
+
+      // Transform reflections to journal entry format
+      const journalEntries = (reflections || []).map(reflection => ({
+        id: reflection.id,
+        title: reflection.question_text,
+        content: reflection.answer_text,
+        tags: reflection.tags || [],
+        reflection_type: reflection.reflection_type,
+        created_at: reflection.created_at,
+        updated_at: reflection.updated_at
+      }));
+
+      setEntries(journalEntries);
     } catch (error) {
       console.error('Error fetching journal entries:', error);
+      setEntries([]);
     } finally {
       setEntriesLoading(false);
     }

@@ -5,34 +5,88 @@
 'use client';
 
 import { useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/contexts/AuthContext';
 import JournalEditor from './JournalEditor';
-import { X, Save, Sparkles, Tag } from 'lucide-react';
+import { X, Save, Sparkles, Tag, Heart, Brain, Zap } from 'lucide-react';
 
 export default function NewJournalEntry({ onSave, onCancel }) {
+  const { user } = useAuth();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [reflectionType, setReflectionType] = useState('journal');
+  const [reflectionType, setReflectionType] = useState('gratitude');
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState('');
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // Sacred reflection types
+  // Enhanced Sacred reflection types for spiritual discernment
   const reflectionTypes = [
-    { value: 'journal', label: 'Journal Entry', icon: '📖' },
-    { value: 'gratitude', label: 'Gratitude', icon: '🙏' },
-    { value: 'challenge', label: 'Challenge', icon: '⚡' },
-    { value: 'insight', label: 'Insight', icon: '✨' },
-    { value: 'prayer', label: 'Prayer', icon: '🕊️' },
-    { value: 'growth', label: 'Growth', icon: '🌱' },
-    { value: 'joy', label: 'Joy', icon: '☀️' }
+    { 
+      value: 'gratitude', 
+      label: 'Gratitude & Appreciation', 
+      icon: '🙏', 
+      description: 'Focusing on blessings and thankfulness',
+      color: 'text-emerald-600'
+    },
+    { 
+      value: 'challenge', 
+      label: 'Challenge & Growth', 
+      icon: '⚡', 
+      description: 'Working through difficulties with wisdom',
+      color: 'text-orange-600'
+    },
+    { 
+      value: 'insight', 
+      label: 'Spiritual Insight', 
+      icon: '✨', 
+      description: 'Moments of divine understanding',
+      color: 'text-purple-600'
+    },
+    { 
+      value: 'prayer', 
+      label: 'Prayer & Communion', 
+      icon: '🕊️', 
+      description: 'Sacred communication and requests',
+      color: 'text-blue-600'
+    },
+    { 
+      value: 'discernment', 
+      label: 'Mind Discernment', 
+      icon: '🧠', 
+      description: 'Distinguishing Natural vs Spiritual thoughts',
+      color: 'text-indigo-600'
+    },
+    { 
+      value: 'transformation', 
+      label: 'Personal Transformation', 
+      icon: '🦋', 
+      description: 'Documenting spiritual growth and change',
+      color: 'text-pink-600'
+    },
+    { 
+      value: 'peace', 
+      label: 'Peace & Joy', 
+      icon: '☀️', 
+      description: 'Celebrating moments of divine peace',
+      color: 'text-yellow-600'
+    }
   ];
 
-  // Handle tag addition
-  const handleAddTag = () => {
-    if (newTag.trim() && !tags.includes(newTag.trim()) && tags.length < 5) {
-      setTags(prev => [...prev, newTag.trim()]);
-      setNewTag('');
+  // Sacred spiritual tags for organization
+  const spiritualTags = [
+    'gratitude', 'peace', 'joy', 'love', 'forgiveness', 'wisdom',
+    'growth', 'challenge', 'breakthrough', 'prayer', 'meditation',
+    'discernment', 'transformation', 'healing', 'faith', 'hope',
+    'surrender', 'trust', 'compassion', 'mindfulness'
+  ];
+
+  // Handle spiritual tag addition
+  const handleAddTag = (tag = null) => {
+    const tagToAdd = tag || newTag.trim();
+    if (tagToAdd && !tags.includes(tagToAdd) && tags.length < 8) {
+      setTags(prev => [...prev, tagToAdd]);
+      if (!tag) setNewTag('');
     }
   };
 
@@ -65,33 +119,47 @@ export default function NewJournalEntry({ onSave, onCancel }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle save
+  // Handle save using direct Supabase operations
   const handleSave = async () => {
-    if (!validateForm()) return;
+    if (!validateForm() || !user) return;
 
     try {
       setSaving(true);
 
-      const response = await fetch('/api/journal', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: title.trim(),
-          content: content.trim(),
-          reflection_type: reflectionType,
-          tags
-        }),
-      });
+      // Prepare reflection data
+      const reflectionData = {
+        user_id: user.id,
+        question_text: title.trim(),
+        answer_text: content.trim(),
+        reflection_type: reflectionType,
+        tags: tags
+      };
 
-      if (response.ok) {
-        const data = await response.json();
-        onSave?.(data.entry);
-      } else {
-        const errorData = await response.json();
-        setErrors({ submit: errorData.error || 'Failed to save your reflection' });
+      // Insert using Supabase client directly
+      const { data: reflection, error } = await supabase
+        .from('reflections')
+        .insert(reflectionData)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error saving reflection:', error);
+        setErrors({ submit: error.message || 'Failed to save your reflection' });
+        return;
       }
+
+      // Transform to journal entry format and callback
+      const journalEntry = {
+        id: reflection.id,
+        title: reflection.question_text,
+        content: reflection.answer_text,
+        tags: reflection.tags || [],
+        reflection_type: reflection.reflection_type,
+        created_at: reflection.created_at,
+        updated_at: reflection.updated_at
+      };
+
+      onSave?.(journalEntry);
     } catch (error) {
       console.error('Error saving journal entry:', error);
       setErrors({ submit: 'Failed to save your reflection. Please try again.' });
@@ -103,179 +171,267 @@ export default function NewJournalEntry({ onSave, onCancel }) {
   // Sacred inspirational prompts based on reflection type
   const getPlaceholder = (type) => {
     const placeholders = {
-      journal: "What's on your heart today? Let your thoughts flow freely...",
-      gratitude: "What fills your heart with gratitude today?",
-      challenge: "What challenge are you facing, and how might you grow through it?",
-      insight: "What spiritual insight or understanding has come to you?",
-      prayer: "Share your sacred conversation, your hopes and requests...",
-      growth: "How are you growing and transforming on this spiritual journey?",
-      joy: "What brings you joy and fills your spirit with light?"
+      gratitude: "What fills your heart with gratitude today? Share the blessings that lift your spirit...",
+      challenge: "What challenge are you facing, and how might you grow through it with divine wisdom?",
+      insight: "What spiritual insight or understanding has illuminated your path today?",
+      prayer: "Share your sacred conversation, your hopes, requests, and communion with the divine...",
+      discernment: "Reflect on your thoughts today. Which came from your Natural Mind vs your Spiritual Mind?",
+      transformation: "How are you growing and transforming on this sacred journey of renewal?",
+      peace: "What brings you joy and fills your spirit with divine peace and light?"
     };
-    return placeholders[type] || placeholders.journal;
+    return placeholders[type] || "Begin your sacred reflection... What is your heart telling you today?";
   };
+
+  // Get current reflection type details
+  const currentReflectionType = reflectionTypes.find(type => type.value === reflectionType);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div className="bg-white rounded-2xl max-w-7xl w-full max-h-[95vh] overflow-hidden shadow-2xl">
         {/* Sacred Header */}
-        <div className="sticky top-0 bg-sacred-blue-50 border-b border-sacred-blue-200 p-6 rounded-t-2xl">
+        <div className="bg-gradient-to-r from-sacred-blue-50 to-sacred-blue-100 border-b border-sacred-blue-200 p-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="sacred-icon-bg-gold w-10 h-10">
-                <Sparkles className="w-5 h-5" />
+            <div className="flex items-center gap-4">
+              <div className="sacred-icon-bg-gold w-12 h-12">
+                <Sparkles className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="font-sacred-serif text-2xl font-bold text-sacred-blue-800">
+                <h2 className="font-sacred-serif text-3xl font-bold text-sacred-blue-800">
                   New Sacred Reflection
                 </h2>
-                <p className="text-sm text-sacred-blue-600">
-                  Create a space for your thoughts and spiritual insights
+                <p className="text-sm text-sacred-blue-600 mt-1">
+                  Create a space for spiritual discernment and growth
                 </p>
               </div>
             </div>
             <button
               onClick={onCancel}
-              className="p-2 hover:bg-sacred-blue-100 rounded-lg transition-colors"
+              className="p-3 hover:bg-sacred-blue-200 rounded-xl transition-colors group"
               title="Close"
             >
-              <X className="w-6 h-6 text-sacred-blue-600" />
+              <X className="w-6 h-6 text-sacred-blue-600 group-hover:text-sacred-blue-800" />
             </button>
           </div>
         </div>
 
-        {/* Sacred Form */}
-        <div className="p-6 space-y-6">
-          {/* Sacred Title Input */}
-          <div>
-            <label className="sacred-label">
-              Title of Your Reflection
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Give your reflection a meaningful title..."
-              className={`sacred-input ${errors.title ? 'error' : ''}`}
-              maxLength={200}
-            />
-            {errors.title && (
-              <p className="sacred-error">{errors.title}</p>
-            )}
-          </div>
-
-          {/* Sacred Reflection Type */}
-          <div>
-            <label className="sacred-label">
-              Type of Reflection
-            </label>
-            <select
-              value={reflectionType}
-              onChange={(e) => setReflectionType(e.target.value)}
-              className="sacred-input"
-            >
-              {reflectionTypes.map(type => (
-                <option key={type.value} value={type.value}>
-                  {type.icon} {type.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Sacred Tags */}
-          <div>
-            <label className="sacred-label flex items-center gap-2">
-              <Tag className="w-4 h-4" />
-              Tags (Optional)
-            </label>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                onKeyPress={handleTagKeyPress}
-                placeholder="Add a tag..."
-                className="sacred-input flex-1"
-                maxLength={20}
-              />
-              <button
-                type="button"
-                onClick={handleAddTag}
-                disabled={!newTag.trim() || tags.length >= 5}
-                className="sacred-button px-4"
-              >
-                Add
-              </button>
-            </div>
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-sacred-blue-100 text-sacred-blue-700 rounded-full text-sm"
-                  >
-                    {tag}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveTag(tag)}
-                      className="hover:text-sacred-blue-900"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                ))}
+        {/* Two-Column Sacred Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-10 h-[calc(95vh-180px)]">
+          {/* Left Column - Metadata (30%) */}
+          <div className="lg:col-span-3 border-r border-sacred-blue-100 bg-sacred-blue-25 p-6 overflow-y-auto">
+            <div className="space-y-6">
+              {/* Sacred Title */}
+              <div>
+                <label className="block text-sm font-semibold text-sacred-blue-700 mb-2">
+                  Title of Your Reflection
+                </label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Give your reflection a meaningful title..."
+                  className={`w-full p-3 border-2 rounded-xl bg-white/70 backdrop-blur-sm transition-all focus:ring-2 focus:ring-sacred-blue-300 focus:border-sacred-blue-400 ${
+                    errors.title ? 'border-red-300 bg-red-50' : 'border-sacred-blue-200'
+                  }`}
+                  maxLength={200}
+                />
+                {errors.title && (
+                  <p className="text-red-600 text-xs mt-1 font-medium">{errors.title}</p>
+                )}
               </div>
-            )}
-            <p className="text-xs text-sacred-blue-500 mt-1">
-              Add up to 5 tags to help categorize your reflection
-            </p>
-          </div>
 
-          {/* Sacred Editor */}
-          <div>
-            <label className="sacred-label">
-              Your Sacred Reflection
-            </label>
-            <JournalEditor
-              content={content}
-              onChange={setContent}
-              placeholder={getPlaceholder(reflectionType)}
-            />
-            {errors.content && (
-              <p className="sacred-error mt-2">{errors.content}</p>
-            )}
-          </div>
+              {/* Sacred Reflection Type */}
+              <div>
+                <label className="block text-sm font-semibold text-sacred-blue-700 mb-2">
+                  Type of Reflection
+                </label>
+                <select
+                  value={reflectionType}
+                  onChange={(e) => setReflectionType(e.target.value)}
+                  className="w-full p-3 border-2 border-sacred-blue-200 rounded-xl bg-white/70 backdrop-blur-sm focus:ring-2 focus:ring-sacred-blue-300 focus:border-sacred-blue-400 transition-all"
+                >
+                  {reflectionTypes.map(type => (
+                    <option key={type.value} value={type.value}>
+                      {type.icon} {type.label}
+                    </option>
+                  ))}
+                </select>
+                {currentReflectionType && (
+                  <p className={`text-xs mt-2 font-medium ${currentReflectionType.color}`}>
+                    {currentReflectionType.description}
+                  </p>
+                )}
+              </div>
 
-          {/* Sacred Error Message */}
-          {errors.submit && (
-            <div className="sacred-error-message">
-              {errors.submit}
+              {/* Sacred Tags */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-semibold text-sacred-blue-700 mb-2">
+                  <Tag className="w-4 h-4" />
+                  Sacred Tags
+                </label>
+                
+                {/* Quick Sacred Tags */}
+                <div className="mb-3">
+                  <p className="text-xs text-sacred-blue-600 mb-2 font-medium">Quick Tags:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {spiritualTags.slice(0, 6).map(tag => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => handleAddTag(tag)}
+                        disabled={tags.includes(tag) || tags.length >= 8}
+                        className={`px-2 py-1 rounded-lg text-xs font-medium transition-all ${
+                          tags.includes(tag)
+                            ? 'bg-sacred-blue-200 text-sacred-blue-800 cursor-not-allowed'
+                            : 'bg-sacred-blue-100 text-sacred-blue-700 hover:bg-sacred-blue-200 hover:scale-105'
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom Tag Input */}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    onKeyPress={handleTagKeyPress}
+                    placeholder="Custom tag..."
+                    className="flex-1 p-2 border-2 border-sacred-blue-200 rounded-lg bg-white/70 backdrop-blur-sm focus:ring-2 focus:ring-sacred-blue-300 focus:border-sacred-blue-400 text-sm"
+                    maxLength={20}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleAddTag()}
+                    disabled={!newTag.trim() || tags.length >= 8}
+                    className="px-3 py-2 bg-sacred-blue-500 text-white rounded-lg hover:bg-sacred-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm font-medium"
+                  >
+                    Add
+                  </button>
+                </div>
+
+                {/* Selected Tags */}
+                {tags.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-xs text-sacred-blue-600 mb-2 font-medium">Selected:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-sacred-blue-100 to-sacred-blue-200 text-sacred-blue-700 rounded-full text-sm font-medium shadow-sm"
+                        >
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveTag(tag)}
+                            className="hover:text-sacred-blue-900 hover:bg-sacred-blue-300 rounded-full p-0.5 transition-all"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <p className="text-xs text-sacred-blue-500 mt-2">
+                  Add up to 8 tags to help organize your spiritual journey
+                </p>
+              </div>
+
+              {/* Mindset Association Placeholder */}
+              <div>
+                <label className="block text-sm font-semibold text-sacred-blue-700 mb-2">
+                  Mindset Association
+                </label>
+                <div className="p-4 bg-gradient-to-r from-sacred-blue-50 to-purple-50 border-2 border-dashed border-sacred-blue-300 rounded-xl">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-8 h-8 bg-gradient-to-r from-sacred-blue-400 to-purple-400 rounded-full flex items-center justify-center">
+                      <Brain className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-semibold text-sacred-blue-800">
+                        Interactive Mind Chart
+                      </h4>
+                      <p className="text-xs text-sacred-blue-600 italic">
+                        Coming Soon
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-sacred-blue-600 leading-relaxed">
+                    Soon you'll be able to associate reflections with your Natural vs Spiritual Mind journey, 
+                    tracking your growth in discernment and spiritual transformation.
+                  </p>
+                </div>
+              </div>
             </div>
-          )}
+          </div>
+
+          {/* Right Column - Sacred Writing Sanctuary (70%) */}
+          <div className="lg:col-span-7 flex flex-col">
+            {/* Editor Header */}
+            <div className="border-b border-sacred-blue-100 p-4 bg-white">
+              <div className="flex items-center gap-3">
+                <Heart className="w-5 h-5 text-sacred-blue-500" />
+                <div>
+                  <h3 className="font-semibold text-sacred-blue-800">
+                    Your Sacred Writing Space
+                  </h3>
+                  <p className="text-sm text-sacred-blue-600">
+                    Let your heart speak through your words
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Sacred Editor */}
+            <div className="flex-1 p-6">
+              <JournalEditor
+                content={content}
+                onChange={setContent}
+                placeholder={getPlaceholder(reflectionType)}
+              />
+              {errors.content && (
+                <p className="text-red-600 text-sm mt-3 font-medium">{errors.content}</p>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Sacred Footer */}
-        <div className="sticky bottom-0 bg-sacred-blue-50 border-t border-sacred-blue-200 p-6 rounded-b-2xl">
+        <div className="border-t border-sacred-blue-200 bg-gradient-to-r from-sacred-blue-50 to-sacred-blue-100 p-6">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-sacred-blue-600 italic">
-              Take your time. Let your thoughts flow naturally.
-            </p>
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-sacred-blue-500" />
+              <p className="text-sm text-sacred-blue-700 font-medium italic">
+                Take your time. Let your sacred thoughts flow naturally.
+              </p>
+            </div>
             <div className="flex gap-3">
               <button
                 onClick={onCancel}
-                className="px-6 py-2 text-sacred-blue-600 hover:bg-sacred-blue-100 rounded-lg transition-colors font-medium"
+                className="px-6 py-3 text-sacred-blue-600 hover:bg-sacred-blue-200 rounded-xl transition-all font-semibold"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
-                disabled={saving}
-                className="sacred-button flex items-center gap-2 px-6"
+                disabled={saving || !user}
+                className="sacred-button flex items-center gap-2 px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-4 h-4" />
-                {saving ? 'Saving...' : 'Save Reflection'}
+                {saving ? 'Saving Sacred Reflection...' : 'Save Reflection'}
               </button>
             </div>
           </div>
+
+          {/* Sacred Error Message */}
+          {errors.submit && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-red-700 font-medium">{errors.submit}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
