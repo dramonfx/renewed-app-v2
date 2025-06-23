@@ -3,8 +3,7 @@
 
 import { motion } from 'framer-motion';
 import SacredCard from '@/components/ui/sacred-card';
-import FullAudiobookPlayer from '@/components/FullAudiobookPlayer';
-import SingleSectionPlayer from '@/components/SingleSectionPlayer';
+import UnifiedAudioPlayer from '@/components/UnifiedAudioPlayer';
 
 export default function TestNewAudioPage() {
   return (
@@ -50,7 +49,7 @@ export default function TestNewAudioPage() {
             <h2 className="text-2xl font-serif text-sacred-blue-900 mb-6 text-center">
               🎧 Full Audiobook Player Test
             </h2>
-            <FullAudiobookPlayer />
+            <UnifiedAudioPlayer mode="full" />
           </SacredCard>
         </motion.div>
 
@@ -65,7 +64,7 @@ export default function TestNewAudioPage() {
               🎵 Single Section Player Test (Prologue)
             </h2>
             <div className="max-w-2xl mx-auto">
-              <SingleSectionPlayer sectionSlug="00_prologue" />
+              <UnifiedAudioPlayer mode="single" singleTrackSlug="00_prologue" />
             </div>
           </SacredCard>
         </motion.div>

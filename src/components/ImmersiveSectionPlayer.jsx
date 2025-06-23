@@ -5,11 +5,11 @@ import { Suspense, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { BookOpen, Headphones, Star, Download, ExternalLink } from 'lucide-react';
+import { BookOpen, Headphones, Star, ExternalLink } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import SacredCard from '@/components/ui/sacred-card';
 import SacredButton from '@/components/ui/sacred-button';
-import ImmersiveAudioPlayer from '@/components/ImmersiveAudioPlayer';
+import UnifiedAudioPlayer from '@/components/UnifiedAudioPlayer';
 
 // Lazy load ReactMarkdown for better performance
 const ReactMarkdown = dynamic(() => import('react-markdown'), {
@@ -253,9 +253,9 @@ export default function ImmersiveSectionPlayer({ section, visuals, visualsMap, p
                   <p className="text-red-600">Audio player unavailable</p>
                 </SacredCard>
               }>
-                <ImmersiveAudioPlayer 
-                  audioUrl={section.audioUrl} 
-                  title={section.title}
+                <UnifiedAudioPlayer 
+                  mode="single" 
+                  singleTrackSlug={params?.sectionSlug || section.slug}
                 />
               </ErrorBoundary>
             </motion.div>
@@ -283,12 +283,7 @@ export default function ImmersiveSectionPlayer({ section, visuals, visualsMap, p
                   </div>
                 </div>
                 
-                <div className="hidden lg:flex items-center space-x-2">
-                  <SacredButton variant="ghost" size="sm">
-                    <Download className="w-4 h-4 mr-2" />
-                    Export
-                  </SacredButton>
-                </div>
+
               </div>
 
               <div className="max-w-4xl mx-auto">
