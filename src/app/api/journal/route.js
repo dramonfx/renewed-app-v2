@@ -67,6 +67,7 @@ export async function GET(request) {
       content: entry.answer_text,
       tags: entry.tags || [],
       reflection_type: entry.reflection_type,
+      mindset: entry.mindset,
       created_at: entry.created_at,
       updated_at: entry.updated_at
     }));
@@ -100,7 +101,7 @@ export async function POST(request) {
 
     // Parse and validate request body
     const body = await request.json();
-    const { title, content, tags, reflection_type } = body;
+    const { title, content, tags, reflection_type, mindset } = body;
 
     // Validation
     if (!title || typeof title !== 'string' || title.trim().length === 0) {
@@ -117,6 +118,7 @@ export async function POST(request) {
       question_text: title.trim(),
       answer_text: content.trim(),
       reflection_type: reflection_type || 'journal',
+      mindset: mindset || null,
       tags: Array.isArray(tags) ? tags.filter(tag => tag && typeof tag === 'string') : []
     };
 
@@ -139,6 +141,7 @@ export async function POST(request) {
       content: entry.answer_text,
       tags: entry.tags || [],
       reflection_type: entry.reflection_type,
+      mindset: entry.mindset,
       created_at: entry.created_at,
       updated_at: entry.updated_at
     };

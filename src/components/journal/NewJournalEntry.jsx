@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/contexts/AuthContext';
 import JournalEditor from './JournalEditor';
+import MindsetSelector from './MindsetSelector';
 import { X, Save, Sparkles, Tag, Heart, Brain, Zap } from 'lucide-react';
 
 export default function NewJournalEntry({ onSave, onCancel }) {
@@ -15,6 +16,7 @@ export default function NewJournalEntry({ onSave, onCancel }) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [reflectionType, setReflectionType] = useState('gratitude');
+  const [mindset, setMindset] = useState(null);
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState('');
   const [saving, setSaving] = useState(false);
@@ -115,6 +117,10 @@ export default function NewJournalEntry({ onSave, onCancel }) {
       newErrors.content = 'Please share your thoughts and reflections';
     }
 
+    if (!mindset) {
+      newErrors.mindset = 'Please select a mindset to complete your spiritual discernment';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -132,6 +138,7 @@ export default function NewJournalEntry({ onSave, onCancel }) {
         question_text: title.trim(),
         answer_text: content.trim(),
         reflection_type: reflectionType,
+        mindset: mindset,
         tags: tags
       };
 
@@ -155,6 +162,7 @@ export default function NewJournalEntry({ onSave, onCancel }) {
         content: reflection.answer_text,
         tags: reflection.tags || [],
         reflection_type: reflection.reflection_type,
+        mindset: reflection.mindset,
         created_at: reflection.created_at,
         updated_at: reflection.updated_at
       };
@@ -340,30 +348,16 @@ export default function NewJournalEntry({ onSave, onCancel }) {
                 </p>
               </div>
 
-              {/* Mindset Association Placeholder */}
+              {/* Sacred Mindset Discernment */}
               <div>
-                <label className="block text-sm font-semibold text-sacred-blue-700 mb-2">
-                  Mindset Association
-                </label>
-                <div className="p-4 bg-gradient-to-r from-sacred-blue-50 to-purple-50 border-2 border-dashed border-sacred-blue-300 rounded-xl">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 bg-gradient-to-r from-sacred-blue-400 to-purple-400 rounded-full flex items-center justify-center">
-                      <Brain className="w-4 h-4 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-semibold text-sacred-blue-800">
-                        Interactive Mind Chart
-                      </h4>
-                      <p className="text-xs text-sacred-blue-600 italic">
-                        Coming Soon
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-xs text-sacred-blue-600 leading-relaxed">
-                    Soon you'll be able to associate reflections with your Natural vs Spiritual Mind journey, 
-                    tracking your growth in discernment and spiritual transformation.
-                  </p>
-                </div>
+                <MindsetSelector
+                  value={mindset}
+                  onChange={setMindset}
+                  required={true}
+                />
+                {errors.mindset && (
+                  <p className="text-red-600 text-sm mt-2 font-medium">{errors.mindset}</p>
+                )}
               </div>
             </div>
           </div>

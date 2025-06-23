@@ -1,26 +1,42 @@
+
+> renewed-app-v2@0.1.0 dev
+> next dev
+
    Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
  ⚠ Port 3000 is in use, using available port 3001 instead.
    Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
    ▲ Next.js 15.3.2
    - Local:        http://localhost:3001
-   - Network:      http://100.120.117.196:3001
+   - Network:      http://100.124.254.34:3001
    - Environments: .env.local
 
  ✓ Starting...
    Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
    Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
- ✓ Ready in 1936ms
+ ✓ Ready in 3.3s
  ○ Compiling / ...
- ✓ Compiled / in 6s (1695 modules)
- HEAD / 200 in 6370ms
- ✓ Compiled in 613ms (777 modules)
- GET / 200 in 74ms
- ✓ Compiled /favicon.ico in 402ms (934 modules)
- GET /favicon.ico 200 in 516ms
+ ✓ Compiled / in 6.4s (1695 modules)
+ GET / 200 in 7072ms
+ ✓ Compiled in 702ms (777 modules)
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 609ms (934 modules)
+ GET /favicon.ico 200 in 740ms
  ○ Compiling /journal ...
- ✓ Compiled /journal in 2.3s (2112 modules)
- GET /journal 200 in 2578ms
- GET /favicon.ico 200 in 24ms
- ✓ Compiled /login in 424ms (2125 modules)
- GET /login 200 in 474ms
- GET /favicon.ico 200 in 20ms
+ ✓ Compiled /journal in 1796ms (2126 modules)
+ GET /journal 200 in 1992ms
+ GET /journal 200 in 54ms
+ GET /favicon.ico 200 in 28ms
+ ✓ Compiled /login in 445ms (2139 modules)
+ GET /login 200 in 497ms
+ GET /favicon.ico 200 in 18ms
+ GET /login 200 in 58ms
+ GET /favicon.ico 200 in 28ms
+ GET /login 200 in 63ms
+ GET /favicon.ico 200 in 17ms
+ ✓ Compiled /signup in 496ms (2146 modules)
+ GET /signup 200 in 594ms
+ GET /favicon.ico 200 in 19ms
+ GET / 200 in 58ms
+ GET /login 200 in 53ms
+ GET /signup 200 in 53ms
+ GET /journal 200 in 53ms

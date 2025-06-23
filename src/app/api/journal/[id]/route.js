@@ -49,6 +49,7 @@ export async function GET(request, { params }) {
       content: entry.answer_text,
       tags: entry.tags || [],
       reflection_type: entry.reflection_type,
+      mindset: entry.mindset,
       created_at: entry.created_at,
       updated_at: entry.updated_at
     };
@@ -81,7 +82,7 @@ export async function PUT(request, { params }) {
 
     // Parse and validate request body
     const body = await request.json();
-    const { title, content, tags, reflection_type } = body;
+    const { title, content, tags, reflection_type, mindset } = body;
 
     // Validation
     if (title !== undefined && (!title || typeof title !== 'string' || title.trim().length === 0)) {
@@ -105,6 +106,10 @@ export async function PUT(request, { params }) {
     
     if (reflection_type !== undefined) {
       updateData.reflection_type = reflection_type;
+    }
+    
+    if (mindset !== undefined) {
+      updateData.mindset = mindset;
     }
     
     if (tags !== undefined) {
@@ -135,6 +140,7 @@ export async function PUT(request, { params }) {
       content: entry.answer_text,
       tags: entry.tags || [],
       reflection_type: entry.reflection_type,
+      mindset: entry.mindset,
       created_at: entry.created_at,
       updated_at: entry.updated_at
     };

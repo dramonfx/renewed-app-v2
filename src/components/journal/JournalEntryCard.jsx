@@ -6,6 +6,7 @@
 
 import { formatDistanceToNow } from 'date-fns';
 import { BookOpen, Calendar, Tag } from 'lucide-react';
+import MindsetBadge from './MindsetBadge';
 
 export default function JournalEntryCard({ entry, onClick }) {
   // Sacred reflection type icons
@@ -86,7 +87,7 @@ export default function JournalEntryCard({ entry, onClick }) {
       </p>
 
       {/* Sacred Entry Footer */}
-      <div className="flex items-center justify-between">
+      <div className="space-y-3">
         {/* Sacred Tags */}
         <div className="flex items-center gap-2">
           {entry.tags && entry.tags.length > 0 && (
@@ -111,10 +112,24 @@ export default function JournalEntryCard({ entry, onClick }) {
           )}
         </div>
 
-        {/* Sacred Reflection Type Badge */}
-        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getReflectionColor(entry.reflection_type)}`}>
-          {entry.reflection_type?.charAt(0).toUpperCase() + entry.reflection_type?.slice(1) || 'General'}
-        </span>
+        {/* Sacred Badges Row */}
+        <div className="flex items-center justify-between">
+          {/* Sacred Mindset Badge */}
+          <div>
+            {entry.mindset ? (
+              <MindsetBadge mindset={entry.mindset} size="small" />
+            ) : (
+              <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-medium">
+                No mindset tracked
+              </span>
+            )}
+          </div>
+
+          {/* Sacred Reflection Type Badge */}
+          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getReflectionColor(entry.reflection_type)}`}>
+            {entry.reflection_type?.charAt(0).toUpperCase() + entry.reflection_type?.slice(1) || 'General'}
+          </span>
+        </div>
       </div>
 
       {/* Sacred Read More Indicator */}
