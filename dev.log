@@ -40,3 +40,15 @@
  GET /login 200 in 53ms
  GET /signup 200 in 53ms
  GET /journal 200 in 53ms
+ GET / 200 in 53ms
+ GET /favicon.ico 200 in 14ms
+ ⚠ Cross origin request detected from 8a826a1cb-3001.preview.abacusai.app to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ GET /journal 200 in 50ms
+ GET /login 200 in 20ms
+ GET /login 200 in 18ms
+ ○ Compiling /book ...
+ ✓ Compiled /book in 861ms (2132 modules)
+ GET /book 200 in 970ms
+ GET /book 200 in 17ms
+ GET /journal 200 in 35ms
