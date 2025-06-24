@@ -2,20 +2,35 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ReactNode } from 'react';
 
-export default function Layout({ children }) {
+// Define interfaces
+interface LayoutProps {
+  children: ReactNode;
+}
+
+interface Section {
+  id: number;
+  title: string;
+  slug: string;
+  order: number;
+}
+
+export default function Layout({ children }: LayoutProps): React.ReactElement {
   const pathname = usePathname();
-  const [sections, setSections] = useState([]);
+  const [sections, setSections] = useState<Section[]>([]);
 
   // Check if current page should have full-screen layout (no sidebar)
-  const isFullScreenPage = pathname === '/onboarding' || pathname === '/login' || pathname === '/signup' || pathname === '/forgot-password';
+  const isFullScreenPage = pathname === '/onboarding' || 
+                           pathname === '/login' || 
+                           pathname === '/signup' || 
+                           pathname === '/forgot-password';
 
   useEffect(() => {
     // Only fetch sections if not on a full-screen page
     if (!isFullScreenPage) {
       // Mock sections data for now since we're making this client-side
-      setSections([
+      const mockSections: Section[] = [
         { id: 1, title: 'Prologue', slug: '00_prologue', order: 1 },
         { id: 2, title: 'Introduction Through Next Steps', slug: '01_intro_through_next_steps', order: 2 },
         { id: 3, title: 'Kingdom Government', slug: '02_kingdom_government', order: 3 },
@@ -26,7 +41,8 @@ export default function Layout({ children }) {
         { id: 8, title: '30 Key Principles (11–20)', slug: '06_key_principles_11-20', order: 8 },
         { id: 9, title: '30 Key Principles (21–30)', slug: '06_key_principles_21-30', order: 9 },
         { id: 10, title: 'Conclusion', slug: '07_conclusion', order: 10 }
-      ]);
+      ];
+      setSections(mockSections);
     }
   }, [isFullScreenPage]);
 
@@ -117,3 +133,6 @@ export default function Layout({ children }) {
     </div>
   );
 }
+
+// Export prop types
+export type { LayoutProps, Section };

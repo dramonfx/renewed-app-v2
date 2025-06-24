@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
-import { LoadingSpinner } from '@/components/LoadingSpinner.jsx';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
 import SacredInput from '@/components/ui/sacred-input';

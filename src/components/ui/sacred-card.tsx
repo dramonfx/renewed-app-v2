@@ -3,8 +3,9 @@
 
 import { motion } from 'framer-motion';
 import { forwardRef } from 'react';
+import type { SacredCardProps, CardVariant } from './types';
 
-const SacredCard = forwardRef(({ 
+const SacredCard = forwardRef<HTMLDivElement, SacredCardProps>(({ 
   children, 
   variant = 'glass', 
   className = '', 
@@ -14,7 +15,7 @@ const SacredCard = forwardRef(({
 }, ref) => {
   const baseClasses = "relative overflow-hidden";
   
-  const variantClasses = {
+  const variantClasses: Record<CardVariant, string> = {
     glass: "sacred-glass",
     heavy: "sacred-glass-heavy",
     solid: "bg-white border border-sacred-blue-100 rounded-2xl shadow-xl"

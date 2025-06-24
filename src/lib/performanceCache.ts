@@ -1,11 +1,32 @@
-// src/lib/performanceCache.js
+
+// src/lib/performanceCache.ts
+
+interface CacheItem<T> {
+  value: T;
+  expiry: number;
+}
+
+interface CacheStats {
+  hits: number;
+  misses: number;
+  sets: number;
+  evictions: number;
+  hitRate: string;
+  size: number;
+}
 
 /**
  * High-performance in-memory cache with TTL and size limits
  * Designed to prevent memory leaks and improve page load times
  */
 class PerformanceCache {
-  constructor(maxSize = 50, defaultTTL = 300000) { // 5 minutes default TTL
+  private cache: Map<string, CacheItem<any>>;
+  private timers: Map<string, NodeJS.Timeout>;
+  private maxSize: number;
+  private defaultTTL: number;
+  private stats: Omit<CacheStats, 'hitRate' | 'size'>;
+
+  constructor(maxSize: number = 50, defaultTTL: number = 300000) { // 5 minutes default TTL
     this.cache = new Map();
     this.timers = new Map();
     this.maxSize = maxSize;
@@ -18,8 +39,8 @@ class PerformanceCache {
     };
   }
 
-  get(key) {
-    const item = this.cache.get(key);
+  get<T>(key: string): T | null {
+    const item = this.cache.get(key) as CacheItem<T> | undefined;
     if (!item) {
       this.stats.misses++;
       return null;
@@ -36,17 +57,22 @@ class PerformanceCache {
     return item.value;
   }
 
-  set(key, value, ttl = this.defaultTTL) {
+  set<T>(key: string, value: T, ttl: number = this.defaultTTL): void {
     // Evict oldest items if cache is full
     if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
       const firstKey = this.cache.keys().next().value;
-      this.delete(firstKey);
-      this.stats.evictions++;
+      if (firstKey) {
+        this.delete(firstKey);
+        this.stats.evictions++;
+      }
     }
 
     // Clear existing timer if updating existing key
     if (this.timers.has(key)) {
-      clearTimeout(this.timers.get(key));
+      const existingTimer = this.timers.get(key);
+      if (existingTimer) {
+        clearTimeout(existingTimer);
+      }
     }
 
     const expiry = Date.now() + ttl;
@@ -61,30 +87,31 @@ class PerformanceCache {
     this.stats.sets++;
   }
 
-  delete(key) {
+  delete(key: string): boolean {
     const deleted = this.cache.delete(key);
-    if (this.timers.has(key)) {
-      clearTimeout(this.timers.get(key));
+    const timer = this.timers.get(key);
+    if (timer) {
+      clearTimeout(timer);
       this.timers.delete(key);
     }
     return deleted;
   }
 
-  clear() {
+  clear(): void {
     // Clear all timers
     this.timers.forEach(timer => clearTimeout(timer));
     this.timers.clear();
     this.cache.clear();
   }
 
-  size() {
+  size(): number {
     return this.cache.size;
   }
 
-  getStats() {
+  getStats(): CacheStats {
     const hitRate = this.stats.hits + this.stats.misses > 0 
       ? (this.stats.hits / (this.stats.hits + this.stats.misses) * 100).toFixed(2)
-      : 0;
+      : '0';
     
     return {
       ...this.stats,
@@ -94,9 +121,9 @@ class PerformanceCache {
   }
 
   // Cleanup expired entries manually
-  cleanup() {
+  cleanup(): number {
     const now = Date.now();
-    const expiredKeys = [];
+    const expiredKeys: string[] = [];
     
     this.cache.forEach((item, key) => {
       if (now > item.expiry) {
@@ -106,6 +133,38 @@ class PerformanceCache {
     
     expiredKeys.forEach(key => this.delete(key));
     return expiredKeys.length;
+  }
+
+  // Check if a key exists and is not expired
+  has(key: string): boolean {
+    const item = this.cache.get(key);
+    if (!item) return false;
+    
+    if (Date.now() > item.expiry) {
+      this.delete(key);
+      return false;
+    }
+    
+    return true;
+  }
+
+  // Get all keys (excluding expired ones)
+  keys(): string[] {
+    const validKeys: string[] = [];
+    const now = Date.now();
+    
+    this.cache.forEach((item, key) => {
+      if (now <= item.expiry) {
+        validKeys.push(key);
+      }
+    });
+    
+    return validKeys;
+  }
+
+  // Get cache usage as percentage
+  getUsagePercentage(): number {
+    return Math.round((this.cache.size / this.maxSize) * 100);
   }
 }
 
@@ -122,7 +181,9 @@ if (typeof window !== 'undefined') {
   }, 300000); // 5 minutes
 }
 
-// Export for debugging
-if (typeof window !== 'undefined') {
-  window.performanceCache = performanceCache;
+// Export for debugging in development
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+  (window as any).performanceCache = performanceCache;
 }
+
+export default PerformanceCache;

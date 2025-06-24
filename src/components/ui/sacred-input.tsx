@@ -2,8 +2,9 @@
 'use client';
 
 import { forwardRef, useState } from 'react';
+import type { SacredInputProps } from './types';
 
-const SacredInput = forwardRef(({ 
+const SacredInput = forwardRef<HTMLInputElement, SacredInputProps>(({ 
   label,
   error,
   type = 'text',
@@ -11,10 +12,22 @@ const SacredInput = forwardRef(({
   showPasswordToggle = false,
   ...props 
 }, ref) => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isFocused, setIsFocused] = useState<boolean>(false);
 
   const inputType = showPasswordToggle && type === 'password' ? (showPassword ? 'text' : 'password') : type;
+
+  const handleTogglePassword = (): void => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleFocus = (): void => {
+    setIsFocused(true);
+  };
+
+  const handleBlur = (): void => {
+    setIsFocused(false);
+  };
 
   return (
     <div className="w-full">
@@ -28,14 +41,14 @@ const SacredInput = forwardRef(({
           ref={ref}
           type={inputType}
           className={`sacred-input ${error ? 'error' : ''} ${showPasswordToggle ? 'pr-12' : ''} ${className}`}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           {...props}
         />
         {showPasswordToggle && type === 'password' && (
           <button
             type="button"
-            onClick={() => setShowPassword(!showPassword)}
+            onClick={handleTogglePassword}
             className="absolute inset-y-0 right-0 pr-3 flex items-center text-sacred-blue-400 hover:text-sacred-blue-600 transition-colors duration-200"
           >
             {showPassword ? (

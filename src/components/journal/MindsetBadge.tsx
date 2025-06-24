@@ -1,17 +1,55 @@
 
-// src/components/journal/MindsetBadge.jsx
+// src/components/journal/MindsetBadge.tsx
 // Sacred Mindset Badge - Display mindset state on journal entries
 
 'use client';
 
-import { Brain, Heart, Zap } from 'lucide-react';
+import React from 'react';
+import { Brain, Heart, Zap, LucideIcon } from 'lucide-react';
+import type { MindsetType } from '@/types';
 
-export default function MindsetBadge({ mindset, size = 'normal', showIcon = true, showText = true }) {
+// Define component prop types
+type BadgeSize = 'small' | 'normal' | 'large';
+
+interface MindsetBadgeProps {
+  mindset: MindsetType;
+  size?: BadgeSize;
+  showIcon?: boolean;
+  showText?: boolean;
+}
+
+// Define mindset configuration types
+interface MindsetColors {
+  bg: string;
+  text: string;
+  border: string;
+  icon: string;
+}
+
+interface MindsetConfig {
+  label: string;
+  shortLabel: string;
+  icon: LucideIcon;
+  colors: MindsetColors;
+}
+
+interface SizeConfig {
+  container: string;
+  text: string;
+  icon: string;
+}
+
+export default function MindsetBadge({ 
+  mindset, 
+  size = 'normal', 
+  showIcon = true, 
+  showText = true 
+}: MindsetBadgeProps): React.ReactElement | null {
   if (!mindset) return null;
 
   // Sacred mindset configurations
-  const mindsetConfig = {
-    Natural: {
+  const mindsetConfig: Record<string, MindsetConfig> = {
+    natural: {
       label: 'Natural Mind',
       shortLabel: 'Natural',
       icon: Brain,
@@ -22,7 +60,7 @@ export default function MindsetBadge({ mindset, size = 'normal', showIcon = true
         icon: 'text-red-600'
       }
     },
-    Transition: {
+    transition: {
       label: 'In Transition',
       shortLabel: 'Transition',
       icon: Zap,
@@ -33,7 +71,7 @@ export default function MindsetBadge({ mindset, size = 'normal', showIcon = true
         icon: 'text-amber-600'
       }
     },
-    Spiritual: {
+    spiritual: {
       label: 'Spiritual Mind',
       shortLabel: 'Spiritual',
       icon: Heart,
@@ -46,13 +84,13 @@ export default function MindsetBadge({ mindset, size = 'normal', showIcon = true
     }
   };
 
-  const config = mindsetConfig[mindset];
+  const config = mindsetConfig[mindset.toLowerCase()];
   if (!config) return null;
 
   const Icon = config.icon;
 
   // Size configurations
-  const sizeConfig = {
+  const sizeConfig: Record<BadgeSize, SizeConfig> = {
     small: {
       container: 'px-2 py-1',
       text: 'text-xs',
@@ -92,3 +130,6 @@ export default function MindsetBadge({ mindset, size = 'normal', showIcon = true
     </div>
   );
 }
+
+// Export prop types for external use
+export type { MindsetBadgeProps, BadgeSize };

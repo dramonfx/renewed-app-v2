@@ -1,19 +1,45 @@
 
-// src/components/journal/MindsetSelector.jsx
+// src/components/journal/MindsetSelector.tsx
 // Sacred Mindset Selector - Help users discern between Natural vs Spiritual Mind
 
 'use client';
 
-import { useState } from 'react';
-import { Brain, Heart, Zap, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { Brain, Heart, Zap, Check, LucideIcon } from 'lucide-react';
+import type { MindsetType } from '@/types';
 
-export default function MindsetSelector({ value, onChange, required = false }) {
-  const [selectedMindset, setSelectedMindset] = useState(value || null);
+// Define component prop types
+interface MindsetSelectorProps {
+  value?: MindsetType | null;
+  onChange?: (mindset: MindsetType) => void;
+  required?: boolean;
+}
+
+// Define mindset configuration types
+interface MindsetTypeConfig {
+  value: MindsetType;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  color: string;
+  borderColor: string;
+  textColor: string;
+  iconColor: string;
+  selectedBg: string;
+  characteristics: string[];
+}
+
+export default function MindsetSelector({ 
+  value, 
+  onChange, 
+  required = false 
+}: MindsetSelectorProps): React.ReactElement {
+  const [selectedMindset, setSelectedMindset] = useState<MindsetType | null>(value || null);
 
   // Sacred mindset types for spiritual discernment
-  const mindsetTypes = [
+  const mindsetTypes: MindsetTypeConfig[] = [
     {
-      value: 'Natural',
+      value: 'natural',
       title: 'The Natural Mind',
       description: 'Governed by fear, anxiety, and condemnation',
       icon: Brain,
@@ -25,7 +51,7 @@ export default function MindsetSelector({ value, onChange, required = false }) {
       characteristics: ['Fear-based thinking', 'Anxiety and worry', 'Self-condemnation', 'Doubt and insecurity']
     },
     {
-      value: 'Transition',
+      value: 'transition',
       title: 'In Transition',
       description: 'Moving from natural patterns to spiritual truth',
       icon: Zap,
@@ -37,7 +63,7 @@ export default function MindsetSelector({ value, onChange, required = false }) {
       characteristics: ['Recognizing old patterns', 'Seeking truth', 'Growing awareness', 'Choosing transformation']
     },
     {
-      value: 'Spiritual',
+      value: 'spiritual',
       title: 'The Spiritual Mind',
       description: 'Governed by love, joy, and peace',
       icon: Heart,
@@ -50,7 +76,7 @@ export default function MindsetSelector({ value, onChange, required = false }) {
     }
   ];
 
-  const handleMindsetSelect = (mindset) => {
+  const handleMindsetSelect = (mindset: MindsetType): void => {
     setSelectedMindset(mindset);
     onChange?.(mindset);
   };
@@ -165,3 +191,6 @@ export default function MindsetSelector({ value, onChange, required = false }) {
     </div>
   );
 }
+
+// Export prop types for external use
+export type { MindsetSelectorProps, MindsetTypeConfig };
