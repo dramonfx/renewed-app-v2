@@ -1,23 +1,41 @@
+
 'use client';
 
-import React from 'react';
+import React, { ReactNode, ErrorInfo } from 'react';
+
+// Define interfaces for ErrorBoundary
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
+}
+
+interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface ErrorFallbackProps {
+  error?: Error;
+  resetError?: () => void;
+}
 
 /**
  * Error Boundary component to catch and handle React errors gracefully
  * Prevents entire page crashes when individual components fail
  */
-export class ErrorBoundary extends React.Component {
-  constructor(props) {
+export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     // Update state so the next render will show the fallback UI
     return { hasError: true };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // Log error details
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     
@@ -27,15 +45,15 @@ export class ErrorBoundary extends React.Component {
     });
 
     // You can also log the error to an error reporting service here
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'exception', {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'exception', {
         description: error.toString(),
         fatal: false
       });
     }
   }
 
-  render() {
+  render(): React.ReactNode {
     if (this.state.hasError) {
       // Render custom fallback UI
       if (this.props.fallback) {
@@ -69,7 +87,7 @@ export class ErrorBoundary extends React.Component {
               </summary>
               <pre className="mt-2 p-3 bg-red-100 rounded text-red-800 overflow-auto text-xs">
                 {this.state.error.toString()}
-                {this.state.errorInfo.componentStack}
+                {this.state.errorInfo?.componentStack}
               </pre>
             </details>
           )}
@@ -84,8 +102,11 @@ export class ErrorBoundary extends React.Component {
 /**
  * Hook version of ErrorBoundary for functional components
  */
-export function withErrorBoundary(Component, fallback) {
-  return function WrappedComponent(props) {
+export function withErrorBoundary<P extends object>(
+  Component: React.ComponentType<P>, 
+  fallback?: ReactNode
+) {
+  return function WrappedComponent(props: P): React.ReactElement {
     return (
       <ErrorBoundary fallback={fallback}>
         <Component {...props} />
@@ -97,14 +118,14 @@ export function withErrorBoundary(Component, fallback) {
 /**
  * Simple error fallback components
  */
-export const SimpleErrorFallback = ({ error, resetError }) => (
+export const SimpleErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError }) => (
   <div className="text-center py-8">
     <div className="text-red-500 text-4xl mb-4">😵</div>
     <h3 className="text-lg font-semibold text-gray-800 mb-2">
       Oops! Something went wrong
     </h3>
     <p className="text-gray-600 mb-4">
-      We're having trouble loading this content.
+      We&apos;re having trouble loading this content.
     </p>
     {resetError && (
       <button
@@ -117,9 +138,12 @@ export const SimpleErrorFallback = ({ error, resetError }) => (
   </div>
 );
 
-export const MinimalErrorFallback = () => (
+export const MinimalErrorFallback: React.FC = () => (
   <div className="text-center py-4 text-gray-500">
     <span className="text-2xl">⚠️</span>
     <p className="text-sm mt-2">Content temporarily unavailable</p>
   </div>
 );
+
+// Export prop types for external use
+export type { ErrorBoundaryProps, ErrorFallbackProps, ErrorBoundaryState };

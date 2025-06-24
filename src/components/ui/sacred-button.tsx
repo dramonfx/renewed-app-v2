@@ -1,10 +1,12 @@
 
 'use client';
 
+import React from 'react';
 import { motion } from 'framer-motion';
 import { forwardRef } from 'react';
+import type { SacredButtonProps, ButtonVariant, ButtonSize } from './types';
 
-const SacredButton = forwardRef(({ 
+const SacredButton = forwardRef<HTMLButtonElement, SacredButtonProps>(({ 
   children, 
   variant = 'primary', 
   size = 'md', 
@@ -17,19 +19,27 @@ const SacredButton = forwardRef(({
 }, ref) => {
   const baseClasses = "font-semibold transition-all duration-300 cursor-pointer inline-flex items-center justify-center";
   
-  const variantClasses = {
+  const variantClasses: Record<ButtonVariant, string> = {
     primary: "sacred-button",
     gold: "sacred-gold-button",
     ghost: "bg-transparent text-sacred-blue-600 hover:bg-sacred-blue-50 border-2 border-sacred-blue-200 hover:border-sacred-blue-300"
   };
   
-  const sizeClasses = {
+  const sizeClasses: Record<ButtonSize, string> = {
     sm: "px-4 py-2 text-sm rounded-lg",
     md: "px-6 py-3 text-sm rounded-xl",
     lg: "px-8 py-4 text-base rounded-xl"
   };
 
   const combinedClasses = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
+
+  // Extract motion-specific props and HTML button props
+  const { 
+    onDrag, 
+    onDragEnd, 
+    onDragStart, 
+    ...buttonProps 
+  } = props;
 
   return (
     <motion.button
@@ -40,7 +50,7 @@ const SacredButton = forwardRef(({
       className={combinedClasses}
       whileHover={!disabled && !loading ? { y: -2 } : {}}
       whileTap={!disabled && !loading ? { y: 0 } : {}}
-      {...props}
+      {...buttonProps}
     >
       {loading && (
         <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

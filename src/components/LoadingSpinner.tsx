@@ -1,9 +1,25 @@
 
-// src/components/LoadingSpinner.jsx
+// src/components/LoadingSpinner.tsx
 'use client';
 
-export const LoadingSpinner = ({ size = 'md', className = '' }) => {
-  const sizeClasses = {
+import { LoadingSpinnerProps } from '@/types';
+
+type SpinnerSize = 'sm' | 'md' | 'lg' | 'xl';
+
+interface LoadingSpinnerComponentProps {
+  size?: SpinnerSize;
+  className?: string;
+}
+
+interface LoadingOverlayProps {
+  message?: string;
+}
+
+export const LoadingSpinner: React.FC<LoadingSpinnerComponentProps> = ({ 
+  size = 'md', 
+  className = '' 
+}) => {
+  const sizeClasses: Record<SpinnerSize, string> = {
     sm: 'w-4 h-4',
     md: 'w-6 h-6',
     lg: 'w-8 h-8',
@@ -17,7 +33,9 @@ export const LoadingSpinner = ({ size = 'md', className = '' }) => {
   );
 };
 
-export const LoadingOverlay = ({ message = 'Loading...' }) => {
+export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ 
+  message = 'Loading...' 
+}) => {
   return (
     <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
       <div className="flex flex-col items-center space-y-3">
@@ -28,3 +46,5 @@ export const LoadingOverlay = ({ message = 'Loading...' }) => {
   );
 };
 
+// Export prop types
+export type { LoadingSpinnerComponentProps, LoadingOverlayProps, SpinnerSize };

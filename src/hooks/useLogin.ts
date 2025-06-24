@@ -1,28 +1,29 @@
 
-// src/hooks/useLogin.js
+// src/hooks/useLogin.ts
 'use client';
 
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import type { UseLoginReturn, LoginValidationErrors, LoginResult } from './types';
 
-export const useLogin = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [validationErrors, setValidationErrors] = useState({});
+export const useLogin = (): UseLoginReturn => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<LoginValidationErrors>({});
   
   const { login } = useAuth();
   const router = useRouter();
 
   // Email validation
-  const validateEmail = (email) => {
+  const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
   // Form validation
-  const validateForm = (email, password) => {
-    const errors = {};
+  const validateForm = (email: string, password: string): LoginValidationErrors => {
+    const errors: LoginValidationErrors = {};
     
     if (!email.trim()) {
       errors.email = 'Email is required';
@@ -40,7 +41,7 @@ export const useLogin = () => {
   };
 
   // Enhanced error message mapping
-  const getErrorMessage = (error) => {
+  const getErrorMessage = (error: any): string | null => {
     if (!error) return null;
     
     const errorMessage = error.message?.toLowerCase() || '';
@@ -70,7 +71,11 @@ export const useLogin = () => {
     return 'Something went wrong. Please try again or contact support if the issue persists.';
   };
 
-  const handleLogin = async (email, password, redirectPath = '/book') => {
+  const handleLogin = async (
+    email: string, 
+    password: string, 
+    redirectPath: string = '/book'
+  ): Promise<LoginResult> => {
     // Clear previous errors
     setError(null);
     setValidationErrors({});
@@ -103,8 +108,9 @@ export const useLogin = () => {
       }
       
       // Fallback error
-      setError('Login failed. Please try again.');
-      return { success: false, error: 'Login failed. Please try again.' };
+      const fallbackError = 'Login failed. Please try again.';
+      setError(fallbackError);
+      return { success: false, error: fallbackError };
       
     } catch (err) {
       console.error('Login error:', err);
@@ -116,7 +122,7 @@ export const useLogin = () => {
     }
   };
 
-  const clearErrors = () => {
+  const clearErrors = (): void => {
     setError(null);
     setValidationErrors({});
   };

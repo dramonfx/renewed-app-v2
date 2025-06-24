@@ -1,22 +1,22 @@
 
+// src/hooks/useVisuals.ts
 'use client';
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import type { UseVisualsReturn, Visual } from './types';
 
 /**
  * Custom hook to fetch visuals for a section with signed URLs
- * @param {number} sectionId - The section ID to fetch visuals for
- * @returns {Object} { data, loading, error, visualsMap }
  */
-export function useVisuals(sectionId) {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [visualsMap, setVisualsMap] = useState(new Map());
+export function useVisuals(sectionId: number | null): UseVisualsReturn {
+  const [data, setData] = useState<Visual[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [visualsMap, setVisualsMap] = useState<Map<string, Visual>>(new Map());
 
   useEffect(() => {
-    async function fetchVisuals() {
+    async function fetchVisuals(): Promise<void> {
       if (!sectionId) {
         setLoading(false);
         return;
@@ -37,8 +37,8 @@ export function useVisuals(sectionId) {
         }
 
         if (visualsData && visualsData.length > 0) {
-          const visualsWithUrls = await Promise.all(
-            visualsData.map(async (visual) => {
+          const visualsWithUrls: Visual[] = await Promise.all(
+            visualsData.map(async (visual): Promise<Visual> => {
               if (visual.file_path) {
                 const { data: signedUrlData, error: signedUrlError } = await supabase.storage
                   .from('book-assets')
@@ -46,16 +46,27 @@ export function useVisuals(sectionId) {
 
                 if (signedUrlError) {
                   console.error(`Error creating signed URL for visual ${visual.file_path}:`, signedUrlError.message);
-                  return { ...visual, displayUrl: null, error: signedUrlError.message };
+                  return { 
+                    ...visual, 
+                    displayUrl: null, 
+                    error: signedUrlError.message 
+                  };
                 }
-                return { ...visual, displayUrl: signedUrlData.signedUrl };
+                return { 
+                  ...visual, 
+                  displayUrl: signedUrlData.signedUrl 
+                };
               }
-              return { ...visual, displayUrl: null, error: 'No file path for visual' };
+              return { 
+                ...visual, 
+                displayUrl: null, 
+                error: 'No file path for visual' 
+              };
             })
           );
 
           // Create visuals map for markdown rendering
-          const newVisualsMap = new Map();
+          const newVisualsMap = new Map<string, Visual>();
           visualsWithUrls.forEach(vis => {
             if (vis.markdown_tag && vis.displayUrl) {
               newVisualsMap.set(vis.markdown_tag, vis);
@@ -69,7 +80,8 @@ export function useVisuals(sectionId) {
           setVisualsMap(new Map());
         }
       } catch (err) {
-        setError(err.message);
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+        setError(errorMessage);
         console.error('Error fetching visuals:', err);
       } finally {
         setLoading(false);
