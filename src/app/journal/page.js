@@ -1,230 +1,241 @@
+'use client'
 
-// src/app/journal/page.js
-// Sacred Journaling Workshop - Main journal page serving as sanctuary for reflection
-
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabaseClient';
-import JournalHeader from '@/components/journal/JournalHeader';
-import JournalEntryList from '@/components/journal/JournalEntryList';
-import NewJournalEntry from '@/components/journal/NewJournalEntry';
-import JournalStats from '@/components/journal/JournalStats';
-import { BookOpen, Plus, Search, Filter } from 'lucide-react';
+import { useState, useEffect } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useRouter } from 'next/navigation'
+import JournalHeader from '@/components/journal/JournalHeader'
+import JournalEntryList from '@/components/journal/JournalEntryList'
+import NewJournalEntry from '@/components/journal/NewJournalEntry'
+import JournalEntryModal from '@/components/journal/JournalEntryModal'
 
 export default function JournalPage() {
-  const { user, loading } = useAuth();
-  const router = useRouter();
+  const [entries, setEntries] = useState([])
+  const [stats, setStats] = useState({})
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [showNewEntry, setShowNewEntry] = useState(false)
+  const [selectedEntry, setSelectedEntry] = useState(null)
+  const [user, setUser] = useState(null)
+  const [filters, setFilters] = useState({
+    mindset: '',
+    reflectionType: '',
+    search: ''
+  })
   
-  // Sacred state management
-  const [entries, setEntries] = useState([]);
-  const [entriesLoading, setEntriesLoading] = useState(true);
-  const [showNewEntry, setShowNewEntry] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState('all');
-  const [selectedTags, setSelectedTags] = useState([]);
+  const supabase = createClientComponentClient()
+  const router = useRouter()
 
-  // Redirect if not authenticated
+  // Check authentication and load user
   useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login');
+    const checkAuth = async () => {
+      const { data: { user }, error } = await supabase.auth.getUser()
+      if (error || !user) {
+        router.push('/login')
+        return
+      }
+      setUser(user)
     }
-  }, [user, loading, router]);
+    checkAuth()
+  }, [supabase, router])
 
-  // Fetch journal entries using Supabase client directly
-  const fetchEntries = async () => {
+  // Load journal entries
+  const loadEntries = async () => {
+    if (!user) return
+    
+    setLoading(true)
+    setError('')
+    
     try {
-      setEntriesLoading(true);
+      const params = new URLSearchParams()
+      if (filters.mindset) params.append('mindset', filters.mindset)
+      if (filters.reflectionType) params.append('reflection_type', filters.reflectionType)
+      if (filters.search) params.append('search', filters.search)
       
-      if (!user) {
-        setEntries([]);
-        return;
+      const response = await fetch(`/api/journal?${params.toString()}`)
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to load entries')
       }
-
-      // Build Supabase query
-      let query = supabase
-        .from('reflections')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      // Add reflection type filter
-      if (filterType && filterType !== 'all') {
-        query = query.eq('reflection_type', filterType);
-      }
-
-      // Add search functionality
-      if (searchQuery) {
-        query = query.or(`question_text.ilike.%${searchQuery}%,answer_text.ilike.%${searchQuery}%`);
-      }
-
-      // Add tag filtering
-      if (selectedTags.length > 0) {
-        query = query.overlaps('tags', selectedTags);
-      }
-
-      // Execute query
-      const { data: reflections, error } = await query;
-
-      if (error) {
-        console.error('Error fetching journal entries:', error);
-        setEntries([]);
-        return;
-      }
-
-      // Transform reflections to journal entry format
-      const journalEntries = (reflections || []).map(reflection => ({
-        id: reflection.id,
-        title: reflection.question_text,
-        content: reflection.answer_text,
-        tags: reflection.tags || [],
-        reflection_type: reflection.reflection_type,
-        created_at: reflection.created_at,
-        updated_at: reflection.updated_at
-      }));
-
-      setEntries(journalEntries);
+      
+      setEntries(data.entries || [])
     } catch (error) {
-      console.error('Error fetching journal entries:', error);
-      setEntries([]);
+      console.error('Error loading entries:', error)
+      setError(error.message)
     } finally {
-      setEntriesLoading(false);
+      setLoading(false)
     }
-  };
-
-  // Initial fetch and refresh on filter changes
-  useEffect(() => {
-    if (user) {
-      fetchEntries();
-    }
-  }, [user, searchQuery, filterType, selectedTags]);
-
-  // Handle new entry creation
-  const handleNewEntry = (newEntry) => {
-    setEntries(prev => [newEntry, ...prev]);
-    setShowNewEntry(false);
-  };
-
-  // Handle entry update
-  const handleEntryUpdate = (updatedEntry) => {
-    setEntries(prev => prev.map(entry => 
-      entry.id === updatedEntry.id ? updatedEntry : entry
-    ));
-  };
-
-  // Handle entry deletion
-  const handleEntryDelete = (deletedEntryId) => {
-    setEntries(prev => prev.filter(entry => entry.id !== deletedEntryId));
-  };
-
-  // Sacred reflection types
-  const reflectionTypes = [
-    { value: 'all', label: 'All Reflections', icon: BookOpen },
-    { value: 'journal', label: 'Journal Entries', icon: BookOpen },
-    { value: 'gratitude', label: 'Gratitude', icon: '🙏' },
-    { value: 'challenge', label: 'Challenges', icon: '⚡' },
-    { value: 'insight', label: 'Insights', icon: '✨' },
-    { value: 'prayer', label: 'Prayers', icon: '🕊️' },
-    { value: 'growth', label: 'Growth', icon: '🌱' },
-    { value: 'joy', label: 'Joy', icon: '☀️' }
-  ];
-
-  // Show loading state during authentication check
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-sacred-blue-50 to-sacred-blue-100 flex items-center justify-center">
-        <div className="sacred-glass p-8 text-center">
-          <div className="sacred-icon-bg w-16 h-16 mx-auto mb-4">
-            <BookOpen className="w-8 h-8" />
-          </div>
-          <p className="text-sacred-blue-700 font-semibold">Preparing your sacred space...</p>
-        </div>
-      </div>
-    );
   }
 
-  // Don't render if not authenticated (will redirect)
+  // Load journal statistics
+  const loadStats = async () => {
+    if (!user) return
+    
+    try {
+      const response = await fetch('/api/journal/stats')
+      const data = await response.json()
+      
+      if (response.ok) {
+        setStats(data.stats || {})
+      }
+    } catch (error) {
+      console.error('Error loading stats:', error)
+      // Don't show error for stats, it's not critical
+    }
+  }
+
+  // Load entries and stats when user is available or filters change
+  useEffect(() => {
+    if (user) {
+      loadEntries()
+      loadStats()
+    }
+  }, [user, filters])
+
+  // Handle new entry creation
+  const handleNewEntry = async (entryData) => {
+    try {
+      const response = await fetch('/api/journal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(entryData),
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create entry')
+      }
+      
+      // Add new entry to the list and refresh stats
+      setEntries(prev => [data.entry, ...prev])
+      loadStats()
+      setShowNewEntry(false)
+    } catch (error) {
+      console.error('Error creating entry:', error)
+      throw error // Re-throw to let the form handle it
+    }
+  }
+
+  // Handle entry update
+  const handleUpdateEntry = async (id, entryData) => {
+    try {
+      const response = await fetch(`/api/journal/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(entryData),
+      })
+      
+      const data = await response.json()
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update entry')
+      }
+      
+      // Update entry in the list and refresh stats
+      setEntries(prev => prev.map(entry => 
+        entry.id === id ? data.entry : entry
+      ))
+      loadStats()
+      setSelectedEntry(null)
+    } catch (error) {
+      console.error('Error updating entry:', error)
+      throw error
+    }
+  }
+
+  // Handle entry deletion
+  const handleDeleteEntry = async (id) => {
+    if (!confirm('Are you sure you want to delete this reflection? This action cannot be undone.')) {
+      return
+    }
+    
+    try {
+      const response = await fetch(`/api/journal/${id}`, {
+        method: 'DELETE',
+      })
+      
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Failed to delete entry')
+      }
+      
+      // Remove entry from the list and refresh stats
+      setEntries(prev => prev.filter(entry => entry.id !== id))
+      loadStats()
+      setSelectedEntry(null)
+    } catch (error) {
+      console.error('Error deleting entry:', error)
+      alert('Failed to delete entry: ' + error.message)
+    }
+  }
+
+  // Handle filter changes
+  const handleFilterChange = (newFilters) => {
+    setFilters(prev => ({ ...prev, ...newFilters }))
+  }
+
   if (!user) {
-    return null;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your sacred space...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sacred-blue-50 via-white to-sacred-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Sacred Journal Header */}
-        <JournalHeader />
-
-        {/* Sacred Journal Statistics */}
-        <JournalStats entries={entries} />
-
-        {/* Sacred Search and Filter Bar */}
-        <div className="sacred-glass p-6 mb-8">
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Sacred Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-sacred-blue-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search your reflections..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="sacred-input pl-10"
-              />
-            </div>
-
-            {/* Sacred Filter */}
-            <div className="lg:w-64">
-              <select
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
-                className="sacred-input"
-              >
-                {reflectionTypes.map(type => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Sacred New Entry Button */}
-            <button
-              onClick={() => setShowNewEntry(true)}
-              className="sacred-button flex items-center gap-2 lg:px-6"
+        <JournalHeader 
+          entries={entries}
+          stats={stats}
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onNewEntry={() => setShowNewEntry(true)}
+        />
+        
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p className="text-red-800">{error}</p>
+            <button 
+              onClick={loadEntries}
+              className="mt-2 text-red-600 hover:text-red-800 font-medium"
             >
-              <Plus className="w-5 h-5" />
-              <span className="hidden sm:inline">New Entry</span>
+              Try Again
             </button>
           </div>
-        </div>
-
-        {/* Sacred Journal Entries */}
-        <JournalEntryList 
+        )}
+        
+        <JournalEntryList
           entries={entries}
-          loading={entriesLoading}
-          onEntryUpdate={handleEntryUpdate}
-          onEntryDelete={handleEntryDelete}
+          loading={loading}
+          onEntryClick={setSelectedEntry}
         />
-
-        {/* Sacred New Entry Modal */}
-        {showNewEntry && (
-          <NewJournalEntry
-            onSave={handleNewEntry}
-            onCancel={() => setShowNewEntry(false)}
+        
+        {/* New Entry Modal */}
+        <NewJournalEntry
+          isOpen={showNewEntry}
+          onClose={() => setShowNewEntry(false)}
+          onSave={handleNewEntry}
+        />
+        
+        {/* Entry Detail Modal */}
+        {selectedEntry && (
+          <JournalEntryModal
+            entry={selectedEntry}
+            onClose={() => setSelectedEntry(null)}
+            onUpdate={handleUpdateEntry}
+            onDelete={handleDeleteEntry}
           />
         )}
-
-        {/* Sacred Floating Action Button for Mobile */}
-        <button
-          onClick={() => setShowNewEntry(true)}
-          className="fixed bottom-6 right-6 lg:hidden sacred-icon-bg w-14 h-14 shadow-2xl hover:scale-110 transition-transform duration-300"
-          aria-label="Create new journal entry"
-        >
-          <Plus className="w-6 h-6" />
-        </button>
       </div>
     </div>
-  );
+  )
 }
