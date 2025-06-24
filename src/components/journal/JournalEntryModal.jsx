@@ -1,418 +1,401 @@
 
-// src/components/journal/JournalEntryModal.jsx
-// Sacred Journal Entry Modal - Full view and editing of spiritual reflections
+'use client'
 
-'use client';
-
-import { useState } from 'react';
-import { format } from 'date-fns';
-import JournalEditor from './JournalEditor';
-import { 
-  X, 
-  Edit, 
-  Save, 
-  Trash2, 
-  Calendar, 
-  Tag, 
-  Eye,
-  AlertTriangle 
-} from 'lucide-react';
+import { useState } from 'react'
+import { XMarkIcon, PencilIcon, TrashIcon, ClockIcon, TagIcon } from '@heroicons/react/24/outline'
 
 export default function JournalEntryModal({ entry, onClose, onUpdate, onDelete }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState(entry.title);
-  const [editContent, setEditContent] = useState(entry.content);
-  const [editReflectionType, setEditReflectionType] = useState(entry.reflection_type);
-  const [editTags, setEditTags] = useState(entry.tags || []);
-  const [newTag, setNewTag] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [isEditing, setIsEditing] = useState(false)
+  const [formData, setFormData] = useState({
+    title: entry.title || '',
+    content: entry.content || '',
+    mindset: entry.mindset || '',
+    reflection_type: entry.reflection_type || 'general',
+    tags: entry.tags || []
+  })
+  const [tagInput, setTagInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  // Sacred reflection types
-  const reflectionTypes = [
-    { value: 'journal', label: 'Journal Entry', icon: '📖' },
-    { value: 'gratitude', label: 'Gratitude', icon: '🙏' },
-    { value: 'challenge', label: 'Challenge', icon: '⚡' },
-    { value: 'insight', label: 'Insight', icon: '✨' },
-    { value: 'prayer', label: 'Prayer', icon: '🕊️' },
-    { value: 'growth', label: 'Growth', icon: '🌱' },
-    { value: 'joy', label: 'Joy', icon: '☀️' }
-  ];
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
 
-  // Get reflection type info
-  const getReflectionTypeInfo = (type) => {
-    return reflectionTypes.find(t => t.value === type) || reflectionTypes[0];
-  };
-
-  // Handle tag addition
-  const handleAddTag = () => {
-    if (newTag.trim() && !editTags.includes(newTag.trim()) && editTags.length < 5) {
-      setEditTags(prev => [...prev, newTag.trim()]);
-      setNewTag('');
+  const getMindsetColor = (mindset) => {
+    switch (mindset) {
+      case 'Natural':
+        return 'bg-red-100 text-red-800'
+      case 'Transition':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'Spiritual':
+        return 'bg-green-100 text-green-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
     }
-  };
+  }
 
-  // Handle tag removal
+  const getReflectionTypeColor = (type) => {
+    switch (type) {
+      case 'assessment':
+        return 'bg-blue-100 text-blue-800'
+      case 'daily':
+        return 'bg-purple-100 text-purple-800'
+      case 'intention':
+        return 'bg-indigo-100 text-indigo-800'
+      case 'completion':
+        return 'bg-pink-100 text-pink-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleAddTag = (e) => {
+    e.preventDefault()
+    const tag = tagInput.trim()
+    if (tag && !formData.tags.includes(tag)) {
+      setFormData(prev => ({
+        ...prev,
+        tags: [...prev.tags, tag]
+      }))
+      setTagInput('')
+    }
+  }
+
   const handleRemoveTag = (tagToRemove) => {
-    setEditTags(prev => prev.filter(tag => tag !== tagToRemove));
-  };
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter(tag => tag !== tagToRemove)
+    }))
+  }
 
-  // Handle tag input key press
-  const handleTagKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAddTag();
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && e.target.name === 'tagInput') {
+      e.preventDefault()
+      handleAddTag(e)
     }
-  };
+  }
 
-  // Validate form
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!editTitle.trim()) {
-      newErrors.title = 'Title is required for your sacred reflection';
-    }
-
-    if (!editContent.trim() || editContent.trim() === '<p></p>') {
-      newErrors.content = 'Please share your thoughts and reflections';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Handle save changes
   const handleSave = async () => {
-    if (!validateForm()) return;
+    if (!formData.title.trim() && !formData.content.trim()) {
+      setError('Please provide either a title or content for your reflection.')
+      return
+    }
+
+    setLoading(true)
+    setError('')
 
     try {
-      setSaving(true);
-
-      const response = await fetch(`/api/journal/${entry.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: editTitle.trim(),
-          content: editContent.trim(),
-          reflection_type: editReflectionType,
-          tags: editTags
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        onUpdate?.(data.entry);
-        setIsEditing(false);
-        setErrors({});
-      } else {
-        const errorData = await response.json();
-        setErrors({ submit: errorData.error || 'Failed to update your reflection' });
-      }
+      await onUpdate(entry.id, formData)
+      setIsEditing(false)
     } catch (error) {
-      console.error('Error updating journal entry:', error);
-      setErrors({ submit: 'Failed to update your reflection. Please try again.' });
+      setError(error.message)
     } finally {
-      setSaving(false);
+      setLoading(false)
     }
-  };
+  }
 
-  // Handle delete
   const handleDelete = async () => {
+    setLoading(true)
     try {
-      setDeleting(true);
-
-      const response = await fetch(`/api/journal/${entry.id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        onDelete?.(entry.id);
-      } else {
-        setErrors({ submit: 'Failed to delete your reflection. Please try again.' });
-      }
+      await onDelete(entry.id)
     } catch (error) {
-      console.error('Error deleting journal entry:', error);
-      setErrors({ submit: 'Failed to delete your reflection. Please try again.' });
-    } finally {
-      setDeleting(false);
-      setShowDeleteConfirm(false);
+      setError(error.message)
+      setLoading(false)
     }
-  };
+  }
 
-  // Cancel editing
-  const handleCancelEdit = () => {
-    setEditTitle(entry.title);
-    setEditContent(entry.content);
-    setEditReflectionType(entry.reflection_type);
-    setEditTags(entry.tags || []);
-    setErrors({});
-    setIsEditing(false);
-  };
+  const handleClose = () => {
+    if (!loading) {
+      onClose()
+      setError('')
+      setIsEditing(false)
+    }
+  }
 
-  const typeInfo = getReflectionTypeInfo(entry.reflection_type);
+  const handleEditToggle = () => {
+    if (isEditing) {
+      // Reset form data when canceling edit
+      setFormData({
+        title: entry.title || '',
+        content: entry.content || '',
+        mindset: entry.mindset || '',
+        reflection_type: entry.reflection_type || 'general',
+        tags: entry.tags || []
+      })
+    }
+    setIsEditing(!isEditing)
+    setError('')
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-        {/* Sacred Header */}
-        <div className="sticky top-0 bg-sacred-blue-50 border-b border-sacred-blue-200 p-6 rounded-t-2xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{typeInfo.icon}</span>
-              <div className="flex-1">
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    className={`font-sacred-serif text-xl font-bold text-sacred-blue-800 bg-transparent border-0 border-b-2 border-sacred-blue-300 focus:border-sacred-blue-500 outline-none w-full ${errors.title ? 'border-red-500' : ''}`}
-                    maxLength={200}
-                  />
-                ) : (
-                  <h2 className="font-sacred-serif text-xl font-bold text-sacred-blue-800">
-                    {entry.title}
-                  </h2>
-                )}
-                <div className="flex items-center gap-4 mt-2 text-sm text-sacred-blue-600">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
-                    <span>
-                      {format(new Date(entry.created_at), 'MMMM d, yyyy • h:mm a')}
-                    </span>
-                  </div>
-                  {entry.updated_at !== entry.created_at && (
-                    <span className="text-xs italic">
-                      Updated {format(new Date(entry.updated_at), 'MMM d, yyyy')}
-                    </span>
-                  )}
-                </div>
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-center p-6 border-b border-gray-200">
+          <div className="flex-1">
+            <h2 className="text-xl font-semibold text-gray-900">
+              {isEditing ? 'Edit Reflection' : 'Sacred Reflection'}
+            </h2>
+            <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+              <div className="flex items-center space-x-1">
+                <ClockIcon className="w-4 h-4" />
+                <span>Created {formatDate(entry.created_at)}</span>
               </div>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              {!isEditing && (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="p-2 hover:bg-sacred-blue-100 rounded-lg transition-colors"
-                  title="Edit reflection"
-                >
-                  <Edit className="w-5 h-5 text-sacred-blue-600" />
-                </button>
+              {entry.updated_at !== entry.created_at && (
+                <div className="flex items-center space-x-1">
+                  <span>Updated {formatDate(entry.updated_at)}</span>
+                </div>
               )}
-              
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="p-2 hover:bg-red-100 rounded-lg transition-colors"
-                title="Delete reflection"
-              >
-                <Trash2 className="w-5 h-5 text-red-600" />
-              </button>
-              
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-sacred-blue-100 rounded-lg transition-colors"
-                title="Close"
-              >
-                <X className="w-6 h-6 text-sacred-blue-600" />
-              </button>
             </div>
           </div>
           
-          {errors.title && (
-            <p className="sacred-error mt-2">{errors.title}</p>
-          )}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={handleEditToggle}
+              disabled={loading}
+              className="p-2 text-gray-400 hover:text-blue-600 disabled:opacity-50"
+              title={isEditing ? "Cancel editing" : "Edit reflection"}
+            >
+              <PencilIcon className="w-5 h-5" />
+            </button>
+            
+            <button
+              onClick={handleDelete}
+              disabled={loading}
+              className="p-2 text-gray-400 hover:text-red-600 disabled:opacity-50"
+              title="Delete reflection"
+            >
+              <TrashIcon className="w-5 h-5" />
+            </button>
+            
+            <button
+              onClick={handleClose}
+              disabled={loading}
+              className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+            >
+              <XMarkIcon className="w-6 h-6" />
+            </button>
+          </div>
         </div>
 
-        {/* Sacred Content */}
         <div className="p-6">
-          {/* Sacred Reflection Type */}
-          {isEditing ? (
-            <div className="mb-6">
-              <label className="sacred-label">Type of Reflection</label>
-              <select
-                value={editReflectionType}
-                onChange={(e) => setEditReflectionType(e.target.value)}
-                className="sacred-input"
-              >
-                {reflectionTypes.map(type => (
-                  <option key={type.value} value={type.value}>
-                    {type.icon} {type.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ) : (
-            <div className="mb-6">
-              <span className={`inline-block px-4 py-2 rounded-full text-sm font-semibold bg-sacred-blue-100 text-sacred-blue-700`}>
-                {typeInfo.icon} {typeInfo.label}
-              </span>
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-red-800">{error}</p>
             </div>
           )}
 
-          {/* Sacred Tags */}
-          <div className="mb-6">
-            <label className="sacred-label flex items-center gap-2 mb-3">
-              <Tag className="w-4 h-4" />
-              Tags
-            </label>
-            
-            {isEditing ? (
-              <>
-                <div className="flex gap-2 mb-2">
+          {isEditing ? (
+            <div className="space-y-6">
+              {/* Title */}
+              <div>
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  placeholder="Give your reflection a meaningful title..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Content */}
+              <div>
+                <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+                  Your Reflection
+                </label>
+                <textarea
+                  id="content"
+                  name="content"
+                  value={formData.content}
+                  onChange={handleInputChange}
+                  rows={12}
+                  placeholder="Share your thoughts, insights, and spiritual reflections..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Mindset */}
+                <div>
+                  <label htmlFor="mindset" className="block text-sm font-medium text-gray-700 mb-2">
+                    Current Mindset
+                  </label>
+                  <select
+                    id="mindset"
+                    name="mindset"
+                    value={formData.mindset}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Choose your mindset...</option>
+                    <option value="Natural">Natural Mind</option>
+                    <option value="Transition">In Transition</option>
+                    <option value="Spiritual">Spiritual Mind</option>
+                  </select>
+                </div>
+
+                {/* Reflection Type */}
+                <div>
+                  <label htmlFor="reflection_type" className="block text-sm font-medium text-gray-700 mb-2">
+                    Reflection Type
+                  </label>
+                  <select
+                    id="reflection_type"
+                    name="reflection_type"
+                    value={formData.reflection_type}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="general">General Reflection</option>
+                    <option value="assessment">Self Assessment</option>
+                    <option value="daily">Daily Practice</option>
+                    <option value="intention">Intention Setting</option>
+                    <option value="completion">Completion Ceremony</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div>
+                <label htmlFor="tagInput" className="block text-sm font-medium text-gray-700 mb-2">
+                  Tags (Optional)
+                </label>
+                <div className="flex space-x-2 mb-3">
                   <input
                     type="text"
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    onKeyPress={handleTagKeyPress}
-                    placeholder="Add a tag..."
-                    className="sacred-input flex-1"
-                    maxLength={20}
+                    id="tagInput"
+                    name="tagInput"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Add tags to categorize your reflection..."
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <button
                     type="button"
                     onClick={handleAddTag}
-                    disabled={!newTag.trim() || editTags.length >= 5}
-                    className="sacred-button px-4"
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     Add
                   </button>
                 </div>
-                {editTags.length > 0 && (
+                
+                {formData.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
-                    {editTags.map((tag, index) => (
-                      <span
+                    {formData.tags.map((tag, index) => (
+                      <span 
                         key={index}
-                        className="inline-flex items-center gap-1 px-3 py-1 bg-sacred-blue-100 text-sacred-blue-700 rounded-full text-sm"
+                        className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
                       >
-                        {tag}
+                        <span>{tag}</span>
                         <button
                           type="button"
                           onClick={() => handleRemoveTag(tag)}
-                          className="hover:text-sacred-blue-900"
+                          className="text-blue-600 hover:text-blue-800"
                         >
-                          <X className="w-3 h-3" />
+                          <XMarkIcon className="w-4 h-4" />
                         </button>
                       </span>
                     ))}
                   </div>
                 )}
-              </>
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {entry.tags && entry.tags.length > 0 ? (
-                  entry.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-sacred-blue-100 text-sacred-blue-700 rounded-full text-sm font-medium"
-                    >
-                      {tag}
-                    </span>
-                  ))
-                ) : (
-                  <span className="text-sacred-blue-500 text-sm italic">No tags</span>
-                )}
               </div>
-            )}
-          </div>
 
-          {/* Sacred Content */}
-          <div>
-            <label className="sacred-label mb-3 block">Content</label>
-            {isEditing ? (
-              <>
-                <JournalEditor
-                  content={editContent}
-                  onChange={setEditContent}
-                  placeholder="Share your sacred thoughts and reflections..."
-                />
-                {errors.content && (
-                  <p className="sacred-error mt-2">{errors.content}</p>
-                )}
-              </>
-            ) : (
-              <div 
-                className="prose prose-lg max-w-none sacred-glass p-6"
-                dangerouslySetInnerHTML={{ __html: entry.content }}
-              />
-            )}
-          </div>
-
-          {/* Sacred Error Message */}
-          {errors.submit && (
-            <div className="sacred-error-message mt-4">
-              {errors.submit}
-            </div>
-          )}
-        </div>
-
-        {/* Sacred Footer */}
-        {isEditing && (
-          <div className="sticky bottom-0 bg-sacred-blue-50 border-t border-sacred-blue-200 p-6 rounded-b-2xl">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-sacred-blue-600 italic">
-                Take your time to refine your sacred reflection.
-              </p>
-              <div className="flex gap-3">
+              {/* Edit Actions */}
+              <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
                 <button
-                  onClick={handleCancelEdit}
-                  className="px-6 py-2 text-sacred-blue-600 hover:bg-sacred-blue-100 rounded-lg transition-colors font-medium"
+                  type="button"
+                  onClick={handleEditToggle}
+                  disabled={loading}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={handleSave}
-                  disabled={saving}
-                  className="sacred-button flex items-center gap-2 px-6"
+                  disabled={loading || (!formData.title.trim() && !formData.content.trim())}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Save className="w-4 h-4" />
-                  {saving ? 'Saving...' : 'Save Changes'}
+                  {loading ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-
-      {/* Sacred Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
+          ) : (
+            <div className="space-y-6">
+              {/* Title and Metadata */}
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                  {entry.title || 'Untitled Reflection'}
+                </h1>
+                
+                <div className="flex flex-wrap items-center gap-4 mb-6">
+                  {entry.mindset && (
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${getMindsetColor(entry.mindset)}`}>
+                      {entry.mindset} Mind
+                    </span>
+                  )}
+                  
+                  {entry.reflection_type && entry.reflection_type !== 'general' && (
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium capitalize ${getReflectionTypeColor(entry.reflection_type)}`}>
+                      {entry.reflection_type}
+                    </span>
+                  )}
+                  
+                  {entry.tags && entry.tags.length > 0 && (
+                    <div className="flex items-center space-x-1 text-sm text-gray-500">
+                      <TagIcon className="w-4 h-4" />
+                      <span>{entry.tags.length} tag{entry.tags.length !== 1 ? 's' : ''}</span>
+                    </div>
+                  )}
+                </div>
               </div>
-              <h3 className="font-sacred-serif text-lg font-semibold text-gray-800">
-                Delete Sacred Reflection?
-              </h3>
+
+              {/* Content */}
+              {entry.content && (
+                <div className="prose max-w-none">
+                  <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {entry.content}
+                  </div>
+                </div>
+              )}
+
+              {/* Tags */}
+              {entry.tags && entry.tags.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-700 mb-3">Tags</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {entry.tags.map((tag, index) => (
+                      <span 
+                        key={index}
+                        className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-            
-            <p className="text-gray-600 mb-6">
-              Are you sure you want to delete "{entry.title}"? This action cannot be undone, 
-              and your sacred reflection will be permanently removed.
-            </p>
-            
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium"
-              >
-                Keep Reflection
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg transition-colors font-medium"
-              >
-                {deleting ? 'Deleting...' : 'Delete Forever'}
-              </button>
-            </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
-  );
+  )
 }

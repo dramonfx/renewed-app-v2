@@ -1,101 +1,57 @@
 
-// src/components/journal/JournalEntryList.jsx
-// Sacred Journal Entry List - Gallery of spiritual reflections
+'use client'
 
-'use client';
+import { BookOpenIcon } from '@heroicons/react/24/outline'
+import JournalEntryCard from './JournalEntryCard'
 
-import { useState } from 'react';
-import JournalEntryCard from './JournalEntryCard';
-import JournalEntryModal from './JournalEntryModal';
-import { BookOpen, Sparkles } from 'lucide-react';
-
-export default function JournalEntryList({ 
-  entries = [], 
-  loading = false,
-  onEntryUpdate,
-  onEntryDelete 
-}) {
-  const [selectedEntry, setSelectedEntry] = useState(null);
-
-  // Handle entry selection for detailed view
-  const handleEntrySelect = (entry) => {
-    setSelectedEntry(entry);
-  };
-
-  // Handle entry close
-  const handleEntryClose = () => {
-    setSelectedEntry(null);
-  };
-
-  // Handle entry update
-  const handleEntryUpdate = (updatedEntry) => {
-    onEntryUpdate?.(updatedEntry);
-    setSelectedEntry(updatedEntry); // Update modal view
-  };
-
-  // Handle entry deletion
-  const handleEntryDelete = (deletedEntryId) => {
-    onEntryDelete?.(deletedEntryId);
-    setSelectedEntry(null); // Close modal if deleting current entry
-  };
-
-  // Sacred loading state
+export default function JournalEntryList({ entries, loading, onEntryClick }) {
   if (loading) {
     return (
-      <div className="sacred-glass p-12 text-center">
-        <div className="sacred-icon-bg w-16 h-16 mx-auto mb-6 animate-pulse">
-          <BookOpen className="w-8 h-8" />
-        </div>
-        <p className="text-sacred-blue-600 font-medium">
-          Gathering your sacred reflections...
-        </p>
+      <div className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 animate-pulse">
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex-1">
+                <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+              </div>
+              <div className="h-6 w-16 bg-gray-200 rounded-full ml-4"></div>
+            </div>
+            <div className="space-y-2">
+              <div className="h-3 bg-gray-200 rounded"></div>
+              <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+              <div className="h-3 bg-gray-200 rounded w-4/6"></div>
+            </div>
+          </div>
+        ))}
       </div>
-    );
+    )
   }
 
-  // Sacred empty state
   if (entries.length === 0) {
     return (
-      <div className="sacred-glass p-12 text-center">
-        <div className="sacred-icon-bg-gold w-20 h-20 mx-auto mb-6">
-          <Sparkles className="w-10 h-10" />
-        </div>
-        <h3 className="font-sacred-serif text-2xl font-semibold text-sacred-blue-800 mb-4">
+      <div className="text-center py-12">
+        <BookOpenIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
           Begin Your Sacred Journey
         </h3>
-        <p className="text-sacred-blue-600 mb-6 max-w-md mx-auto">
-          Your journal is ready to receive your first reflection. Every thought, 
-          every insight, every moment of growth starts with a single entry.
-        </p>
-        <p className="text-sm text-sacred-blue-500 italic">
-          Click "New Entry" above to begin your spiritual writing practice.
+        <p className="text-gray-600 mb-6">
+          Create your first reflection to start documenting your spiritual growth.
         </p>
       </div>
-    );
+    )
   }
 
   return (
-    <>
-      {/* Sacred Entry Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-        {entries.map((entry) => (
-          <JournalEntryCard
-            key={entry.id}
-            entry={entry}
-            onClick={() => handleEntrySelect(entry)}
-          />
-        ))}
-      </div>
-
-      {/* Sacred Entry Modal */}
-      {selectedEntry && (
-        <JournalEntryModal
-          entry={selectedEntry}
-          onClose={handleEntryClose}
-          onUpdate={handleEntryUpdate}
-          onDelete={handleEntryDelete}
+    <div className="space-y-4">
+      {entries.map((entry) => (
+        <JournalEntryCard
+          key={entry.id}
+          entry={entry}
+          onClick={() => onEntryClick(entry)}
         />
-      )}
-    </>
-  );
+      ))}
+    </div>
+  )
 }

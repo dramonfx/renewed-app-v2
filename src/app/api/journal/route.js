@@ -1,155 +1,207 @@
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
 
-// src/app/api/journal/route.js
-// Sacred Journaling API - Main journal operations (GET, POST)
+export const dynamic = 'force-dynamic'
 
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
-
-export const dynamic = 'force-dynamic';
-
-// GET /api/journal - Retrieve user's journal entries
+// GET /api/journal - Fetch user's journal entries
 export async function GET(request) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createRouteHandlerClient({ cookies })
     
     // Verify authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Parse query parameters
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 50); // Max 50 entries per request
-    const search = searchParams.get('search');
-    const reflectionType = searchParams.get('type');
-    const tags = searchParams.get('tags')?.split(',').filter(Boolean);
+    const { searchParams } = new URL(request.url)
+    const limit = parseInt(searchParams.get('limit')) || 50
+    const offset = parseInt(searchParams.get('offset')) || 0
+    const mindset = searchParams.get('mindset')
+    const reflectionType = searchParams.get('reflection_type')
+    const search = searchParams.get('search')
 
-    // Build query
-    let query = supabase
-      .from('reflections')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
+    try {
+      // If search query is provided, use the search function
+      if (search && search.trim()) {
+        const { data: entries, error: searchError } = await supabase
+          .rpc('search_user_reflections', {
+            search_query: search.trim(),
+            reflection_type_filter: reflectionType,
+            limit_results: limit
+          })
 
-    // Add filters
-    if (reflectionType) {
-      query = query.eq('reflection_type', reflectionType);
-    }
+        if (searchError) {
+          console.error('Search error:', searchError)
+          return NextResponse.json({ error: 'Search failed' }, { status: 500 })
+        }
 
-    // Add search functionality
-    if (search) {
-      query = query.or(`question_text.ilike.%${search}%,answer_text.ilike.%${search}%`);
-    }
+        // Transform search results to match journal interface
+        const transformedEntries = entries.map(entry => ({
+          id: entry.id,
+          title: entry.title || entry.question_text?.substring(0, 100) || 'Untitled',
+          content: entry.answer_text,
+          reflection_type: entry.reflection_type,
+          mindset: entry.mindset,
+          tags: entry.tags || [],
+          created_at: entry.created_at,
+          updated_at: entry.updated_at
+        }))
 
-    // Add tag filtering
-    if (tags && tags.length > 0) {
-      query = query.overlaps('tags', tags);
-    }
-
-    // Add pagination
-    const from = (page - 1) * limit;
-    query = query.range(from, from + limit - 1);
-
-    const { data: entries, error, count } = await query;
-
-    if (error) {
-      console.error('Error fetching journal entries:', error);
-      return NextResponse.json({ error: 'Failed to fetch journal entries' }, { status: 500 });
-    }
-
-    // Transform entries to journal format
-    const journalEntries = entries.map(entry => ({
-      id: entry.id,
-      title: entry.question_text,
-      content: entry.answer_text,
-      tags: entry.tags || [],
-      reflection_type: entry.reflection_type,
-      mindset: entry.mindset,
-      created_at: entry.created_at,
-      updated_at: entry.updated_at
-    }));
-
-    return NextResponse.json({
-      entries: journalEntries,
-      pagination: {
-        page,
-        limit,
-        total: count,
-        hasMore: entries.length === limit
+        return NextResponse.json({ 
+          entries: transformedEntries, 
+          count: transformedEntries.length,
+          isSearch: true 
+        })
       }
-    });
 
+      // Use optimized function for filtered queries
+      const { data: entries, error } = await supabase
+        .rpc('get_journal_entries', {
+          mindset_filter: mindset,
+          reflection_type_filter: reflectionType,
+          limit_entries: limit,
+          offset_entries: offset
+        })
+
+      if (error) {
+        console.error('Database error:', error)
+        return NextResponse.json({ error: 'Failed to fetch entries' }, { status: 500 })
+      }
+
+      return NextResponse.json({ entries: entries || [], count: entries?.length || 0 })
+    } catch (rpcError) {
+      // Fallback to direct query if RPC functions aren't available
+      console.warn('RPC function not available, using direct query:', rpcError)
+      
+      let query = supabase
+        .from('reflections')
+        .select(`
+          id,
+          title,
+          question_text,
+          answer_text,
+          reflection_type,
+          mindset,
+          tags,
+          created_at,
+          updated_at
+        `)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1)
+
+      // Apply filters
+      if (mindset) query = query.eq('mindset', mindset)
+      if (reflectionType) query = query.eq('reflection_type', reflectionType)
+
+      const { data: entries, error } = await query
+
+      if (error) {
+        console.error('Fallback query error:', error)
+        return NextResponse.json({ error: 'Failed to fetch entries' }, { status: 500 })
+      }
+
+      // Transform entries to match journal interface
+      const transformedEntries = (entries || []).map(entry => ({
+        id: entry.id,
+        title: entry.title || entry.question_text?.substring(0, 100) || 'Untitled',
+        content: entry.answer_text,
+        reflection_type: entry.reflection_type,
+        mindset: entry.mindset,
+        tags: entry.tags || [],
+        created_at: entry.created_at,
+        updated_at: entry.updated_at
+      }))
+
+      return NextResponse.json({ 
+        entries: transformedEntries, 
+        count: transformedEntries.length 
+      })
+    }
   } catch (error) {
-    console.error('Journal API GET error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('API error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
 // POST /api/journal - Create new journal entry
 export async function POST(request) {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createRouteHandlerClient({ cookies })
     
     // Verify authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Parse and validate request body
-    const body = await request.json();
-    const { title, content, tags, reflection_type, mindset } = body;
+    // Parse request body
+    const body = await request.json()
+    const { title, content, reflection_type, tags, mindset } = body
 
-    // Validation
-    if (!title || typeof title !== 'string' || title.trim().length === 0) {
-      return NextResponse.json({ error: 'Title is required' }, { status: 400 });
+    // Validate required fields
+    if (!title?.trim() && !content?.trim()) {
+      return NextResponse.json({ 
+        error: 'Either title or content is required' 
+      }, { status: 400 })
     }
 
-    if (!content || typeof content !== 'string' || content.trim().length === 0) {
-      return NextResponse.json({ error: 'Content is required' }, { status: 400 });
+    if (mindset && !['Natural', 'Transition', 'Spiritual'].includes(mindset)) {
+      return NextResponse.json({ 
+        error: 'Invalid mindset. Must be Natural, Transition, or Spiritual' 
+      }, { status: 400 })
     }
 
-    // Sanitize and prepare data
+    // Prepare entry data
     const entryData = {
       user_id: user.id,
-      question_text: title.trim(),
-      answer_text: content.trim(),
-      reflection_type: reflection_type || 'journal',
-      mindset: mindset || null,
-      tags: Array.isArray(tags) ? tags.filter(tag => tag && typeof tag === 'string') : []
-    };
+      title: title?.trim() || '',
+      question_text: title?.trim() || 'Journal Entry',
+      answer_text: content?.trim() || '',
+      reflection_type: reflection_type || 'general',
+      tags: Array.isArray(tags) ? tags : [],
+      mindset: mindset || null
+    }
 
-    // Insert new journal entry
+    // Create journal entry
     const { data: entry, error } = await supabase
       .from('reflections')
       .insert(entryData)
-      .select()
-      .single();
+      .select(`
+        id,
+        title,
+        question_text,
+        answer_text,
+        reflection_type,
+        mindset,
+        tags,
+        created_at,
+        updated_at
+      `)
+      .single()
 
     if (error) {
-      console.error('Error creating journal entry:', error);
-      return NextResponse.json({ error: 'Failed to create journal entry' }, { status: 500 });
+      console.error('Database error:', error)
+      return NextResponse.json({ error: 'Failed to create entry' }, { status: 500 })
     }
 
-    // Transform to journal format
-    const journalEntry = {
+    // Transform response to match journal interface
+    const transformedEntry = {
       id: entry.id,
-      title: entry.question_text,
+      title: entry.title || entry.question_text,
       content: entry.answer_text,
-      tags: entry.tags || [],
       reflection_type: entry.reflection_type,
       mindset: entry.mindset,
+      tags: entry.tags || [],
       created_at: entry.created_at,
       updated_at: entry.updated_at
-    };
+    }
 
-    return NextResponse.json({ entry: journalEntry }, { status: 201 });
-
+    return NextResponse.json({ entry: transformedEntry }, { status: 201 })
   } catch (error) {
-    console.error('Journal API POST error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('API error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
