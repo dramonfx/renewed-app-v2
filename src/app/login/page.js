@@ -17,15 +17,15 @@ export default function LoginPage() {
   const [loginSuccess, setLoginSuccess] = useState(false);
   
   const { handleLogin, isLoading, error, validationErrors, clearErrors } = useLogin();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  // Redirect if already logged in
+  // Redirect if already logged in (but wait for auth loading to complete)
   useEffect(() => {
-    if (user) {
+    if (user && !authLoading) {
       router.push('/book');
     }
-  }, [user, router]);
+  }, [user, authLoading, router]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
