@@ -3,13 +3,28 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Layout({ children }) {
   const pathname = usePathname();
   const [sections, setSections] = useState([]);
+  const { user, logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Check if current page should have full-screen layout (no sidebar)
   const isFullScreenPage = pathname === '/onboarding' || pathname === '/login' || pathname === '/signup' || pathname === '/forgot-password';
+
+  // Logout handler
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   useEffect(() => {
     // Only fetch sections if not on a full-screen page
@@ -101,6 +116,39 @@ export default function Layout({ children }) {
                     🎧 Full Audiobook
                   </Link>
                 </li>
+                
+                {/* Logout Button - Only show when user is authenticated */}
+                {user && (
+                  <>
+                    {/* Sacred Divider */}
+                    <hr className="my-4 border-sacred-blue-300" />
+                    
+                    <li>
+                      <button
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                        className="w-full text-left block py-3 px-4 rounded-lg text-sacred-blue-900 hover:bg-red-100 hover:text-red-800 font-sans font-semibold text-base transition-all duration-300 border border-transparent hover:border-red-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label="Log out of your account"
+                      >
+                        {isLoggingOut ? (
+                          <>
+                            <svg className="inline w-4 h-4 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Logging out...
+                          </>
+                        ) : (
+                          <>
+                            <svg className="inline w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                            Logout
+                          </>
+                        )}
+                      </button>
+                    </li>
+                  </>
+                )}
               </ul>
             </nav>
           </div>

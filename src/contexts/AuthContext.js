@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
     if (error) {
       console.error('Error logging out:', error.message);
     }
-    router.push('/login'); // Redirect to login after logout
+    router.push('/'); // Redirect to home page after logout
     return { error };
   };
 
