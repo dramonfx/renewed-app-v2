@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
 import JournalHeader from '@/components/journal/JournalHeader'
 import JournalEntryList from '@/components/journal/JournalEntryList'
 import NewJournalEntry from '@/components/journal/NewJournalEntry'
@@ -11,38 +11,32 @@ import JournalEntryModal from '@/components/journal/JournalEntryModal'
 export default function JournalPage() {
   const [entries, setEntries] = useState([])
   const [stats, setStats] = useState({})
-  const [loading, setLoading] = useState(true)
+  const [dataLoading, setDataLoading] = useState(true)
   const [error, setError] = useState('')
   const [showNewEntry, setShowNewEntry] = useState(false)
   const [selectedEntry, setSelectedEntry] = useState(null)
-  const [user, setUser] = useState(null)
   const [filters, setFilters] = useState({
     mindset: '',
     reflectionType: '',
     search: ''
   })
   
-  const supabase = createClientComponentClient()
+  const { user, loading: authLoading } = useAuth()
   const router = useRouter()
 
-  // Check authentication and load user
+  // Handle authentication redirect properly
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser()
-      if (error || !user) {
-        router.push('/login')
-        return
-      }
-      setUser(user)
+    // Only redirect if authentication loading is complete and no user
+    if (!authLoading && !user) {
+      router.push('/login')
     }
-    checkAuth()
-  }, [supabase, router])
+  }, [user, authLoading, router])
 
   // Load journal entries
   const loadEntries = async () => {
     if (!user) return
     
-    setLoading(true)
+    setDataLoading(true)
     setError('')
     
     try {
@@ -63,7 +57,7 @@ export default function JournalPage() {
       console.error('Error loading entries:', error)
       setError(error.message)
     } finally {
-      setLoading(false)
+      setDataLoading(false)
     }
   }
 
@@ -179,7 +173,8 @@ export default function JournalPage() {
     setFilters(prev => ({ ...prev, ...newFilters }))
   }
 
-  if (!user) {
+  // Show loading state while authentication is being determined
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center">
@@ -188,6 +183,11 @@ export default function JournalPage() {
         </div>
       </div>
     )
+  }
+
+  // Don't render anything while redirecting unauthenticated users
+  if (!user) {
+    return null
   }
 
   return (
@@ -215,7 +215,7 @@ export default function JournalPage() {
         
         <JournalEntryList
           entries={entries}
-          loading={loading}
+          loading={dataLoading}
           onEntryClick={setSelectedEntry}
         />
         
