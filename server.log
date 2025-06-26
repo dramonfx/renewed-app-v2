@@ -1,11 +1,14 @@
-Internal Error: renewed-app-v2@workspace:.: This package doesn't seem to be present in your lockfile; run "yarn install" to update the lockfile
-    at jR.getCandidates (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:204:8149)
-    at em.getCandidates (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:141:1311)
-    at /home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:8420
-    at qE (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:140:54028)
-    at dt (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:8400)
-    at async Promise.allSettled (index 0)
-    at async Uu (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:140:53356)
-    at async /home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:9166
-    at async Yi.startProgressPromise (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:140:140548)
-    at async t.resolveEverything (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:7138)
+
+> renewed-app-v2@0.1.0 dev
+> next dev
+
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+ ⚠ Port 3000 is in use, using available port 3002 instead.
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+   ▲ Next.js 15.3.2
+   - Local:        http://localhost:3002
+   - Network:      http://100.124.231.207:3002
+   - Environments: .env.local
+
+ ✓ Starting...
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs

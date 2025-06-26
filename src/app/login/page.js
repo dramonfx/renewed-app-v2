@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useLogin } from '@/hooks/useLogin';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
@@ -19,15 +19,16 @@ export default function LoginPage() {
   const { handleLogin, isLoading, error, validationErrors, clearErrors } = useLogin();
   const { user, loading: authLoading } = useAuth(); // Fixed: Added loading state
   const router = useRouter();
+  const pathname = usePathname();
 
-  // ENHANCED REDIRECT LOGIC - Fixed to check loading state
+  // ENHANCED REDIRECT LOGIC - Only redirect if user is on login page
   useEffect(() => {
-    // Only redirect when user is authenticated AND we're not loading
-    if (user && !authLoading) {
+    // Only redirect when user is authenticated AND we're not loading AND we're on the login page
+    if (user && !authLoading && pathname === '/login') {
       router.push('/book');
     }
     // If user is null/undefined and not loading, allow access to login page
-  }, [user, authLoading, router]);
+  }, [user, authLoading, pathname, router]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
