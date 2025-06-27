@@ -10,7 +10,6 @@ export async function middleware(req) {
   // Define protected routes that require authentication
   const protectedRoutes = [
     '/dashboard',
-    '/journal',
     '/book',
     '/onboarding',
     '/full-audio-player',

@@ -1,8 +1,10 @@
 
+
 'use client'
 
-import { useState } from 'react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
+import { useState, useEffect, useCallback } from 'react'
+import { XMarkIcon, CloudIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
+import journalStorage from '@/lib/journalStorage'
 
 export default function NewJournalEntry({ isOpen, onClose, onSave }) {
   const [formData, setFormData] = useState({
@@ -15,11 +17,77 @@ export default function NewJournalEntry({ isOpen, onClose, onSave }) {
   const [tagInput, setTagInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [autoSaveStatus, setAutoSaveStatus] = useState('') // 'saving', 'saved', 'error'
+  const [draftRestored, setDraftRestored] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
+
+  // Auto-save function with debouncing
+  const autoSave = useCallback(async () => {
+    if (formData.title.trim() || formData.content.trim()) {
+      setAutoSaveStatus('saving')
+      try {
+        const success = journalStorage.saveDraft(formData)
+        setAutoSaveStatus(success ? 'saved' : 'error')
+        
+        // Clear status after 2 seconds
+        setTimeout(() => setAutoSaveStatus(''), 2000)
+      } catch (error) {
+        setAutoSaveStatus('error')
+        setTimeout(() => setAutoSaveStatus(''), 2000)
+      }
+    }
+  }, [formData])
+
+  // Load draft when modal opens
+  useEffect(() => {
+    if (isOpen && !draftRestored) {
+      const draft = journalStorage.loadDraft()
+      if (draft) {
+        setFormData({
+          title: draft.title || '',
+          content: draft.content || '',
+          mindset: draft.mindset || '',
+          reflection_type: draft.reflection_type || 'general',
+          tags: draft.tags || []
+        })
+        setDraftRestored(true)
+      }
+    }
+  }, [isOpen, draftRestored])
+
+  // Auto-save with debouncing
+  useEffect(() => {
+    if (!isOpen) return
+
+    const timeoutId = setTimeout(() => {
+      autoSave()
+    }, 1000) // Auto-save after 1 second of inactivity
+
+    return () => clearTimeout(timeoutId)
+  }, [formData, isOpen, autoSave])
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setFormData({
+        title: '',
+        content: '',
+        mindset: '',
+        reflection_type: 'general',
+        tags: []
+      })
+      setTagInput('')
+      setError('')
+      setAutoSaveStatus('')
+      setDraftRestored(false)
+      setSaveSuccess(false)
+    }
+  }, [isOpen])
 
   const handleAddTag = (e) => {
     e.preventDefault()
@@ -49,7 +117,7 @@ export default function NewJournalEntry({ isOpen, onClose, onSave }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     if (!formData.title.trim() && !formData.content.trim()) {
       setError('Please provide either a title or content for your reflection.')
       return
@@ -60,6 +128,10 @@ export default function NewJournalEntry({ isOpen, onClose, onSave }) {
 
     try {
       await onSave(formData)
+      
+      // Show success message
+      setSaveSuccess(true)
+      
       // Reset form
       setFormData({
         title: '',
@@ -69,6 +141,16 @@ export default function NewJournalEntry({ isOpen, onClose, onSave }) {
         tags: []
       })
       setTagInput('')
+      
+      // Clear draft since we successfully saved
+      journalStorage.clearDraft()
+      
+      // Close modal after a short delay
+      setTimeout(() => {
+        setSaveSuccess(false)
+        onClose()
+      }, 1500)
+      
     } catch (error) {
       setError(error.message)
     } finally {
@@ -89,7 +171,42 @@ export default function NewJournalEntry({ isOpen, onClose, onSave }) {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">New Sacred Reflection</h2>
+          <div className="flex-1">
+            <h2 className="text-xl font-semibold text-gray-900">New Sacred Reflection</h2>
+            
+            {/* Auto-save status indicator */}
+            {autoSaveStatus && (
+              <div className="flex items-center mt-1 text-sm">
+                {autoSaveStatus === 'saving' && (
+                  <div className="flex items-center text-blue-600">
+                    <CloudIcon className="w-4 h-4 mr-1 animate-pulse" />
+                    <span>Saving draft...</span>
+                  </div>
+                )}
+                {autoSaveStatus === 'saved' && (
+                  <div className="flex items-center text-green-600">
+                    <CloudIcon className="w-4 h-4 mr-1" />
+                    <span>Draft saved</span>
+                  </div>
+                )}
+                {autoSaveStatus === 'error' && (
+                  <div className="flex items-center text-red-600">
+                    <CloudIcon className="w-4 h-4 mr-1" />
+                    <span>Error saving draft</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Success message */}
+            {saveSuccess && (
+              <div className="flex items-center mt-1 text-sm text-green-600">
+                <CheckCircleIcon className="w-4 h-4 mr-1" />
+                <span>Reflection saved successfully!</span>
+              </div>
+            )}
+          </div>
+          
           <button
             onClick={handleClose}
             disabled={loading}
@@ -203,11 +320,10 @@ export default function NewJournalEntry({ isOpen, onClose, onSave }) {
                 Add
               </button>
             </div>
-            
             {formData.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {formData.tags.map((tag, index) => (
-                  <span 
+                  <span
                     key={index}
                     className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center space-x-1"
                   >
@@ -238,9 +354,10 @@ export default function NewJournalEntry({ isOpen, onClose, onSave }) {
             <button
               type="submit"
               disabled={loading || (!formData.title.trim() && !formData.content.trim())}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
-              {loading ? 'Saving...' : 'Save Reflection'}
+              {loading && <CloudIcon className="w-4 h-4 animate-spin" />}
+              <span>{loading ? 'Saving...' : 'Save Reflection'}</span>
             </button>
           </div>
         </form>
