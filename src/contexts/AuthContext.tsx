@@ -23,7 +23,7 @@ interface AuthContextValue {
   user: User | null;
   loading: boolean;
   signUp: (email: string, password: string) => Promise<AuthResult>;
-  login: (email: string, password: string) => Promise<AuthResult>;
+  login: (email: string, password: string, redirectPath?: string) => Promise<AuthResult>;
   logout: () => Promise<AuthError>;
 }
 
@@ -103,14 +103,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Login function
-  const login = async (email: string, password: string): Promise<AuthResult> => {
+  // Login function with optional redirect
+  const login = async (email: string, password: string, redirectPath?: string): Promise<AuthResult> => {
     setLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ 
         email, 
         password 
       });
+      
+      if (!error && data?.user) {
+        // Handle redirect after successful login
+        const targetPath = redirectPath || '/dashboard';
+        setTimeout(() => {
+          router.push(targetPath);
+        }, 500); // Small delay to show success state
+      }
+      
       setLoading(false);
       return { 
         user: data?.user as User ?? null, 

@@ -1,0 +1,19 @@
+
+> renewed-app-v2@0.1.0 dev
+> next dev
+
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+   ▲ Next.js 15.3.2
+   - Local:        http://localhost:3000
+   - Network:      http://100.96.53.40:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+ ✓ Ready in 2s
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 5.4s (1697 modules)
+ HEAD /dashboard 200 in 5803ms
+ ✓ Compiled in 638ms (778 modules)

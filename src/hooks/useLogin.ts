@@ -95,7 +95,7 @@ export const useLogin = (): UseLoginReturn => {
       if (loginError) {
         const friendlyError = getErrorMessage(loginError);
         setError(friendlyError);
-        return { success: false, error: friendlyError };
+        return { success: false, error: friendlyError ?? undefined };
       }
       
       if (user && session) {

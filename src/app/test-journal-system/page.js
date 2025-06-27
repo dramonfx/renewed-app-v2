@@ -263,7 +263,7 @@ export default function TestJournalSystem() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Test Results</h2>
           
           {results.length === 0 ? (
-            <p className="text-gray-500 italic">No tests run yet. Click "Run Full Test Suite" to begin.</p>
+            <p className="text-gray-500 italic">No tests run yet. Click &quot;Run Full Test Suite&quot; to begin.</p>
           ) : (
             <div className="space-y-4">
               {results.map((result, index) => (

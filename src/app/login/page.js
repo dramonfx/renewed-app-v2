@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useLogin } from '@/hooks/useLogin';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
@@ -19,6 +19,10 @@ export default function LoginPage() {
   const { handleLogin, isLoading, error, validationErrors, clearErrors } = useLogin();
   const { user, loading: authLoading } = useAuth(); // Fixed: Added loading state
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  // Get the return URL from query parameters
+  const returnUrl = searchParams.get('returnUrl') || '/dashboard';
 
   // ENHANCED REDIRECT LOGIC - Fixed to check loading state
   useEffect(() => {
@@ -32,7 +36,7 @@ export default function LoginPage() {
   const onSubmit = async (e) => {
     e.preventDefault();
     
-    const result = await handleLogin(email, password);
+    const result = await handleLogin(email, password, returnUrl);
     
     if (result.success) {
       setLoginSuccess(true);
