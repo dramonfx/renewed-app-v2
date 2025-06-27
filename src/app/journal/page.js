@@ -1,48 +1,34 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
 import JournalHeader from '@/components/journal/JournalHeader'
 import JournalEntryList from '@/components/journal/JournalEntryList'
 import NewJournalEntry from '@/components/journal/NewJournalEntry'
 import JournalEntryModal from '@/components/journal/JournalEntryModal'
+import { LoadingSpinner } from '@/components/LoadingSpinner'
 
 export default function JournalPage() {
   const [entries, setEntries] = useState([])
   const [stats, setStats] = useState({})
-  const [loading, setLoading] = useState(true)
+  const [entriesLoading, setEntriesLoading] = useState(true)
   const [error, setError] = useState('')
   const [showNewEntry, setShowNewEntry] = useState(false)
   const [selectedEntry, setSelectedEntry] = useState(null)
-  const [user, setUser] = useState(null)
   const [filters, setFilters] = useState({
     mindset: '',
     reflectionType: '',
     search: ''
   })
   
-  const supabase = createClientComponentClient()
-  const router = useRouter()
-
-  // Check authentication and load user
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser()
-      if (error || !user) {
-        router.push('/login')
-        return
-      }
-      setUser(user)
-    }
-    checkAuth()
-  }, [supabase, router])
+  // Use the production AuthContext instead of managing our own auth state
+  const { user, loading: authLoading } = useAuth()
 
   // Load journal entries
   const loadEntries = async () => {
     if (!user) return
     
-    setLoading(true)
+    setEntriesLoading(true)
     setError('')
     
     try {
@@ -63,7 +49,7 @@ export default function JournalPage() {
       console.error('Error loading entries:', error)
       setError(error.message)
     } finally {
-      setLoading(false)
+      setEntriesLoading(false)
     }
   }
 
@@ -86,11 +72,11 @@ export default function JournalPage() {
 
   // Load entries and stats when user is available or filters change
   useEffect(() => {
-    if (user) {
+    if (user && !authLoading) {
       loadEntries()
       loadStats()
     }
-  }, [user, filters])
+  }, [user, authLoading, filters])
 
   // Handle new entry creation
   const handleNewEntry = async (entryData) => {
@@ -179,12 +165,22 @@ export default function JournalPage() {
     setFilters(prev => ({ ...prev, ...newFilters }))
   }
 
+  // Show loading while authentication is being checked
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    )
+  }
+
+  // If auth is complete but no user, let middleware handle the redirect
+  // (This should not happen in normal flow since middleware protects this route)
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your sacred space...</p>
+          <p className="text-gray-600">Redirecting to login...</p>
         </div>
       </div>
     )
@@ -215,7 +211,7 @@ export default function JournalPage() {
         
         <JournalEntryList
           entries={entries}
-          loading={loading}
+          loading={entriesLoading}
           onEntryClick={setSelectedEntry}
         />
         

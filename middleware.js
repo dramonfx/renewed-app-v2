@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server'
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 
-export function middleware(req) {
+export async function middleware(req) {
   console.log('Middleware running for path:', req.nextUrl.pathname)
   
   const { pathname } = req.nextUrl
+  const res = NextResponse.next()
   
   // Define protected routes that require authentication
   const protectedRoutes = [
@@ -20,16 +22,39 @@ export function middleware(req) {
     pathname === route || pathname.startsWith(route + '/')
   )
 
-  // For now, redirect all protected routes to login (simplified test)
   if (isProtectedRoute) {
-    console.log(`Redirecting protected route ${pathname} to login`)
-    const redirectUrl = req.nextUrl.clone()
-    redirectUrl.pathname = '/login'
-    redirectUrl.searchParams.set('returnUrl', pathname)
-    return NextResponse.redirect(redirectUrl)
+    try {
+      // Create Supabase client for middleware
+      const supabase = createMiddlewareClient({ req, res })
+      
+      // Check if user is authenticated
+      const { data: { session }, error } = await supabase.auth.getSession()
+      
+      if (error) {
+        console.error('Error checking session in middleware:', error)
+      }
+      
+      // If no session, redirect to login with return URL
+      if (!session) {
+        console.log(`No session found, redirecting ${pathname} to login`)
+        const redirectUrl = req.nextUrl.clone()
+        redirectUrl.pathname = '/login'
+        redirectUrl.searchParams.set('returnUrl', pathname)
+        return NextResponse.redirect(redirectUrl)
+      }
+      
+      console.log(`User authenticated, allowing access to ${pathname}`)
+    } catch (error) {
+      console.error('Error in middleware auth check:', error)
+      // On error, redirect to login for safety
+      const redirectUrl = req.nextUrl.clone()
+      redirectUrl.pathname = '/login'
+      redirectUrl.searchParams.set('returnUrl', pathname)
+      return NextResponse.redirect(redirectUrl)
+    }
   }
 
-  return NextResponse.next()
+  return res
 }
 
 export const config = {
