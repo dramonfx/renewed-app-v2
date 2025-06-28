@@ -33,12 +33,16 @@ const SacredButton = forwardRef<HTMLButtonElement, SacredButtonProps>(({
 
   const combinedClasses = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
 
-  // Extract motion-specific props and HTML button props
+  // Extract conflicting props and only pass safe ones
   const { 
     onDrag, 
     onDragEnd, 
-    onDragStart, 
-    ...buttonProps 
+    onDragStart,
+    onAnimationStart,
+    onAnimationEnd,
+    onAnimationIteration,
+    onTransitionEnd,
+    ...safeProps 
   } = props;
 
   return (
@@ -50,7 +54,7 @@ const SacredButton = forwardRef<HTMLButtonElement, SacredButtonProps>(({
       className={combinedClasses}
       whileHover={!disabled && !loading ? { y: -2 } : {}}
       whileTap={!disabled && !loading ? { y: 0 } : {}}
-      {...buttonProps}
+      {...safeProps}
     >
       {loading && (
         <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

@@ -2,7 +2,10 @@
 'use client'
 
 import { useState } from 'react'
-import { PlusIcon, BookOpenIcon, MagnifyingGlassIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline'
+import { motion } from 'framer-motion'
+import { PlusIcon, BookOpenIcon, MagnifyingGlassIcon, AdjustmentsHorizontalIcon, SparklesIcon } from '@heroicons/react/24/outline'
+import SacredButton from '@/components/ui/sacred-button'
+import SacredCard from '@/components/ui/sacred-card'
 
 export default function JournalHeader({ entries, stats, filters, onFilterChange, onNewEntry }) {
   const [showFilters, setShowFilters] = useState(false)
@@ -32,27 +35,48 @@ export default function JournalHeader({ entries, stats, filters, onFilterChange,
 
   return (
     <div className="mb-8">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-6 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Sacred Journal
-          </h1>
-          <p className="text-gray-600">
-            Your personal space for spiritual reflection and growth
-          </p>
+      <SacredCard variant="heavy" className="p-8 mb-6">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
+          <motion.div
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="flex items-center space-x-3 mb-3">
+              <SparklesIcon className="w-8 h-8 text-blue-600" />
+              <h1 className="text-4xl font-bold text-sacred-dark font-serif">
+                Sacred Journal
+              </h1>
+            </div>
+            <p className="text-sacred-medium text-lg">
+              Your personal sanctuary for spiritual reflection and conscious growth
+            </p>
+            <p className="text-sacred-medium text-sm mt-2 opacity-80">
+              A workshop for the soul • Mindful reflection • Sacred space
+            </p>
+          </motion.div>
+          
+          <motion.div
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex-shrink-0"
+          >
+            <SacredButton
+              onClick={onNewEntry}
+              variant="primary"
+              size="lg"
+              className="shadow-xl hover:shadow-2xl"
+            >
+              <PlusIcon className="w-5 h-5 mr-2" />
+              Begin Sacred Reflection
+            </SacredButton>
+          </motion.div>
         </div>
-        
-        <button
-          onClick={onNewEntry}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2 transition-colors self-start"
-        >
-          <PlusIcon className="w-5 h-5" />
-          <span>New Reflection</span>
-        </button>
-      </div>
+      </SacredCard>
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-6">
+      <SacredCard variant="glass" className="p-6 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           {/* Search */}
           <div className="flex-1 relative">
@@ -146,11 +170,16 @@ export default function JournalHeader({ entries, stats, filters, onFilterChange,
             )}
           </div>
         )}
-      </div>
+      </SacredCard>
       
       {/* Statistics */}
       {totalEntries > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <SacredCard variant="glass" className="p-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
             <BookOpenIcon className="w-5 h-5 mr-2" />
             Your Spiritual Journey
@@ -208,7 +237,8 @@ export default function JournalHeader({ entries, stats, filters, onFilterChange,
               </div>
             </div>
           )}
-        </div>
+          </SacredCard>
+        </motion.div>
       )}
     </div>
   )
