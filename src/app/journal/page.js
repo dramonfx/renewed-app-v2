@@ -1,6 +1,6 @@
-use client'
+'use client'
 
-import { useState, useEffect } from 'react
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import JournalHeader from '@/components/journal/JournalHeader'
 import JournalEntryList from '@/components/journal/JournalEntryList'
