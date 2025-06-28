@@ -1,12 +1,13 @@
+use client'
 
-'use client'
-
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react
+import { motion } from 'framer-motion'
 import JournalHeader from '@/components/journal/JournalHeader'
 import JournalEntryList from '@/components/journal/JournalEntryList'
-import NewJournalEntry from '@/components/journal/NewJournalEntry'
+import SacredJournalEntry from '@/components/journal/SacredJournalEntry'
 import JournalEntryModal from '@/components/journal/JournalEntryModal'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { SparklesIcon } from '@heroicons/react/24/outline'
 import journalStorage from '@/lib/journalStorage'
 
 export default function JournalPage() {
@@ -197,52 +198,89 @@ export default function JournalPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <JournalHeader
-          entries={entries}
-          stats={stats}
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          onNewEntry={() => setShowNewEntry(true)}
-          onExportData={handleExportData}
-        />
+    <div className="min-h-screen relative">
+      {/* Sacred Background Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/5 via-indigo-900/3 to-purple-900/5 pointer-events-none"></div>
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative z-10"
+      >
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          {/* Sacred Header with Enhanced Styling */}
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            <JournalHeader 
+              entries={entries}
+              stats={stats}
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onNewEntry={() => setShowNewEntry(true)}
+              onExportData={handleExportData}
+            />
+          </motion.div>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <p className="text-red-800">{error}</p>
-            <button
-              onClick={loadEntries}
-              className="mt-2 text-red-600 hover:text-red-800 font-medium"
+          {/* Enhanced Error Display */}
+          {error && (
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              className="bg-red-50/90 backdrop-blur-sm border border-red-200 rounded-xl p-6 mb-6 shadow-lg"
             >
-              Try Again
-            </button>
-          </div>
-        )}
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <SparklesIcon className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <p className="text-red-800 font-medium">Something went amiss in your sacred space</p>
+                  <p className="text-red-600 text-sm mt-1">{error}</p>
+                </div>
+              </div>
+              <button 
+                onClick={loadEntries}
+                className="mt-4 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors font-medium"
+              >
+                Restore Connection
+              </button>
+            </motion.div>
+          )}
 
-        <JournalEntryList
-          entries={entries}
-          loading={entriesLoading}
-          onEntryClick={setSelectedEntry}
+          {/* Sacred Journal Entries */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+          >
+            <JournalEntryList
+              entries={entries}
+              loading={entriesLoading}
+              onEntryClick={setSelectedEntry}
+            />
+          </motion.div>
+        </div>
+      </motion.div>
+      
+      {/* Sacred Journal Entry Modal */}
+      <SacredJournalEntry
+        isOpen={showNewEntry}
+        onClose={() => setShowNewEntry(false)}
+        onSave={handleNewEntry}
+      />
+      
+      {/* Entry Detail Modal */}
+      {selectedEntry && (
+        <JournalEntryModal
+          entry={selectedEntry}
+          onClose={() => setSelectedEntry(null)}
+          onUpdate={handleUpdateEntry}
+          onDelete={handleDeleteEntry}
         />
-
-        {/* New Entry Modal */}
-        <NewJournalEntry
-          isOpen={showNewEntry}
-          onClose={() => setShowNewEntry(false)}
-          onSave={handleNewEntry}
-        />
-
-        {/* Entry Detail Modal */}
-        {selectedEntry && (
-          <JournalEntryModal
-            entry={selectedEntry}
-            onClose={() => setSelectedEntry(null)}
-            onUpdate={handleUpdateEntry}
-            onDelete={handleDeleteEntry}
-          />
-        )}
-      </div>
+      )}
     </div>
   )
 }
