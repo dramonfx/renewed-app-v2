@@ -24,6 +24,25 @@ This guidebook is more than just a simple read. As you work through the template
     updatedAt: new Date().toISOString()
   },
   {
+    id: '0',
+    slug: '00_prologue',
+    title: 'Prologue',
+    description: 'The foundational introduction to discovering your spiritual identity through The New Man Story.',
+    content: `The straightforward yet insightful exercise template contained in this guidebook has been refined over many years with one clear objective: to help individuals navigate through spiritual principles that unlock the understanding of their spiritual identity. Through iterations and refinements, this template has evolved to its current form, offering a structured approach to unveil the spiritual truths that enable us to tell "The New Man Story."
+
+"Therefore, if anyone is in Christ, he is a new creation. The old has passed away; behold, the new has come." — 2 Corinthians 5:17
+
+This guidebook is more than just a simple read. As you work through the template, you'll have the opportunity to record the principles you discover, allowing the narrative of your renewed self to unfold.`,
+    order: 0,
+    category: 'prologue',
+    sectionType: 'intro',
+    scriptureReferences: ['2 Corinthians 5:17', 'Galatians 6:8', 'Romans 12:2', 'Matthew 6:10'],
+    readingTime: 3,
+    isPublished: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
     id: '2',
     slug: 'principle-1-the-fruit',
     title: 'The Fruit',
@@ -223,7 +242,7 @@ export async function getPrinciplesByCategory(category: string): Promise<BookSec
       readingTime: section.reading_time,
       isPublished: section.is_published,
       createdAt: section.created_at,
-      updatedAt: section.updated_at
+      updatedAt: data.updated_at
     }))
   } catch (error) {
     console.error('Database connection error, using mock data:', error)
