@@ -2,9 +2,11 @@
 'use client';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { onboardingStorage } from '@/lib/onboardingStorage';
 
 const CompletionStep = ({ onboardingData = {}, data = {} }) => {
   const [showConfetti, setShowConfetti] = useState(false);
+  const [pathSaved, setPathSaved] = useState(false);
 
   // Use onboardingData if available, fallback to data prop
   const safeData = onboardingData || data || {};
@@ -14,6 +16,14 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
     const timer = setTimeout(() => setShowConfetti(false), 3000);
     return () => clearTimeout(timer);
   }, []);
+
+  // Save Sacred Path when completion step is reached
+  useEffect(() => {
+    if (safeData.selectedPath) {
+      const saved = onboardingStorage.saveSacredPath(safeData);
+      setPathSaved(saved);
+    }
+  }, [safeData]);
 
   const getPathInfo = () => {
     const pathMap = {
@@ -160,8 +170,25 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 1.5 }}
-          className="text-center"
+          className="text-center space-y-4"
         >
+          {/* Sacred Path Saved Confirmation */}
+          {pathSaved && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="bg-sacred-gold-50/80 backdrop-blur-md rounded-xl p-4 border border-sacred-gold-200/50"
+            >
+              <div className="flex items-center justify-center space-x-2">
+                <span className="text-sacred-gold-600 text-sm">✓</span>
+                <span className="text-sacred-gold-700 text-sm font-medium">
+                  Your Sacred Path choice has been saved
+                </span>
+              </div>
+            </motion.div>
+          )}
+          
           <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-white/40">
             <div className="flex items-center justify-center space-x-3 mb-3">
               <div className="w-6 h-6 rounded-full bg-sacred-gradient animate-pulse"></div>
