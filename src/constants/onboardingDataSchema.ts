@@ -84,9 +84,9 @@ export const validateStepData: Record<OnboardingStepKey, (data: Partial<Onboardi
   assessment: (data: Partial<OnboardingData>): boolean => {
     const assessment = data.assessment || {};
     return Boolean(
-      assessment.stress_level && 
-      assessment.life_satisfaction && 
-      assessment.growth_desire
+      (assessment as any).stress_level && 
+      (assessment as any).life_satisfaction && 
+      (assessment as any).growth_desire
     );
   },
   
