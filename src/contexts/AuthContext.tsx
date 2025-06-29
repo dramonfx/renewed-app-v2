@@ -1,188 +1,92 @@
+'use client'
 
-// src/contexts/AuthContext.tsx
-'use client'; // This context will be used by client components
+import React, { createContext, useContext, useState, useEffect } from 'react'
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-import { useRouter } from 'next/navigation';
-import type { User } from '@/types';
-
-// Auth result interfaces
-interface AuthResult {
-  user: User | null;
-  session: any;
-  error: any;
+interface User {
+  id: string
+  email: string
+  name?: string
 }
 
-interface AuthError {
-  error: any;
+interface AuthContextType {
+  user: User | null
+  login: (email: string, password: string) => Promise<void>
+  logout: () => Promise<void>
+  isLoading: boolean
 }
 
-// Context interface
-interface AuthContextValue {
-  user: User | null;
-  loading: boolean;
-  signUp: (email: string, password: string) => Promise<AuthResult>;
-  login: (email: string, password: string, redirectPath?: string) => Promise<AuthResult>;
-  logout: () => Promise<AuthError>;
-}
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// Provider props interface
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-const AuthContext = createContext<AuthContextValue | null>(null);
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true); // Start with loading true
-  const router = useRouter();
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Check for an existing session
-    const getSession = async (): Promise<void> => {
+    // Check for existing session on mount
+    const checkAuth = async () => {
       try {
-        const { data, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error("Error getting session:", error.message);
-          setLoading(false);
-          return;
+        const savedUser = localStorage.getItem('sacred_user')
+        if (savedUser) {
+          setUser(JSON.parse(savedUser))
         }
-        setUser(data?.session?.user as User ?? null);
-        setLoading(false);
       } catch (error) {
-        console.error("Unexpected error getting session:", error);
-        setLoading(false);
+        console.error('Auth check failed:', error)
+      } finally {
+        setIsLoading(false)
       }
-    };
-
-    getSession();
-
-    // Listen for changes in auth state (login, logout)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: string, session: any) => {
-        console.log('Auth event:', event, session);
-        setUser(session?.user as User ?? null);
-        setLoading(false); // Ensure loading is false after auth state change
-        
-        // Optional: Redirect based on event
-        // if (event === 'SIGNED_IN') router.push('/book');
-        // if (event === 'SIGNED_OUT') router.push('/');
-      }
-    );
-
-    // Cleanup listener on component unmount
-    return () => {
-      subscription?.unsubscribe();
-    };
-  }, [router]); // Added router to dependency array
-
-  // Signup function
-  const signUp = async (email: string, password: string): Promise<AuthResult> => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signUp({ 
-        email, 
-        password 
-      });
-      setLoading(false);
-      return { 
-        user: data?.user as User ?? null, 
-        session: data?.session ?? null, 
-        error 
-      };
-    } catch (error) {
-      setLoading(false);
-      console.error('Error during signup:', error);
-      return { 
-        user: null, 
-        session: null, 
-        error 
-      };
     }
-  };
 
-  // Login function with optional redirect
-  const login = async (email: string, password: string, redirectPath?: string): Promise<AuthResult> => {
-    setLoading(true);
+    checkAuth()
+  }, [])
+
+  const login = async (email: string, password: string) => {
+    setIsLoading(true)
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ 
-        email, 
-        password 
-      });
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
-      if (!error && data?.user) {
-        // Handle redirect after successful login
-        const targetPath = redirectPath || '/dashboard';
-        setTimeout(() => {
-          router.push(targetPath);
-        }, 500); // Small delay to show success state
+      // For demo purposes, accept any email/password
+      const userData: User = {
+        id: '1',
+        email,
+        name: email.split('@')[0]
       }
       
-      setLoading(false);
-      return { 
-        user: data?.user as User ?? null, 
-        session: data?.session ?? null, 
-        error 
-      };
+      setUser(userData)
+      localStorage.setItem('sacred_user', JSON.stringify(userData))
     } catch (error) {
-      setLoading(false);
-      console.error('Error during login:', error);
-      return { 
-        user: null, 
-        session: null, 
-        error 
-      };
+      throw new Error('Login failed')
+    } finally {
+      setIsLoading(false)
     }
-  };
+  }
 
-  // Logout function
-  const logout = async (): Promise<AuthError> => {
-    setLoading(true);
+  const logout = async () => {
+    setIsLoading(true)
     try {
-      const { error } = await supabase.auth.signOut();
-      setUser(null); // Clear user state immediately
-      setLoading(false);
-      if (error) {
-        console.error('Error logging out:', error.message);
-      } else {
-        router.push('/login'); // Redirect to login after successful logout
-      }
-      return { error };
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      setUser(null)
+      localStorage.removeItem('sacred_user')
     } catch (error) {
-      setLoading(false);
-      console.error('Unexpected error during logout:', error);
-      return { error };
+      console.error('Logout failed:', error)
+    } finally {
+      setIsLoading(false)
     }
-  };
+  }
 
-  const value: AuthContextValue = {
-    user,
-    loading,
-    signUp,
-    login,
-    logout,
-  };
-
-  // Don't render children until loading is false (initial session check is done)
-  // Or show a loading spinner for the whole app
   return (
-    <AuthContext.Provider value={value}>
-      {/* We could show a global loading spinner here if `loading` is true */}
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
-  );
-};
+  )
+}
 
-// Custom hook to use the AuthContext
-export const useAuth = (): AuthContextValue => {
-  const context = useContext(AuthContext);
-  if (context === undefined || context === null) { // Check for null as well
-    throw new Error('useAuth must be used within an AuthProvider');
+export function useAuth() {
+  const context = useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider')
   }
-  return context;
-};
-
-// Export types for other files to use
-export type { AuthContextValue, AuthProviderProps, AuthResult, AuthError };
+  return context
+}
