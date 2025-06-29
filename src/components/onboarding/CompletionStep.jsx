@@ -1,12 +1,9 @@
-
 'use client';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { onboardingStorage } from '@/lib/onboardingStorage';
 
 const CompletionStep = ({ onboardingData = {}, data = {} }) => {
   const [showConfetti, setShowConfetti] = useState(false);
-  const [pathSaved, setPathSaved] = useState(false);
 
   // Use onboardingData if available, fallback to data prop
   const safeData = onboardingData || data || {};
@@ -16,14 +13,6 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
     const timer = setTimeout(() => setShowConfetti(false), 3000);
     return () => clearTimeout(timer);
   }, []);
-
-  // Save Sacred Path when completion step is reached
-  useEffect(() => {
-    if (safeData.selectedPath) {
-      const saved = onboardingStorage.saveSacredPath(safeData);
-      setPathSaved(saved);
-    }
-  }, [safeData]);
 
   const getPathInfo = () => {
     const pathMap = {
@@ -65,145 +54,157 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
         </div>
       )}
 
-      <div className="w-full max-w-4xl mx-auto text-center">
-        {/* Main Completion Card */}
+      {/* Main Content */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
+        className="max-w-2xl mx-auto text-center relative z-10"
+      >
+        {/* Sacred Symbol */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="bg-white/95 backdrop-blur-xl border border-white/50 rounded-3xl p-12 md:p-16 shadow-2xl mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          className="mb-8"
         >
-          {/* Success Icon */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="w-24 h-24 md:w-32 md:h-32 mx-auto mb-8 rounded-full bg-sacred-gradient flex items-center justify-center shadow-2xl"
-          >
-            <span className="text-white text-4xl md:text-5xl">✨</span>
-          </motion.div>
-
-          {/* Main Heading */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-serif text-sacred-blue-900 mb-6 leading-tight"
-          >
-            Your Sacred Journey{' '}
-            <span className="bg-sacred-gradient bg-clip-text text-transparent">
-              Begins Now
-            </span>
-          </motion.h1>
-
-          {/* Subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.7 }}
-            className="text-sacred-blue-600 text-xl md:text-2xl mb-10 max-w-2xl mx-auto leading-relaxed"
-          >
-            Congratulations! You've taken the first sacred step toward transformation. 
-            Your personalized journey awaits.
-          </motion.p>
-
-          {/* Journey Summary */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
-            className="bg-sacred-blue-50 rounded-2xl p-8 mb-8"
-          >
-            <h3 className="text-2xl font-serif text-sacred-blue-900 mb-6">Your Sacred Path Summary</h3>
-            
-            <div className="grid md:grid-cols-3 gap-6 text-center">
-              {/* Selected Path */}
-              <div>
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-gradient flex items-center justify-center">
-                  <span className="text-white text-2xl">{pathInfo.icon}</span>
-                </div>
-                <h4 className="font-serif text-lg text-sacred-blue-900 mb-2">Your Path</h4>
-                <p className="text-sacred-blue-600">{pathInfo.name}</p>
-              </div>
-
-              {/* Intentions Count */}
-              <div>
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-gold-gradient flex items-center justify-center">
-                  <span className="text-white text-2xl">🎯</span>
-                </div>
-                <h4 className="font-serif text-lg text-sacred-blue-900 mb-2">Intentions Set</h4>
-                <p className="text-sacred-blue-600">{intentionCount} Sacred Intentions</p>
-              </div>
-
-              {/* Mind Choice */}
-              <div>
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-purple-gradient flex items-center justify-center">
-                  <span className="text-white text-2xl">
-                    {safeData.selectedMind === 'new' ? '✨' : '🌫️'}
-                  </span>
-                </div>
-                <h4 className="font-serif text-lg text-sacred-blue-900 mb-2">Mind Focus</h4>
-                <p className="text-sacred-blue-600">
-                  {safeData.selectedMind === 'new' ? 'New Mind' : 'Old Mind'} Awareness
-                </p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Inspiring Message */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.1 }}
-            className="bg-gradient-to-r from-sacred-gold-50 to-sacred-purple-50 rounded-2xl p-6 border border-sacred-gold-200"
-          >
-            <p className="text-sacred-blue-700 text-lg italic leading-relaxed">
-              "The journey of a thousand miles begins with one step. You have taken that step. 
-              Trust the process, embrace the transformation, and remember that every moment 
-              is a new opportunity to choose the New Mind."
-            </p>
-          </motion.div>
-        </motion.div>
-
-        {/* Auto-redirect Message */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1.5 }}
-          className="text-center space-y-4"
-        >
-          {/* Sacred Path Saved Confirmation */}
-          {pathSaved && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="bg-sacred-gold-50/80 backdrop-blur-md rounded-xl p-4 border border-sacred-gold-200/50"
-            >
-              <div className="flex items-center justify-center space-x-2">
-                <span className="text-sacred-gold-600 text-sm">✓</span>
-                <span className="text-sacred-gold-700 text-sm font-medium">
-                  Your Sacred Path choice has been saved
-                </span>
-              </div>
-            </motion.div>
-          )}
-          
-          <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-white/40">
-            <div className="flex items-center justify-center space-x-3 mb-3">
-              <div className="w-6 h-6 rounded-full bg-sacred-gradient animate-pulse"></div>
-              <span className="text-sacred-blue-700 font-medium">
-                Preparing your personalized experience...
-              </span>
-            </div>
-            <p className="text-sacred-blue-600 text-sm">
-              You'll be redirected to your sacred journey in a few moments
-            </p>
+          <div className="w-24 h-24 mx-auto bg-sacred-gold-500/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-sacred-gold-400/30">
+            <span className="text-4xl">{pathInfo.icon}</span>
           </div>
         </motion.div>
-      </div>
 
-      {/* Background Elements */}
+        {/* Welcome Message */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
+          className="mb-8"
+        >
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Welcome to Your Sacred Journey
+          </h1>
+          <p className="text-xl text-sacred-gold-200 mb-6">
+            Your transformation begins now
+          </p>
+        </motion.div>
+
+        {/* Path Summary */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.6 }}
+          className="bg-white/10 backdrop-blur-md rounded-2xl p-8 mb-8 border border-white/20"
+        >
+          <h2 className="text-2xl font-semibold text-white mb-6">
+            Your Sacred Path Summary
+          </h2>
+          
+          <div className="grid md:grid-cols-2 gap-6 text-left">
+            {/* Selected Path */}
+            <div className="bg-sacred-gold-500/10 rounded-xl p-4 border border-sacred-gold-400/20">
+              <h3 className="text-lg font-medium text-sacred-gold-200 mb-2">
+                Chosen Path
+              </h3>
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{pathInfo.icon}</span>
+                <span className="text-white font-medium">{pathInfo.name}</span>
+              </div>
+            </div>
+
+            {/* Intentions Count */}
+            <div className="bg-sacred-purple-500/10 rounded-xl p-4 border border-sacred-purple-400/20">
+              <h3 className="text-lg font-medium text-sacred-purple-200 mb-2">
+                Sacred Intentions
+              </h3>
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🎯</span>
+                <span className="text-white font-medium">
+                  {intentionCount} {intentionCount === 1 ? 'Intention' : 'Intentions'} Set
+                </span>
+              </div>
+            </div>
+
+            {/* Personal Info */}
+            {safeData.name && (
+              <div className="bg-sacred-teal-500/10 rounded-xl p-4 border border-sacred-teal-400/20">
+                <h3 className="text-lg font-medium text-sacred-teal-200 mb-2">
+                  Sacred Name
+                </h3>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">✨</span>
+                  <span className="text-white font-medium">{safeData.name}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Experience Level */}
+            {safeData.experience && (
+              <div className="bg-sacred-rose-500/10 rounded-xl p-4 border border-sacred-rose-400/20">
+                <h3 className="text-lg font-medium text-sacred-rose-200 mb-2">
+                  Experience Level
+                </h3>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🌟</span>
+                  <span className="text-white font-medium capitalize">{safeData.experience}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* Next Steps */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9, duration: 0.6 }}
+          className="mb-8"
+        >
+          <h3 className="text-xl font-semibold text-white mb-4">
+            What Happens Next?
+          </h3>
+          <div className="grid md:grid-cols-3 gap-4 text-sm">
+            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <div className="text-2xl mb-2">📚</div>
+              <div className="text-sacred-gold-200 font-medium mb-1">Personalized Content</div>
+              <div className="text-white/70">Receive teachings tailored to your path</div>
+            </div>
+            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <div className="text-2xl mb-2">📝</div>
+              <div className="text-sacred-gold-200 font-medium mb-1">Sacred Journal</div>
+              <div className="text-white/70">Track your spiritual growth journey</div>
+            </div>
+            <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <div className="text-2xl mb-2">🎯</div>
+              <div className="text-sacred-gold-200 font-medium mb-1">Guided Practice</div>
+              <div className="text-white/70">Daily exercises for transformation</div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Continue Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.1, duration: 0.6 }}
+        >
+          <button
+            onClick={() => {
+              // Store completion in localStorage
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('renewed_onboarding_complete', 'true');
+                localStorage.setItem('renewed_onboarding_data', JSON.stringify(safeData));
+                // Redirect to dashboard
+                window.location.href = '/dashboard';
+              }
+            }}
+            className="bg-sacred-gold-500 hover:bg-sacred-gold-600 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+          >
+            Begin Your Sacred Journey
+          </button>
+        </motion.div>
+      </motion.div>
+
+      {/* Ambient Background Effects */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
           className="absolute top-1/4 left-1/6 w-32 h-32 bg-sacred-gold-400/20 rounded-full blur-2xl"
