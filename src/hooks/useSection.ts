@@ -26,7 +26,7 @@ export function useSection(slug: string | null): UseSectionReturn {
         setLoading(true);
         setError(null);
 
-        const { data: section, error: sectionError } = await supabase
+        const { data: section, error: sectionError } = await (supabase as any)
           .from('sections')
           .select('*')
           .eq('slug', slug)
@@ -49,7 +49,7 @@ export function useSection(slug: string | null): UseSectionReturn {
           
           if (audioError) {
             console.error('Audio Signed URL Error:', audioError.message);
-          } else {
+          } else if (audioData) {
             audioUrl = audioData.signedUrl;
           }
         }
