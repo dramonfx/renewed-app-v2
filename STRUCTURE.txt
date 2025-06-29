@@ -1,0 +1,49 @@
+Renewed App Structure
+
+/src
+  /app
+    /api
+      /auth
+      /content
+      /journal
+    /dashboard
+    /onboarding
+    /sacred-path
+    /journal
+    layout.js
+    page.js
+  /components
+    /auth
+    /onboarding
+    /journal
+    /ui
+    /sacred
+  /lib
+    /auth
+    /database
+    /storage
+    /utils
+  /styles
+    globals.css
+    components.css
+
+/public
+  /images
+    /backgrounds
+    /icons
+    /sacred
+  /fonts
+
+/docs
+  architecture.md
+  deployment.md
+  development.md
+
+Key Features:
+- Sacred Path Onboarding
+- Authentic Content Engine
+- Local Journal System
+- Supabase Integration
+- Responsive Design
+- Error Boundaries
+- Service Layer Architecture
