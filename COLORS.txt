@@ -1,0 +1,35 @@
+# Sacred Journey Color Palette
+
+## Primary Colors
+- **Sacred Blue**: #1e40af (Primary brand color - represents divine connection)
+- **Gold Accent**: #f59e0b (Secondary accent - represents divine light)
+- **Pure White**: #ffffff (Clean backgrounds and text)
+- **Soft Gray**: #f3f4f6 (Subtle interface elements)
+- **Deep Navy**: #1e293b (Strong text contrast)
+
+## Usage Guidelines
+- Sacred Blue: Main navigation, primary buttons, headers
+- Gold Accent: Call-to-action elements, highlights, sacred symbols
+- Pure White: Main content backgrounds, card backgrounds
+- Soft Gray: Secondary text, borders, subtle elements
+- Deep Navy: Primary text, important headings
+
+## Spiritual Significance
+- Blue represents heavenly connection and divine wisdom
+- Gold represents divine light and transformation
+- White represents purity and new beginnings
+- The combination creates a sacred, peaceful environment for spiritual growth
+
+## Technical Implementation
+- All colors are defined in Tailwind CSS configuration
+- Custom CSS variables available for dynamic theming
+- Accessibility compliant with WCAG 2.1 AA standards
+- Optimized for both light and dark reading environments
+
+## Brand Consistency
+- These colors should be used consistently across all components
+- Maintain proper contrast ratios for accessibility
+- Use Sacred Blue as the dominant color with Gold as strategic accent
+- White space is crucial for creating peaceful, uncluttered interfaces
+
+This color system supports the spiritual transformation journey by creating an environment that feels both sacred and approachable.

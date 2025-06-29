@@ -1,0 +1,34 @@
+# Renewed App Structure
+
+## Core Architecture
+- Next.js 14 with App Router
+- TypeScript for type safety
+- Tailwind CSS for styling
+- Supabase for backend services
+
+## Directory Structure
+```
+src/
+├── app/                 # Next.js App Router pages
+├── components/          # Reusable UI components
+├── contexts/           # React contexts (Auth, etc.)
+├── hooks/              # Custom React hooks
+├── lib/                # Utility libraries
+├── types/              # TypeScript type definitions
+└── utils/              # Helper functions
+```
+
+## Key Features
+- Authentication system with Supabase
+- Content Engine with 30 Key Principles
+- Sacred Journaling system
+- Progress tracking
+- Responsive design
+
+## Sacred Blue Design System
+- Consistent color palette
+- Spiritual typography (Playfair Display + Inter)
+- Sacred card components
+- Peaceful, transformative UI
+
+This structure supports a scalable, maintainable spiritual transformation platform.
