@@ -11,6 +11,7 @@ export async function middleware(req) {
   const protectedRoutes = [
     '/dashboard',
     '/book',
+    '/journal',
     '/onboarding',
     '/full-audio-player',
     '/workshop'

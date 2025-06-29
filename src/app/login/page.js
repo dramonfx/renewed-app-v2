@@ -24,14 +24,14 @@ export default function LoginPage() {
   // Get the return URL from query parameters
   const returnUrl = searchParams.get('returnUrl') || '/dashboard';
 
-  // ENHANCED REDIRECT LOGIC - Fixed to check loading state
+  // ENHANCED REDIRECT LOGIC - Fixed to use returnUrl parameter
   useEffect(() => {
     // Only redirect when user is authenticated AND we're not loading
     if (user && !authLoading) {
-      router.push('/book');
+      router.push(returnUrl);
     }
     // If user is null/undefined and not loading, allow access to login page
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, returnUrl]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
