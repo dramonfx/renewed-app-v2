@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -24,14 +23,14 @@ export default function LoginPage() {
   // Get the return URL from query parameters
   const returnUrl = searchParams.get('returnUrl') || '/dashboard';
 
-  // ENHANCED REDIRECT LOGIC - Fixed to use returnUrl parameter
+  // ENHANCED REDIRECT LOGIC - Only redirect if user was already authenticated on page load
   useEffect(() => {
-    // Only redirect when user is authenticated AND we're not loading
-    if (user && !authLoading) {
+    // Only redirect when user is authenticated AND we're not loading AND login wasn't just successful
+    if (user && !authLoading && !loginSuccess) {
       router.push(returnUrl);
     }
     // If user is null/undefined and not loading, allow access to login page
-  }, [user, authLoading, router, returnUrl]);
+  }, [user, authLoading, router, returnUrl, loginSuccess]);
 
   const onSubmit = async (e) => {
     e.preventDefault();
