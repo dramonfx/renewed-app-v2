@@ -1,4 +1,3 @@
-
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
@@ -17,7 +16,7 @@ export async function GET() {
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     // Query visuals table using golden snippet pattern
-    const { data: visualData, error: visualError } = await supabase
+    let { data: visualData, error: visualError } = await supabase
       .from('visuals')
       .select('file_path, caption')
       .eq('markdown_tag', 'NEXT_STEPS_CHART')

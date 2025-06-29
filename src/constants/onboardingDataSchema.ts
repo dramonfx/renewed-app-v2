@@ -1,4 +1,3 @@
-
 /**
  * Onboarding Data Schema and Initial State
  * 
@@ -82,11 +81,11 @@ export const validateStepData: Record<OnboardingStepKey, (data: Partial<Onboardi
   twoMinds: (data: Partial<OnboardingData>): boolean => Boolean(data.selectedMind),
   
   assessment: (data: Partial<OnboardingData>): boolean => {
-    const assessment = data.assessment || {};
+    const assessment = data.assessment;
     return Boolean(
-      (assessment as any).stress_level && 
-      (assessment as any).life_satisfaction && 
-      (assessment as any).growth_desire
+      assessment?.stress_level && 
+      assessment?.life_satisfaction && 
+      assessment?.growth_desire
     );
   },
   
