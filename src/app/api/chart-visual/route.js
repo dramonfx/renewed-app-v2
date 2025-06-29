@@ -17,7 +17,9 @@ export async function GET() {
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
     // Query visuals table using golden snippet pattern
-    const { data: visualData, error: visualError } = await supabase
+    let visualData = null;
+    
+    const { data: initialData, error: visualError } = await supabase
       .from('visuals')
       .select('file_path, caption')
       .eq('markdown_tag', 'NEXT_STEPS_CHART')
@@ -54,6 +56,8 @@ export async function GET() {
         console.error('❌ Database query error:', visualError);
         throw new Error(`Database query failed: ${visualError.message}`);
       }
+    } else {
+      visualData = initialData;
     }
 
     if (!visualData?.file_path) {
