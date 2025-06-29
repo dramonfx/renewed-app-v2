@@ -5,6 +5,19 @@ const nextConfig = {
   experimental: {
     // optimizeCss: true, // Disabled due to critters dependency issue
   },
+
+  // Webpack configuration to resolve Supabase dependency warnings
+  webpack: (config, { isServer }) => {
+    // Suppress warnings for @supabase/realtime-js dynamic dependency expressions
+    config.ignoreWarnings = [
+      {
+        module: /node_modules\/@supabase\/realtime-js/,
+        message: /Critical dependency: the request of a dependency is an expression/,
+      },
+    ];
+    
+    return config;
+  },
   
   // Security headers
   async headers() {
