@@ -13,22 +13,22 @@ const WelcomeScreen = ({ onNext }) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Enhanced Sacred Background Elements */}
+      {/* Sacred Blue Atmospheric Background - Gentle, Non-Breathing */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Primary Divine Light */}
+        {/* Primary Sacred Light */}
         <motion.div
           className="absolute top-1/4 left-1/6 w-40 h-40 rounded-full blur-3xl"
           style={{
-            background: 'radial-gradient(circle, rgba(250, 207, 81, 0.4) 0%, rgba(14, 165, 233, 0.2) 50%, transparent 100%)',
+            background: 'radial-gradient(circle, rgba(14, 165, 233, 0.4) 0%, rgba(59, 130, 246, 0.2) 50%, transparent 100%)',
           }}
           animate={{
-            scale: [1, 1.8, 1],
-            opacity: [0.4, 0.8, 0.4],
-            x: [0, 20, 0],
-            y: [0, -10, 0],
+            scale: [1, 1.3, 1],
+            opacity: [0.3, 0.6, 0.3],
+            x: [0, 15, 0],
+            y: [0, -8, 0],
           }}
           transition={{
-            duration: 8,
+            duration: 12,
             repeat: Infinity,
             ease: 'easeInOut',
           }}
@@ -38,41 +38,41 @@ const WelcomeScreen = ({ onNext }) => {
         <motion.div
           className="absolute bottom-1/4 right-1/6 w-56 h-56 rounded-full blur-3xl"
           style={{
-            background: 'radial-gradient(circle, rgba(14, 165, 233, 0.3) 0%, rgba(147, 51, 234, 0.2) 50%, transparent 100%)',
+            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, rgba(147, 51, 234, 0.2) 50%, transparent 100%)',
           }}
           animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.3, 0.6, 0.3],
-            x: [0, -15, 0],
-            y: [0, 15, 0],
+            scale: [1.1, 1, 1.1],
+            opacity: [0.2, 0.5, 0.2],
+            x: [0, -12, 0],
+            y: [0, 12, 0],
           }}
           transition={{
-            duration: 10,
+            duration: 14,
             repeat: Infinity,
             ease: 'easeInOut',
-            delay: 2,
+            delay: 3,
           }}
         />
 
-        {/* Sacred Particles */}
-        {mounted && Array.from({ length: 8 }).map((_, i) => (
+        {/* Sacred Floating Elements - Gentle Rise */}
+        {mounted && Array.from({ length: 6 }).map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-2 h-2 rounded-full"
+            className="absolute w-1.5 h-1.5 rounded-full"
             style={{
-              background: `radial-gradient(circle, rgba(250, 207, 81, 0.8) 0%, transparent 70%)`,
-              left: `${20 + (i * 10)}%`,
-              top: `${30 + (i * 5)}%`,
+              background: `radial-gradient(circle, rgba(14, 165, 233, 0.7) 0%, transparent 70%)`,
+              left: `${25 + (i * 8)}%`,
+              top: `${40 + (i * 3)}%`,
             }}
             animate={{
-              y: [0, -100, -200],
-              opacity: [0, 0.8, 0],
-              scale: [0.5, 1, 0.5],
+              y: [0, -80, -160],
+              opacity: [0, 0.7, 0],
+              scale: [0.3, 1, 0.3],
             }}
             transition={{
-              duration: 6 + (i * 0.5),
+              duration: 8 + (i * 0.5),
               repeat: Infinity,
-              delay: i * 0.8,
+              delay: i * 1.2,
               ease: 'easeOut',
             }}
           />
@@ -85,7 +85,7 @@ const WelcomeScreen = ({ onNext }) => {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
         >
-          <SacredCard variant="heavy" className="p-12 md:p-20 sacred-breathing">
+          <SacredCard variant="heavy" className="p-12 md:p-20">
             {/* Sacred Threshold Header */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -96,12 +96,12 @@ const WelcomeScreen = ({ onNext }) => {
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif sacred-text-enhanced mb-6 leading-tight">
                 Welcome to Your{' '}
                 <motion.span 
-                  className="bg-gradient-to-r from-blue-600 via-purple-600 to-amber-500 bg-clip-text text-transparent"
+                  className="bg-gradient-to-r from-blue-600 via-blue-500 to-blue-700 bg-clip-text text-transparent"
                   animate={{ 
                     backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
                   }}
                   transition={{ 
-                    duration: 4, 
+                    duration: 6, 
                     repeat: Infinity, 
                     ease: 'linear' 
                   }}
@@ -121,7 +121,7 @@ const WelcomeScreen = ({ onNext }) => {
               </motion.p>
             </motion.div>
 
-            {/* Sacred Pillars - Enhanced with Living Glassmorphism */}
+            {/* Sacred Pillars - Enhanced Glassmorphism Clarity */}
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
@@ -133,21 +133,21 @@ const WelcomeScreen = ({ onNext }) => {
                   icon: '🕊️',
                   title: 'Divine Peace',
                   description: 'Experience profound tranquility through sacred practices that quiet the mind and open the heart to divine presence',
-                  gradient: 'from-blue-500 to-cyan-400',
+                  gradient: 'from-blue-500 to-blue-600',
                   delay: 0.1
                 },
                 {
                   icon: '🛡️', 
                   title: 'Sacred Security',
                   description: 'Find unshakeable confidence in your spiritual identity, rooted in divine love and eternal promises',
-                  gradient: 'from-amber-500 to-orange-400',
+                  gradient: 'from-blue-600 to-blue-700',
                   delay: 0.2
                 },
                 {
                   icon: '⭐',
                   title: 'Living Transformation',
                   description: 'Embrace the ongoing renewal of your mind and spirit through structured pathways to divine enlightenment',
-                  gradient: 'from-purple-500 to-pink-400',
+                  gradient: 'from-blue-500 to-purple-500',
                   delay: 0.3
                 }
               ].map((pillar, index) => (
@@ -160,7 +160,7 @@ const WelcomeScreen = ({ onNext }) => {
                   <SacredCard variant="enhanced" className="p-8 h-full text-center group">
                     <motion.div 
                       className={`w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br ${pillar.gradient} flex items-center justify-center shadow-xl group-hover:shadow-2xl`}
-                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      whileHover={{ scale: 1.05, rotate: 2 }}
                       transition={{ duration: 0.3 }}
                     >
                       <span className="text-white text-3xl">{pillar.icon}</span>
@@ -182,8 +182,8 @@ const WelcomeScreen = ({ onNext }) => {
               className="text-center"
             >
               <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
               >
                 <SacredButton
                   onClick={onNext}
