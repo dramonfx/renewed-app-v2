@@ -1,5 +1,4 @@
 
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -69,23 +68,224 @@
 }
 
 @layer components {
-  /* Sacred Glass Card - Enhanced for Better Readability */
+  /* Sacred Glass Card - Enhanced Living Glassmorphism */
   .sacred-glass {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 
+      0 8px 32px rgba(14, 165, 233, 0.08),
+      0 2px 8px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    border-radius: 1.25rem;
+    position: relative;
+    overflow: hidden;
   }
 
   .sacred-glass-heavy {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    box-shadow: 
+      0 20px 60px rgba(14, 165, 233, 0.12),
+      0 8px 32px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
     border-radius: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Sacred Glass Enhanced - Medium clarity */
+  .sacred-glass-enhanced {
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 
+      0 12px 40px rgba(14, 165, 233, 0.1),
+      0 4px 16px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    border-radius: 1.375rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Sacred Glass Living Effects */
+  .sacred-glass::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+    z-index: 1;
+  }
+
+  .sacred-glass-heavy::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+    z-index: 1;
+  }
+
+  .sacred-glass-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+    z-index: 1;
+  }
+
+  /* Sacred Glass Hover States */
+  .sacred-glass:hover {
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 
+      0 12px 40px rgba(14, 165, 233, 0.12),
+      0 4px 16px rgba(0, 0, 0, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .sacred-glass-heavy:hover {
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 
+      0 24px 70px rgba(14, 165, 233, 0.15),
+      0 10px 40px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .sacred-glass-enhanced:hover {
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 
+      0 16px 50px rgba(14, 165, 233, 0.14),
+      0 6px 24px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    transform: translateY(-1px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Enhanced Text Readability on Glass Backgrounds */
+  .sacred-text-enhanced {
+    color: #0c4a6e;
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+  }
+
+  .sacred-text-body {
+    color: #075985;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+  }
+
+  .sacred-text-muted {
+    color: #0369a1;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  }
+
+  /* Sacred Atmospheric Effects */
+  .sacred-floating-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle, rgba(250, 207, 81, 0.6) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: sacredFloat 8s infinite linear;
+  }
+
+  .sacred-light-ray {
+    position: absolute;
+    width: 2px;
+    height: 100px;
+    background: linear-gradient(180deg, transparent 0%, rgba(250, 207, 81, 0.3) 50%, transparent 100%);
+    animation: sacredPulse 4s infinite ease-in-out;
+    pointer-events: none;
+  }
+
+  .sacred-gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center, rgba(14, 165, 233, 0.03) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Sacred Breathing Animation */
+  @keyframes sacredBreathe {
+    0%, 100% { 
+      transform: scale(1); 
+      opacity: 0.8; 
+    }
+    50% { 
+      transform: scale(1.02); 
+      opacity: 1; 
+    }
+  }
+
+  @keyframes sacredFloat {
+    0% { 
+      transform: translateY(100vh) rotate(0deg); 
+      opacity: 0; 
+    }
+    10% { 
+      opacity: 0.6; 
+    }
+    90% { 
+      opacity: 0.6; 
+    }
+    100% { 
+      transform: translateY(-100px) rotate(360deg); 
+      opacity: 0; 
+    }
+  }
+
+  @keyframes sacredPulse {
+    0%, 100% { 
+      opacity: 0.2; 
+      transform: scaleY(0.8); 
+    }
+    50% { 
+      opacity: 0.6; 
+      transform: scaleY(1.2); 
+    }
+  }
+
+  .sacred-breathing {
+    animation: sacredBreathe 6s infinite ease-in-out;
+  }
+
+  /* Sacred Selection States */
+  .sacred-selected {
+    background: rgba(14, 165, 233, 0.08);
+    border-color: rgba(14, 165, 233, 0.3);
+    box-shadow: 
+      0 0 0 2px rgba(14, 165, 233, 0.2),
+      0 8px 32px rgba(14, 165, 233, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .sacred-selected-gold {
+    background: rgba(250, 207, 81, 0.08);
+    border-color: rgba(250, 207, 81, 0.3);
+    box-shadow: 
+      0 0 0 2px rgba(250, 207, 81, 0.2),
+      0 8px 32px rgba(250, 207, 81, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
   }
 
   /* Sacred Button Styles */
@@ -96,289 +296,132 @@
     padding: 0.75rem 1.5rem;
     border-radius: 0.75rem;
     font-weight: 600;
-    font-size: 0.875rem;
-    transition: all 0.3s ease;
     box-shadow: 0 4px 16px rgba(14, 165, 233, 0.3);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    transition: all 0.3s ease;
   }
 
   .sacred-button:hover {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    box-shadow: 0 8px 24px rgba(14, 165, 233, 0.4);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
   }
 
-  .sacred-button:active {
-    transform: translateY(0);
-  }
-
-  .sacred-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  /* Sacred Gold Button */
-  .sacred-gold-button {
-    background: linear-gradient(135deg, #FACF51 0%, #f59e0b 100%);
-    color: #1f2937;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.75rem;
-    font-weight: 600;
-    font-size: 0.875rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 16px rgba(250, 207, 81, 0.3);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .sacred-gold-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(250, 207, 81, 0.4);
-  }
-
-  .sacred-gold-button:active {
-    transform: translateY(0);
-  }
-
-  .sacred-gold-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  /* Sacred Input Fields */
+  /* Sacred Form Elements */
   .sacred-input {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 2px solid rgba(14, 165, 233, 0.2);
-    border-radius: 0.75rem;
     background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(8px);
-    transition: all 0.2s ease;
-    font-size: 0.875rem;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(14, 165, 233, 0.2);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
     color: #0c4a6e;
+    transition: all 0.3s ease;
   }
 
   .sacred-input:focus {
     outline: none;
-    border-color: #0ea5e9;
-    background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
-  }
-
-  .sacred-input:hover {
     border-color: rgba(14, 165, 233, 0.4);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+    background: rgba(255, 255, 255, 0.95);
   }
 
-  .sacred-input.error {
-    border-color: #ef4444;
-    background: rgba(254, 242, 242, 0.9);
+  /* Sacred Progress Indicators */
+  .sacred-progress {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 1rem;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
   }
 
-  .sacred-input.error:focus {
-    border-color: #ef4444;
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  .sacred-progress-bar {
+    background: linear-gradient(90deg, #0ea5e9 0%, #fbbf24 100%);
+    height: 100%;
+    border-radius: 1rem;
+    transition: width 0.5s ease;
+    box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
   }
 
-  /* Sacred Label */
-  .sacred-label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 600;
+  /* Sacred Animations */
+  @keyframes sacredGlow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(14, 165, 233, 0.5);
+    }
+  }
+
+  .sacred-glow {
+    animation: sacredGlow 3s infinite ease-in-out;
+  }
+
+  /* Sacred Responsive Design */
+  @media (max-width: 768px) {
+    .sacred-glass,
+    .sacred-glass-enhanced,
+    .sacred-glass-heavy {
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+  }
+
+  /* Sacred Accessibility */
+  .sacred-focus:focus {
+    outline: 2px solid #fbbf24;
+    outline-offset: 2px;
+  }
+
+  /* Sacred Loading States */
+  .sacred-loading {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    background-size: 200% 100%;
+    animation: sacredShimmer 1.5s infinite;
+  }
+
+  @keyframes sacredShimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+}
+
+/* Sacred Utility Classes */
+@layer utilities {
+  .sacred-shadow {
+    box-shadow: 0 8px 32px rgba(14, 165, 233, 0.15);
+  }
+
+  .sacred-shadow-lg {
+    box-shadow: 0 16px 48px rgba(14, 165, 233, 0.2);
+  }
+
+  .sacred-border {
+    border: 1px solid rgba(14, 165, 233, 0.2);
+  }
+
+  .sacred-bg {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+  }
+
+  .sacred-text {
     color: #0c4a6e;
-    margin-bottom: 0.5rem;
   }
 
-  /* Sacred Error Text */
-  .sacred-error {
-    color: #ef4444;
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
+  .sacred-text-light {
+    color: #0369a1;
   }
 
-  /* Sacred Success Message */
-  .sacred-success {
-    background: rgba(34, 197, 94, 0.1);
-    border: 1px solid rgba(34, 197, 94, 0.2);
-    color: #166534;
-    padding: 1rem;
-    border-radius: 0.75rem;
-    font-size: 0.875rem;
+  .sacred-gradient {
+    background: linear-gradient(135deg, #0ea5e9 0%, #fbbf24 100%);
   }
 
-  /* Sacred Error Message */
-  .sacred-error-message {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    color: #991b1b;
-    padding: 1rem;
-    border-radius: 0.75rem;
-    font-size: 0.875rem;
-  }
-
-  /* Sacred Icon Background */
-  .sacred-icon-bg {
-    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 16px rgba(14, 165, 233, 0.3);
-  }
-
-  .sacred-icon-bg-gold {
-    background: linear-gradient(135deg, #FACF51 0%, #f59e0b 100%);
-    color: #1f2937;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 16px rgba(250, 207, 81, 0.3);
+  .sacred-gradient-text {
+    background: linear-gradient(135deg, #0ea5e9 0%, #fbbf24 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 }
-
-/* Suppress hydration warnings */
-#__next {
-  display: contents;
-}
-
-/* Hide scrollbar while maintaining functionality */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-/* Sacred Journal Editor Styles */
-.sacred-editor-content {
-  font-family: "Inter", "Nunito Sans", sans-serif;
-}
-
-.sacred-editor-content .ProseMirror {
-  outline: none;
-  padding: 1.5rem;
-  min-height: 300px;
-  line-height: 1.7;
-  color: #0c4a6e;
-  font-size: 1rem;
-}
-
-.sacred-editor-content .ProseMirror p {
-  margin: 0.75rem 0;
-}
-
-.sacred-editor-content .ProseMirror h1,
-.sacred-editor-content .ProseMirror h2,
-.sacred-editor-content .ProseMirror h3 {
-  font-family: "Playfair Display", serif;
-  font-weight: 600;
-  color: #075985;
-  margin: 1.5rem 0 0.75rem 0;
-}
-
-.sacred-editor-content .ProseMirror h1 {
-  font-size: 1.875rem;
-}
-
-.sacred-editor-content .ProseMirror h2 {
-  font-size: 1.5rem;
-}
-
-.sacred-editor-content .ProseMirror h3 {
-  font-size: 1.25rem;
-}
-
-.sacred-editor-content .ProseMirror ul,
-.sacred-editor-content .ProseMirror ol {
-  padding-left: 1.5rem;
-  margin: 0.75rem 0;
-}
-
-.sacred-editor-content .ProseMirror li {
-  margin: 0.25rem 0;
-}
-
-.sacred-editor-content .ProseMirror blockquote {
-  border-left: 4px solid #0ea5e9;
-  padding-left: 1rem;
-  margin: 1rem 0;
-  color: #075985;
-  font-style: italic;
-  background: rgba(14, 165, 233, 0.05);
-  padding: 1rem;
-  border-radius: 0.5rem;
-}
-
-.sacred-editor-content .ProseMirror strong {
-  font-weight: 600;
-  color: #075985;
-}
-
-.sacred-editor-content .ProseMirror em {
-  color: #0284c7;
-}
-
-.sacred-editor-content .ProseMirror p.is-editor-empty:first-child::before {
-  content: attr(data-placeholder);
-  float: left;
-  color: #94a3b8;
-  pointer-events: none;
-  height: 0;
-}
-
-/* Sacred Journal Prose Styles for Reading Mode */
-.prose {
-  color: #0c4a6e;
-  line-height: 1.7;
-}
-
-.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-  font-family: "Playfair Display", serif;
-  font-weight: 600;
-  color: #075985;
-}
-
-.prose p {
-  margin: 0.75rem 0;
-}
-
-.prose blockquote {
-  border-left: 4px solid #0ea5e9;
-  padding-left: 1rem;
-  margin: 1rem 0;
-  color: #075985;
-  font-style: italic;
-  background: rgba(14, 165, 233, 0.05);
-  padding: 1rem;
-  border-radius: 0.5rem;
-  border-left-width: 4px;
-}
-
-.prose ul, .prose ol {
-  padding-left: 1.5rem;
-  margin: 0.75rem 0;
-}
-
-.prose li {
-  margin: 0.25rem 0;
-}
-
-.prose strong {
-  font-weight: 600;
-  color: #075985;
-}
-
-.prose em {
-  color: #0284c7;
-}
-
