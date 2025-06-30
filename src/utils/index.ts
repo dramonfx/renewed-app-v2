@@ -4,6 +4,18 @@
  */
 
 /**
+ * Combine class names utility function
+ * Simple implementation for merging CSS classes
+ */
+export function cn(...classes: (string | undefined | null | boolean)[]): string {
+  return classes
+    .filter(Boolean)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
  * Format a date string to a readable format
  */
 export function formatDate(dateString: string): string {
