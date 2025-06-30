@@ -1,38 +1,64 @@
+export type CardVariant = 'glass' | 'enhanced' | 'heavy' | 'solid';
 
-// src/components/ui/types.ts
-import { ReactNode, ButtonHTMLAttributes, InputHTMLAttributes, HTMLAttributes } from 'react';
-
-// SacredButton types
-export type ButtonVariant = 'primary' | 'gold' | 'ghost';
-export type ButtonSize = 'sm' | 'md' | 'lg';
-
-export interface SacredButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'> {
-  children: ReactNode;
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  disabled?: boolean;
-  loading?: boolean;
-  className?: string;
-  onClick?: () => void;
-  type?: 'button' | 'submit' | 'reset';
-}
-
-// SacredCard types
-export type CardVariant = 'glass' | 'heavy' | 'solid';
-
-export interface SacredCardProps extends HTMLAttributes<HTMLDivElement> {
-  children: ReactNode;
+export interface SacredCardProps {
+  children: React.ReactNode;
   variant?: CardVariant;
   className?: string;
   onClick?: () => void;
   hover?: boolean;
+  [key: string]: any;
 }
 
-// SacredInput types
-export interface SacredInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  label?: string;
-  error?: string;
-  type?: string;
+export interface SacredButtonProps {
+  children: React.ReactNode;
+  variant?: 'primary' | 'secondary' | 'outline';
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
-  showPasswordToggle?: boolean;
+  onClick?: () => void;
+  disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
+  [key: string]: any;
+}
+
+export interface OnboardingData {
+  selectedMind?: string;
+  assessmentAnswers?: Record<string, any>;
+  selectedPath?: string;
+  intentions?: string[];
+  [key: string]: any;
+}
+
+export interface OnboardingStepProps {
+  onNext: (data?: any) => void;
+  onBack?: () => void;
+  data?: OnboardingData;
+}
+
+export interface AssessmentQuestion {
+  id: string;
+  question: string;
+  type: 'scale' | 'choice' | 'text';
+  options?: string[];
+  scaleRange?: [number, number];
+  scaleLabels?: [string, string];
+}
+
+export interface SpiritualPath {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+  gradient: string;
+  features: string[];
+  duration: string;
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+}
+
+export interface SacredIntention {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  category: 'peace' | 'growth' | 'purpose' | 'healing' | 'wisdom' | 'love';
 }
