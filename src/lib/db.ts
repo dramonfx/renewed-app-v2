@@ -99,4 +99,66 @@ export async function getSectionBySlug(slug: string): Promise<BookSection | null
   }
 }
 
+export async function createSection(data: CreateSectionData): Promise<BookSection | null> {
+  try {
+    const newSection = {
+      slug: data.slug,
+      title: data.title,
+      description: data.description || '',
+      content: data.content,
+      order: data.order || 999,
+      category: data.category || 'general',
+      section_type: data.sectionType || 'content',
+      principle_number: data.principleNumber,
+      scripture_references: data.scriptureReferences || [],
+      audio_url: data.audioUrl,
+      audio_title: data.audioTitle,
+      audio_duration: data.audioDuration,
+      reading_time: data.readingTime || 5,
+      is_published: data.isPublished ?? true,
+    }
+
+    const { data: result, error } = await supabase
+      .from('book_sections')
+      .insert(newSection)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error creating section:', error)
+      return null
+    }
+
+    return {
+      id: result.id,
+      slug: result.slug,
+      title: result.title,
+      description: result.description,
+      content: result.content,
+      order: result.order,
+      category: result.category,
+      sectionType: result.section_type,
+      principleNumber: result.principle_number,
+      scriptureReferences: result.scripture_references || [],
+      audioUrl: result.audio_url,
+      audioTitle: result.audio_title,
+      audioDuration: result.audio_duration,
+      readingTime: result.reading_time,
+      isPublished: result.is_published,
+      createdAt: result.created_at,
+      updatedAt: result.updated_at
+    }
+  } catch (error) {
+    console.error('Database connection error creating section:', error)
+    return null
+  }
+}
+
+// ContentService object for API consistency
+export const ContentService = {
+  getAllSections,
+  getSectionBySlug,
+  createSection,
+}
+
 export { supabase }
