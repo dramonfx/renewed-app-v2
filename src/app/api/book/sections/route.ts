@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ContentService } from '@/lib/db'
-import type { SectionsResponse } from '@/lib/types'
+import type { SectionsResponse } from '@/types'
 
 export const dynamic = 'force-dynamic'
 
