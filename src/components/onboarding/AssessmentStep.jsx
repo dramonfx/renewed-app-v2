@@ -1,171 +1,206 @@
-
 'use client';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import SacredCard from '@/components/ui/sacred-card';
 import SacredButton from '@/components/ui/sacred-button';
+import SacredCard from '@/components/ui/sacred-card';
 
-const AssessmentStep = ({ onNext, onboardingData = {}, data = {} }) => {
-  // Use onboardingData if available, fallback to data prop, then to empty object
-  const safeData = onboardingData.assessment || data.assessment || {};
-  const [responses, setResponses] = useState(safeData);
+const AssessmentStep = ({ onNext, onBack }) => {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState({});
 
   const questions = [
     {
-      id: 'stress_level',
-      question: 'How would you rate your current stress level?',
+      id: 'peace_level',
+      text: 'How often do you experience deep, lasting peace in your daily life?',
       options: [
-        { value: 'low', label: 'Low - I feel generally calm and balanced' },
-        { value: 'moderate', label: 'Moderate - Some stress but manageable' },
-        { value: 'high', label: 'High - Often feeling overwhelmed' },
-        { value: 'extreme', label: 'Extreme - Constantly stressed and anxious' }
+        { value: 'rarely', label: 'Rarely - My mind is often restless and anxious' },
+        { value: 'sometimes', label: 'Sometimes - I have moments of peace but they don\'t last' },
+        { value: 'often', label: 'Often - I generally feel peaceful with occasional disruptions' },
+        { value: 'consistently', label: 'Consistently - I maintain deep peace even in challenges' }
       ]
     },
     {
-      id: 'life_satisfaction',
-      question: 'How satisfied are you with your current life direction?',
+      id: 'spiritual_connection',
+      text: 'How connected do you feel to your spiritual life and divine purpose?',
       options: [
-        { value: 'very_satisfied', label: 'Very satisfied - Living with purpose' },
-        { value: 'satisfied', label: 'Satisfied - Generally on the right track' },
-        { value: 'unsatisfied', label: 'Unsatisfied - Something feels missing' },
-        { value: 'very_unsatisfied', label: 'Very unsatisfied - Need significant change' }
+        { value: 'disconnected', label: 'Disconnected - I struggle to sense any spiritual reality' },
+        { value: 'seeking', label: 'Seeking - I want connection but find it difficult to maintain' },
+        { value: 'growing', label: 'Growing - I feel increasing awareness of divine presence' },
+        { value: 'strong', label: 'Strong - I consistently experience divine connection and guidance' }
       ]
     },
     {
-      id: 'growth_desire',
-      question: 'How strong is your desire for personal transformation?',
+      id: 'transformation_readiness',
+      text: 'How ready are you to embrace significant changes in your thinking and lifestyle?',
       options: [
-        { value: 'curious', label: 'Curious - Exploring possibilities' },
-        { value: 'interested', label: 'Interested - Ready to learn more' },
-        { value: 'committed', label: 'Committed - Ready to take action' },
-        { value: 'desperate', label: 'Desperate - Need change urgently' }
+        { value: 'hesitant', label: 'Hesitant - Change feels overwhelming and scary' },
+        { value: 'cautious', label: 'Cautious - I want change but need support and time' },
+        { value: 'ready', label: 'Ready - I\'m prepared to make necessary changes' },
+        { value: 'eager', label: 'Eager - I\'m excited to transform and grow spiritually' }
       ]
     }
   ];
 
-  const handleResponseChange = (questionId, value) => {
-    setResponses(prev => ({
-      ...prev,
-      [questionId]: value
-    }));
+  const handleAnswer = (questionId, value) => {
+    setAnswers(prev => ({ ...prev, [questionId]: value }));
   };
 
   const handleNext = () => {
-    onNext({ assessment: responses });
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(prev => prev + 1);
+    } else {
+      // Store assessment results
+      localStorage.setItem('renewedAssessment', JSON.stringify(answers));
+      onNext();
+    }
   };
 
-  const allQuestionsAnswered = questions.every(q => responses[q.id]);
+  const handlePrevious = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(prev => prev - 1);
+    } else {
+      onBack();
+    }
+  };
+
+  const currentQuestionData = questions[currentQuestion];
+  const isAnswered = answers[currentQuestionData.id];
+  const progressPercentage = ((currentQuestion + 1) / questions.length) * 100;
 
   return (
-    <div className="min-h-screen p-6 lg:p-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-4xl mx-auto">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          key={currentQuestion}
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -50 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-10"
         >
           <SacredCard variant="heavy" className="p-8 md:p-12">
-            <h2 className="text-3xl md:text-4xl font-serif text-sacred-blue-900 mb-4">
-              Current State{' '}
-              <span className="bg-sacred-gradient bg-clip-text text-transparent">
-                Assessment
-              </span>
-            </h2>
-            <p className="text-sacred-blue-600 text-lg leading-relaxed">
-              Understanding where you are now helps us guide you toward where you want to be.
-            </p>
-          </SacredCard>
-        </motion.div>
-
-        {/* Questions */}
-        <div className="space-y-6 mb-10">
-          {questions.map((question, index) => (
+            {/* Sacred Discovery Header */}
             <motion.div
-              key={question.id}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-center mb-8"
             >
-              <SacredCard variant="glass" className="p-6">
-                <h3 className="text-xl font-serif text-sacred-blue-900 mb-6">
-                  {question.question}
-                </h3>
-                <div className="space-y-3">
-                  {question.options.map((option) => (
-                    <motion.label
-                      key={option.value}
-                      className={`
-                        flex items-center p-4 rounded-xl cursor-pointer transition-all duration-300 shadow-sm
-                        ${responses[question.id] === option.value
-                          ? 'bg-sacred-blue-100 border-2 border-sacred-blue-400'
-                          : 'bg-white/50 border-2 border-gray-200 hover:bg-white/80 hover:border-sacred-blue-200'
-                        }
-                      `}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <input
-                        type="radio"
-                        name={question.id}
-                        value={option.value}
-                        checked={responses[question.id] === option.value}
-                        onChange={(e) => handleResponseChange(question.id, e.target.value)}
-                        className="sr-only"
-                      />
-                      <div className={`
-                        w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center
-                        ${responses[question.id] === option.value
-                          ? 'border-sacred-blue-500 bg-sacred-blue-500'
-                          : 'border-gray-300'
-                        }
-                      `}>
-                        {responses[question.id] === option.value && (
-                          <div className="w-2 h-2 rounded-full bg-white"></div>
-                        )}
-                      </div>
-                      <span className="text-sacred-blue-700 flex-1">
-                        {option.label}
-                      </span>
-                    </motion.label>
+              <h1 className="text-3xl md:text-4xl font-serif sacred-text-enhanced mb-4">
+                Sacred Self-Discovery
+              </h1>
+              <p className="sacred-text-body text-lg leading-relaxed max-w-2xl mx-auto mb-6">
+                These questions will help us understand where you are in your spiritual journey 
+                and how to best guide your transformation.
+              </p>
+              
+              {/* Gentle Progress Flow - No Numbers */}
+              <div className="flex justify-center mb-6">
+                <div className="flex space-x-2">
+                  {questions.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                        index <= currentQuestion 
+                          ? 'bg-blue-500 shadow-md' 
+                          : 'bg-slate-300'
+                      }`}
+                    />
                   ))}
                 </div>
-              </SacredCard>
+              </div>
             </motion.div>
-          ))}
-        </div>
 
-        {/* Progress Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-center mb-8"
-        >
-          <SacredCard variant="glass" className="p-4">
-            <p className="text-sacred-blue-600 text-sm">
-              {Object.keys(responses).length} of {questions.length} questions completed
-            </p>
+            {/* Question */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mb-8"
+            >
+              <SacredCard variant="glass" className="p-6 mb-8">
+                <h2 className="text-xl md:text-2xl font-serif sacred-text-enhanced mb-6 text-center">
+                  {currentQuestionData.text}
+                </h2>
+              </SacredCard>
+
+              {/* Answer Options */}
+              <div className="space-y-4">
+                {currentQuestionData.options.map((option, index) => (
+                  <motion.div
+                    key={option.value}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.6 + (index * 0.1) }}
+                  >
+                    <SacredCard
+                      variant="enhanced"
+                      className={`p-6 cursor-pointer transition-all duration-300 ${
+                        answers[currentQuestionData.id] === option.value
+                          ? 'sacred-selected ring-2 ring-blue-400 transform scale-105'
+                          : 'hover:shadow-lg hover:scale-102'
+                      }`}
+                      onClick={() => handleAnswer(currentQuestionData.id, option.value)}
+                    >
+                      <div className="flex items-center">
+                        <div className={`w-5 h-5 rounded-full border-2 mr-4 flex items-center justify-center ${
+                          answers[currentQuestionData.id] === option.value
+                            ? 'border-blue-500 bg-blue-500'
+                            : 'border-slate-300'
+                        }`}>
+                          {answers[currentQuestionData.id] === option.value && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ duration: 0.2 }}
+                              className="w-2 h-2 bg-white rounded-full"
+                            />
+                          )}
+                        </div>
+                        <span className="sacred-text-body text-base leading-relaxed">
+                          {option.label}
+                        </span>
+                      </div>
+                    </SacredCard>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Navigation */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1.0 }}
+              className="flex flex-col sm:flex-row gap-4 justify-between items-center"
+            >
+              <SacredButton
+                onClick={handlePrevious}
+                variant="ghost"
+                className="px-8 py-3"
+              >
+                ← {currentQuestion === 0 ? 'Previous' : 'Previous Question'}
+              </SacredButton>
+              
+              <div className="text-center">
+                <SacredButton
+                  onClick={handleNext}
+                  variant="primary"
+                  disabled={!isAnswered}
+                  className="px-12 py-3 text-lg font-semibold"
+                >
+                  {currentQuestion === questions.length - 1 ? 'Continue Journey' : 'Next Question'} →
+                </SacredButton>
+                
+                {!isAnswered && (
+                  <p className="sacred-text-muted text-sm mt-2">
+                    Please select an answer to continue
+                  </p>
+                )}
+              </div>
+
+              <div className="w-24"> {/* Spacer for alignment */}</div>
+            </motion.div>
           </SacredCard>
-        </motion.div>
-
-        {/* Next Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="text-center"
-        >
-          <SacredButton
-            onClick={handleNext}
-            disabled={!allQuestionsAnswered}
-            variant="primary"
-            size="lg"
-            className="px-8"
-          >
-            Continue to Path Selection →
-          </SacredButton>
         </motion.div>
       </div>
     </div>
