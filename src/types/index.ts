@@ -129,12 +129,40 @@ export interface BookSection {
   title: string;
   slug: string;
   content: string;
-  order_index: number;
-  chapter_number?: number;
-  audio_tracks: AudioTrack[];
-  estimated_reading_time: number;
-  created_at: string;
-  updated_at: string;
+  description?: string;
+  order: number;
+  category?: string;
+  sectionType?: string;
+  principleNumber?: number;
+  scriptureReferences?: string[];
+  audioUrl?: string | null;
+  audioTitle?: string;
+  audioDuration?: number;
+  readingTime?: number;
+  isPublished?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateSectionData {
+  slug: string;
+  title: string;
+  description?: string;
+  content: string;
+  order?: number;
+  category?: string;
+  sectionType?: string;
+  principleNumber?: number;
+  scriptureReferences?: string[];
+  audioUrl?: string;
+  audioTitle?: string;
+  audioDuration?: number;
+  readingTime?: number;
+  isPublished?: boolean;
+}
+
+export interface UpdateSectionData extends Partial<CreateSectionData> {
+  id: string;
 }
 
 export interface Book {
@@ -322,6 +350,12 @@ export interface JournalEntriesResponse {
 export interface AudioTracksResponse {
   tracks: AudioTrack[];
   total: number;
+}
+
+export interface SectionsResponse {
+  data?: BookSection[];
+  error?: string;
+  success: boolean;
 }
 
 // =============================================================================

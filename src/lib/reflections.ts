@@ -97,7 +97,7 @@ export async function saveReflection(
       reflection_type: reflectionType
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('reflections')
       .insert(insertData)
       .select()
@@ -143,7 +143,7 @@ export async function getUserReflections(
       return { data: [], status: 200 };
     }
     
-    const query = supabase
+    const query = (supabase as any)
       .from('reflections')
       .select('*')
       .eq('user_id', sessionData.session.user.id)
@@ -192,7 +192,7 @@ export async function updateReflection(
       updated_at: new Date().toISOString()
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('reflections')
       .update(updatePayload)
       .eq('id', reflectionId)
@@ -233,7 +233,7 @@ export async function deleteReflection(
       throw new Error('User must be authenticated to delete reflections');
     }
     
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('reflections')
       .delete()
       .eq('id', reflectionId)
@@ -276,7 +276,7 @@ export async function searchReflections(
       return { data: [], status: 200 };
     }
     
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('reflections')
       .select('*')
       .eq('user_id', sessionData.session.user.id)
@@ -328,7 +328,7 @@ export async function getReflectionStats(): Promise<ApiResponse<ReflectionStats>
     }
     
     // Get all reflections for stats calculation
-    const { data: allReflections, error: allError } = await supabase
+    const { data: allReflections, error: allError } = await (supabase as any)
       .from('reflections')
       .select('*')
       .eq('user_id', sessionData.session.user.id);
@@ -415,7 +415,7 @@ export async function getReflectionsByDateRange(
       return { data: [], status: 200 };
     }
     
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('reflections')
       .select('*')
       .eq('user_id', sessionData.session.user.id)
@@ -465,7 +465,7 @@ export async function getReflectionsByMindset(
       return { data: [], status: 200 };
     }
     
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('reflections')
       .select('*')
       .eq('user_id', sessionData.session.user.id)

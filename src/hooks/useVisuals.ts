@@ -26,7 +26,7 @@ export function useVisuals(sectionId: number | null): UseVisualsReturn {
         setLoading(true);
         setError(null);
 
-        const { data: visualsData, error: visualsError } = await supabase
+        const { data: visualsData, error: visualsError } = await (supabase as any)
           .from('visuals')
           .select('*')
           .eq('section_id', sectionId)
@@ -38,9 +38,9 @@ export function useVisuals(sectionId: number | null): UseVisualsReturn {
 
         if (visualsData && visualsData.length > 0) {
           const visualsWithUrls: Visual[] = await Promise.all(
-            visualsData.map(async (visual): Promise<Visual> => {
+            visualsData.map(async (visual: any): Promise<Visual> => {
               if (visual.file_path) {
-                const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+                const { data: signedUrlData, error: signedUrlError } = await (supabase as any).storage
                   .from('book-assets')
                   .createSignedUrl(visual.file_path, 60 * 60);
 
@@ -54,7 +54,7 @@ export function useVisuals(sectionId: number | null): UseVisualsReturn {
                 }
                 return { 
                   ...visual, 
-                  displayUrl: signedUrlData.signedUrl 
+                  displayUrl: signedUrlData?.signedUrl || null 
                 };
               }
               return { 
