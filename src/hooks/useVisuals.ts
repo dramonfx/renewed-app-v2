@@ -40,7 +40,7 @@ export function useVisuals(sectionId: number | null): UseVisualsReturn {
           const visualsWithUrls: Visual[] = await Promise.all(
             visualsData.map(async (visual: any): Promise<Visual> => {
               if (visual.file_path) {
-                const { data: signedUrlData, error: signedUrlError } = await (supabase as any).storage
+                const { data: signedUrlData, error: signedUrlError } = await supabase.storage
                   .from('book-assets')
                   .createSignedUrl(visual.file_path, 60 * 60);
 
@@ -54,7 +54,7 @@ export function useVisuals(sectionId: number | null): UseVisualsReturn {
                 }
                 return { 
                   ...visual, 
-                  displayUrl: signedUrlData?.signedUrl || null 
+                  displayUrl: signedUrlData?.signedUrl ?? null 
                 };
               }
               return { 

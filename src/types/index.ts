@@ -129,32 +129,38 @@ export interface BookSection {
   title: string;
   slug: string;
   content: string;
-  description?: string;
   order: number;
-  category?: string;
-  sectionType?: string;
+  category: string;
+  sectionType: string;
   principleNumber?: number;
-  scriptureReferences?: string[];
+  description: string;
+  scriptureReferences: string[];
   audioUrl?: string | null;
   audioTitle?: string;
   audioDuration?: number;
-  readingTime?: number;
-  isPublished?: boolean;
+  readingTime: number;
+  isPublished: boolean;
+  chapter_number?: number;
+  audio_tracks?: AudioTrack[];
+  estimated_reading_time?: number;
+  order_index?: number;
   createdAt: string;
   updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CreateSectionData {
   slug: string;
   title: string;
-  description?: string;
+  description: string;
   content: string;
-  order?: number;
-  category?: string;
-  sectionType?: string;
+  order: number;
+  category: string;
+  sectionType: string;
   principleNumber?: number;
   scriptureReferences?: string[];
-  audioUrl?: string;
+  audioUrl?: string | null;
   audioTitle?: string;
   audioDuration?: number;
   readingTime?: number;
@@ -163,6 +169,21 @@ export interface CreateSectionData {
 
 export interface UpdateSectionData extends Partial<CreateSectionData> {
   id: string;
+}
+
+export interface ExerciseTemplate {
+  id: string;
+  title: string;
+  description: string;
+  steps: string[];
+  category: string;
+  estimatedTime: number;
+}
+
+export interface SectionsResponse {
+  data?: BookSection[];
+  error?: string;
+  success: boolean;
 }
 
 export interface Book {
@@ -350,12 +371,6 @@ export interface JournalEntriesResponse {
 export interface AudioTracksResponse {
   tracks: AudioTrack[];
   total: number;
-}
-
-export interface SectionsResponse {
-  data?: BookSection[];
-  error?: string;
-  success: boolean;
 }
 
 // =============================================================================

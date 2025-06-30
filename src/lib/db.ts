@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { supabase } from './supabaseClient'
-import type { BookSection, CreateSectionData, UpdateSectionData, ExerciseTemplate } from './types'
+import type { BookSection, CreateSectionData } from '@/types'
 
 // Mock data for development/testing when Supabase is not available
 // Updated to match the authentic RENEWED content structure
@@ -99,28 +99,26 @@ export async function getSectionBySlug(slug: string): Promise<BookSection | null
   }
 }
 
-export async function createSection(data: CreateSectionData): Promise<BookSection | null> {
+export async function createSection(sectionData: CreateSectionData): Promise<BookSection | null> {
   try {
-    const newSection = {
-      slug: data.slug,
-      title: data.title,
-      description: data.description || '',
-      content: data.content,
-      order: data.order || 999,
-      category: data.category || 'general',
-      section_type: data.sectionType || 'content',
-      principle_number: data.principleNumber,
-      scripture_references: data.scriptureReferences || [],
-      audio_url: data.audioUrl,
-      audio_title: data.audioTitle,
-      audio_duration: data.audioDuration,
-      reading_time: data.readingTime || 5,
-      is_published: data.isPublished ?? true,
-    }
-
-    const { data: result, error } = await supabase
+    const { data, error } = await supabase
       .from('book_sections')
-      .insert(newSection)
+      .insert({
+        slug: sectionData.slug,
+        title: sectionData.title,
+        description: sectionData.description,
+        content: sectionData.content,
+        order: sectionData.order,
+        category: sectionData.category,
+        section_type: sectionData.sectionType,
+        principle_number: sectionData.principleNumber,
+        scripture_references: sectionData.scriptureReferences || [],
+        audio_url: sectionData.audioUrl,
+        audio_title: sectionData.audioTitle,
+        audio_duration: sectionData.audioDuration,
+        reading_time: sectionData.readingTime || 5,
+        is_published: sectionData.isPublished || false
+      })
       .select()
       .single()
 
@@ -130,35 +128,37 @@ export async function createSection(data: CreateSectionData): Promise<BookSectio
     }
 
     return {
-      id: result.id,
-      slug: result.slug,
-      title: result.title,
-      description: result.description,
-      content: result.content,
-      order: result.order,
-      category: result.category,
-      sectionType: result.section_type,
-      principleNumber: result.principle_number,
-      scriptureReferences: result.scripture_references || [],
-      audioUrl: result.audio_url,
-      audioTitle: result.audio_title,
-      audioDuration: result.audio_duration,
-      readingTime: result.reading_time,
-      isPublished: result.is_published,
-      createdAt: result.created_at,
-      updatedAt: result.updated_at
+      id: data.id,
+      slug: data.slug,
+      title: data.title,
+      description: data.description,
+      content: data.content,
+      order: data.order,
+      category: data.category,
+      sectionType: data.section_type,
+      principleNumber: data.principle_number,
+      scriptureReferences: data.scripture_references || [],
+      audioUrl: data.audio_url,
+      audioTitle: data.audio_title,
+      audioDuration: data.audio_duration,
+      readingTime: data.reading_time,
+      isPublished: data.is_published,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+      created_at: data.created_at,
+      updated_at: data.updated_at
     }
   } catch (error) {
-    console.error('Database connection error creating section:', error)
+    console.error('Database connection error:', error)
     return null
   }
 }
 
-// ContentService object for API consistency
+// ContentService object that wraps the functions for API compatibility
 export const ContentService = {
   getAllSections,
   getSectionBySlug,
-  createSection,
+  createSection
 }
 
 export { supabase }

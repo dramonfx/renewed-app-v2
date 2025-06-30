@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useLogin } from '@/hooks/useLogin';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -10,7 +10,16 @@ import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
 import SacredInput from '@/components/ui/sacred-input';
 
-export default function LoginPage() {
+// Component that uses useSearchParams - will be wrapped in Suspense
+function LoginPageWithParams() {
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams.get('returnUrl') || '/dashboard';
+  
+  return <LoginPageContent returnUrl={returnUrl} />;
+}
+
+// Main login component that accepts returnUrl as prop
+function LoginPageContent({ returnUrl }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginSuccess, setLoginSuccess] = useState(false);
@@ -18,10 +27,6 @@ export default function LoginPage() {
   const { handleLogin, isLoading, error, validationErrors, clearErrors } = useLogin();
   const { user, loading: authLoading } = useAuth(); // Fixed: Added loading state
   const router = useRouter();
-  const searchParams = useSearchParams();
-  
-  // Get the return URL from query parameters
-  const returnUrl = searchParams.get('returnUrl') || '/dashboard';
 
   // ENHANCED REDIRECT LOGIC - Only redirect if user was already authenticated on page load
   useEffect(() => {
@@ -224,5 +229,18 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Export default component wrapped in Suspense
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" className="text-sacred-blue-500" />
+      </div>
+    }>
+      <LoginPageWithParams />
+    </Suspense>
   );
 }
