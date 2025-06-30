@@ -1,221 +1,194 @@
-
 'use client';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import SacredCard from '@/components/ui/sacred-card';
 import SacredButton from '@/components/ui/sacred-button';
+import SacredCard from '@/components/ui/sacred-card';
+import SacredInput from '@/components/ui/sacred-input';
 
-const IntentionsStep = ({ onNext, onboardingData = {}, data = {} }) => {
-  // Use onboardingData if available, fallback to data prop, then to empty array
-  const safeData = onboardingData || data || {};
-  const [intentions, setIntentions] = useState(safeData.intentions || []);
-  const [customIntention, setCustomIntention] = useState('');
+const IntentionsStep = ({ onNext, onBack }) => {
+  const [intentions, setIntentions] = useState({
+    primaryIntention: '',
+    dailyCommitment: '',
+    transformationGoal: ''
+  });
 
-  const predefinedIntentions = [
-    { id: 'peace', label: 'Find inner peace and calm', icon: '🕊️' },
-    { id: 'purpose', label: 'Discover my life purpose', icon: '🎯' },
-    { id: 'relationships', label: 'Improve my relationships', icon: '💝' },
-    { id: 'confidence', label: 'Build self-confidence', icon: '💪' },
-    { id: 'mindfulness', label: 'Develop mindfulness practice', icon: '🧘' },
-    { id: 'creativity', label: 'Unlock my creativity', icon: '🎨' },
-    { id: 'health', label: 'Improve physical and mental health', icon: '🌱' },
-    { id: 'abundance', label: 'Cultivate abundance mindset', icon: '✨' },
-    { id: 'forgiveness', label: 'Practice forgiveness', icon: '🤲' },
-    { id: 'gratitude', label: 'Develop gratitude practice', icon: '🙏' }
+  const handleInputChange = (field, value) => {
+    setIntentions(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleContinue = () => {
+    // Store intentions
+    localStorage.setItem('renewedIntentions', JSON.stringify(intentions));
+    onNext();
+  };
+
+  const isFormValid = intentions.primaryIntention.trim() && 
+                     intentions.dailyCommitment.trim() && 
+                     intentions.transformationGoal.trim();
+
+  const intentionPrompts = [
+    {
+      field: 'primaryIntention',
+      label: 'Primary Sacred Intention',
+      placeholder: 'What is your deepest desire for this spiritual journey?',
+      guidance: 'Express your heart\'s truest longing for transformation and growth'
+    },
+    {
+      field: 'dailyCommitment',
+      label: 'Daily Sacred Commitment',
+      placeholder: 'How will you honor this journey each day?',
+      guidance: 'Describe the daily practices you\'re willing to embrace'
+    },
+    {
+      field: 'transformationGoal',
+      label: 'Vision of Transformation',
+      placeholder: 'Who do you aspire to become through this journey?',
+      guidance: 'Paint a picture of your renewed spiritual self'
+    }
   ];
 
-  const toggleIntention = (intentionId) => {
-    setIntentions(prev => 
-      prev.includes(intentionId)
-        ? prev.filter(id => id !== intentionId)
-        : [...prev, intentionId]
-    );
-  };
-
-  const addCustomIntention = () => {
-    if (customIntention.trim() && !intentions.includes(customIntention.trim())) {
-      setIntentions(prev => [...prev, customIntention.trim()]);
-      setCustomIntention('');
-    }
-  };
-
-  const removeCustomIntention = (intention) => {
-    setIntentions(prev => prev.filter(i => i !== intention));
-  };
-
-  const handleNext = () => {
-    onNext({ intentions });
-  };
-
   return (
-    <div className="min-h-screen p-6 lg:p-8">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-10"
-        >
-          <SacredCard variant="heavy" className="p-8 md:p-12">
-            <h2 className="text-3xl md:text-4xl font-serif text-sacred-blue-900 mb-4">
-              Set Your Sacred{' '}
-              <span className="bg-sacred-gradient bg-clip-text text-transparent">
-                Intentions
-              </span>
-            </h2>
-            <p className="text-sacred-blue-600 text-lg leading-relaxed max-w-2xl mx-auto">
-              Intentions are the compass for your journey. Choose what resonates with your heart and guides your transformation.
-            </p>
-          </SacredCard>
-        </motion.div>
-
-        {/* Predefined Intentions Grid */}
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-8"
+          transition={{ duration: 0.8 }}
         >
-          <SacredCard variant="glass" className="p-6">
-            <h3 className="text-xl font-serif text-sacred-blue-900 mb-6 text-center">
-              Choose Your Intentions
-            </h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {predefinedIntentions.map((intention, index) => (
+          <SacredCard variant="heavy" className="p-8 md:p-12">
+            {/* Sacred Ceremony Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-center mb-12"
+            >
+              <h1 className="text-4xl md:text-5xl font-serif sacred-text-enhanced mb-6">
+                Sacred Intention Ceremony
+              </h1>
+              <p className="sacred-text-body text-lg md:text-xl leading-relaxed max-w-3xl mx-auto">
+                In this sacred moment, you will declare your intentions and commit your heart 
+                to the transformative journey ahead. These words will guide and anchor your path.
+              </p>
+            </motion.div>
+
+            {/* Ceremonial Light Elements */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.4 }}
+              className="flex justify-center mb-8"
+            >
+              <div className="flex space-x-6">
+                {[...Array(3)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="w-3 h-8 bg-gradient-to-t from-amber-400 to-amber-200 rounded-full"
+                    animate={{
+                      scaleY: [1, 1.2, 1],
+                      opacity: [0.7, 1, 0.7],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      delay: i * 0.3,
+                      ease: 'easeInOut',
+                    }}
+                  />
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Sacred Intentions Form */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="space-y-8 mb-12"
+            >
+              {intentionPrompts.map((prompt, index) => (
                 <motion.div
-                  key={intention.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  key={prompt.field}
+                  initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.05 }}
-                  className={`
-                    p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 shadow-sm
-                    ${intentions.includes(intention.id)
-                      ? 'border-sacred-gold-400 bg-sacred-gold-50'
-                      : 'border-gray-200 bg-white/50 hover:border-sacred-gold-200 hover:bg-white/80 hover:shadow-md'
-                    }
-                  `}
-                  onClick={() => toggleIntention(intention.id)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.6, delay: 0.8 + (index * 0.2) }}
                 >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-2xl">{intention.icon}</span>
-                    <span className="text-sacred-blue-700 font-medium flex-1">
-                      {intention.label}
-                    </span>
-                    {intentions.includes(intention.id) && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="w-5 h-5 rounded-full bg-sacred-gold-400 flex items-center justify-center"
-                      >
-                        <span className="text-white text-xs">✓</span>
-                      </motion.div>
-                    )}
-                  </div>
+                  <SacredCard variant="glass" className="p-6">
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="text-xl font-serif sacred-text-enhanced mb-2">
+                          {prompt.label}
+                        </h3>
+                        <p className="sacred-text-muted text-sm mb-4">
+                          {prompt.guidance}
+                        </p>
+                      </div>
+                      
+                      <SacredInput
+                        value={intentions[prompt.field]}
+                        onChange={(e) => handleInputChange(prompt.field, e.target.value)}
+                        placeholder={prompt.placeholder}
+                        className="min-h-[80px] resize-none"
+                        multiline
+                      />
+                    </div>
+                  </SacredCard>
                 </motion.div>
               ))}
-            </div>
-          </SacredCard>
-        </motion.div>
+            </motion.div>
 
-        {/* Custom Intention Input */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="mb-8"
-        >
-          <SacredCard variant="glass" className="p-6">
-            <h3 className="text-xl font-serif text-sacred-blue-900 mb-4">
-              Add Your Own Intention
-            </h3>
-            <div className="flex space-x-3">
-              <input
-                type="text"
-                value={customIntention}
-                onChange={(e) => setCustomIntention(e.target.value)}
-                placeholder="Write your personal intention..."
-                className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:border-sacred-blue-400 focus:outline-none bg-white shadow-sm"
-                onKeyPress={(e) => e.key === 'Enter' && addCustomIntention()}
-              />
+            {/* Sacred Affirmation */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1.4 }}
+              className="mb-8"
+            >
+              <SacredCard variant="enhanced" className="p-6 text-center">
+                <p className="sacred-text-body text-base leading-relaxed italic">
+                  "I commit to this sacred journey with an open heart and willing spirit. 
+                  I trust in the divine process of transformation and welcome the growth 
+                  that awaits me. May these intentions guide my steps and strengthen my resolve."
+                </p>
+              </SacredCard>
+            </motion.div>
+
+            {/* Navigation */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1.6 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            >
               <SacredButton
-                onClick={addCustomIntention}
-                disabled={!customIntention.trim()}
-                variant="primary"
-                size="md"
+                onClick={onBack}
+                variant="ghost"
+                className="px-8 py-3"
               >
-                Add
+                ← Previous
               </SacredButton>
-            </div>
+              
+              <SacredButton
+                onClick={handleContinue}
+                variant="primary"
+                disabled={!isFormValid}
+                className="px-12 py-3 text-lg font-semibold"
+              >
+                Seal Sacred Intentions ✨
+              </SacredButton>
+            </motion.div>
+
+            {!isFormValid && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: 1.8 }}
+                className="sacred-text-muted text-sm mt-4 text-center"
+              >
+                Please complete all intention fields to continue
+              </motion.p>
+            )}
           </SacredCard>
-        </motion.div>
-
-        {/* Selected Custom Intentions */}
-        {intentions.some(i => !predefinedIntentions.find(p => p.id === i)) && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <SacredCard variant="glass" className="p-6">
-              <h4 className="text-lg font-serif text-sacred-blue-900 mb-4">Your Personal Intentions:</h4>
-              <div className="flex flex-wrap gap-3">
-                {intentions
-                  .filter(i => !predefinedIntentions.find(p => p.id === i))
-                  .map((intention, index) => (
-                    <motion.div
-                      key={intention}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="bg-sacred-purple-100 text-sacred-purple-700 px-4 py-2 rounded-full flex items-center space-x-2"
-                    >
-                      <span>{intention}</span>
-                      <button
-                        onClick={() => removeCustomIntention(intention)}
-                        className="text-sacred-purple-500 hover:text-sacred-purple-700"
-                      >
-                        ×
-                      </button>
-                    </motion.div>
-                  ))}
-              </div>
-            </SacredCard>
-          </motion.div>
-        )}
-
-        {/* Selected Count */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="text-center mb-8"
-        >
-          <SacredCard variant="glass" className="p-4">
-            <p className="text-sacred-blue-600 text-sm">
-              {intentions.length} intention{intentions.length !== 1 ? 's' : ''} selected
-            </p>
-          </SacredCard>
-        </motion.div>
-
-        {/* Next Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="text-center"
-        >
-          <SacredButton
-            onClick={handleNext}
-            disabled={intentions.length === 0}
-            variant="primary"
-            size="lg"
-            className="px-8"
-          >
-            Complete Sacred Journey Setup →
-          </SacredButton>
         </motion.div>
       </div>
     </div>
