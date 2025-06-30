@@ -1,4 +1,3 @@
-
 'use client';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
@@ -15,40 +14,20 @@ const WizardLayout = ({
 }) => {
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Light Scenic Background - matching welcome screen */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-        {/* Soft background elements */}
-        <div className="absolute top-20 left-20 w-64 h-64 bg-blue-200/30 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-20 w-80 h-80 bg-purple-200/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-100/40 rounded-full blur-3xl"></div>
+      {/* Sacred Threshold Background - No Distracting Elements */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Gentle Sacred Atmosphere */}
+        <div className="absolute top-20 left-20 w-64 h-64 bg-blue-200/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-20 w-80 h-80 bg-purple-200/15 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-100/25 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="relative z-20 w-full bg-white/80 backdrop-blur-sm border-b border-white/50 py-4">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-slate-600">
-              Step {currentStep} of {totalSteps - 1}
-            </span>
-            <span className="text-sm font-medium text-slate-600">
-              {Math.round(progress)}% Complete
-            </span>
-          </div>
-          <div className="w-full bg-slate-200 rounded-full h-2">
-            <motion.div
-              className="bg-blue-600 h-2 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
-            />
-          </div>
-        </div>
-      </div>
+      {/* NO PROGRESS BAR - Clean Sacred Threshold Experience */}
 
       {/* Main Content Area */}
       <div className="relative z-10 min-h-screen pt-8 pb-16">
         <div className="max-w-4xl mx-auto px-6">
-          {/* Back Button */}
+          {/* Back Button - Clean and Minimal */}
           {canGoBack && (
             <motion.button
               initial={{ opacity: 0, x: -20 }}
@@ -59,6 +38,8 @@ const WizardLayout = ({
               className="
                 mb-8 flex items-center gap-2 text-slate-600 hover:text-slate-800
                 transition-colors duration-200 disabled:opacity-50
+                bg-white/80 backdrop-blur-sm px-4 py-2 rounded-lg shadow-sm
+                hover:bg-white/90 hover:shadow-md
               "
             >
               <ArrowLeft className="w-5 h-5" />
@@ -66,12 +47,12 @@ const WizardLayout = ({
             </motion.button>
           )}
 
-          {/* White Content Card */}
+          {/* Sacred Threshold Content Container */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="bg-white rounded-2xl shadow-xl p-8 md:p-12"
+            className="relative"
           >
             {children}
           </motion.div>
