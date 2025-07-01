@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -84,7 +85,7 @@ export default function NotFound() {
             </div>
             
             <p className="text-blue-600 text-sm mt-6 italic">
-              &ldquo;Not all who wander are lost, but all who seek shall find their way.&rdquo;
+              "Not all who wander are lost, but all who seek shall find their way."
             </p>
           </div>
         </div>
