@@ -1,20 +1,49 @@
-Development Server Log
 
-[2025-06-29 02:25:00] Server started on http://localhost:3000
-[2025-06-29 02:25:01] Next.js compilation complete
-[2025-06-29 02:25:02] Sacred Path routes initialized
-[2025-06-29 02:25:03] Content Engine connected to Supabase
-[2025-06-29 02:25:04] Authentication middleware active
-[2025-06-29 02:25:05] Journal system ready
-[2025-06-29 02:25:06] Error boundaries configured
-[2025-06-29 02:25:07] Service layer separation complete
-[2025-06-29 02:25:08] Foundational rebirth architecture active
-[2025-06-29 02:25:09] All systems operational
-[2025-06-29 02:25:10] Ready for sacred transformation
+> renewed-app-v2@0.1.0 dev
+> next dev
 
-[INFO] Routing foundation crisis resolved
-[INFO] Clean app structure maintained
-[INFO] Auth context preserved in layout.js
-[INFO] CSS syntax verified
-[SUCCESS] Routes now work properly
-[SUCCESS] Foundational rebirth complete
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+   ▲ Next.js 15.3.2
+   - Local:        http://localhost:3000
+   - Network:      http://100.107.254.50:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
+ ✓ Ready in 3s
+ ✓ Compiled /middleware in 473ms (108 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 6.3s (1702 modules)
+ GET / 200 in 6966ms
+ ✓ Compiled in 654ms (780 modules)
+ ○ Compiling /book/[sectionSlug] ...
+ ✓ Compiled /book/[sectionSlug] in 2.2s (2416 modules)
+Section fetch error for slug: kingdom_government Error: JSON object requested, multiple (or no) rows returned
+Unexpected error in SectionPage: Error: NEXT_HTTP_ERROR_FALLBACK;404
+    at notFound (.next/server/vendor-chunks/next.js:839:41)
+    at SectionPage (.next/server/app/book/[sectionSlug]/page.js:347:70) {
+  digest: 'NEXT_HTTP_ERROR_FALLBACK;404'
+}
+Section failed after 494ms
+ GET /book/kingdom_government 404 in 3915ms
+ ✓ Compiled /book in 442ms (2423 modules)
+ GET /book 200 in 535ms
+ GET / 200 in 74ms
+ ✓ Compiled /favicon.ico in 378ms (1359 modules)
+ GET /favicon.ico 200 in 531ms
+Section fetch error for slug: kingdom-government Error: JSON object requested, multiple (or no) rows returned
+Unexpected error in SectionPage: Error: NEXT_HTTP_ERROR_FALLBACK;404
+    at notFound (.next/server/vendor-chunks/next.js:858:41)
+    at SectionPage (.next/server/app/book/[sectionSlug]/page.js:347:70) {
+  digest: 'NEXT_HTTP_ERROR_FALLBACK;404'
+}
+Section failed after 336ms
+ GET /book/kingdom-government 404 in 423ms
+Section fetch error for slug: prologue Error: JSON object requested, multiple (or no) rows returned
+Unexpected error in SectionPage: Error: NEXT_HTTP_ERROR_FALLBACK;404
+    at notFound (.next/server/vendor-chunks/next.js:858:41)
+    at SectionPage (.next/server/app/book/[sectionSlug]/page.js:347:70) {
+  digest: 'NEXT_HTTP_ERROR_FALLBACK;404'
+}
