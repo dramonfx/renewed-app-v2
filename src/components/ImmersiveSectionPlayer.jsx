@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Suspense, useMemo, useState } from 'react';
@@ -101,12 +100,26 @@ export default function ImmersiveSectionPlayer({ section, visuals, visualsMap, p
 
   // Enhanced markdown components with immersive styling
   const markdownComponents = useMemo(() => ({
-    // Enhanced paragraph styling
+    // Enhanced paragraph styling - Fix hydration issue by ensuring valid HTML structure
     p: ({ node, children }) => {
-      // Check if this paragraph contains only an image
-      if (node.children.length === 1 && node.children[0].tagName === 'img') {
-        return <div className="my-8">{children}</div>;
+      // Check if this paragraph contains any block-level elements
+      const hasBlockElements = node?.children?.some(child => 
+        child.tagName === 'img' || 
+        child.tagName === 'div' || 
+        child.tagName === 'blockquote' ||
+        child.tagName === 'h1' || 
+        child.tagName === 'h2' || 
+        child.tagName === 'h3' ||
+        child.tagName === 'ul' ||
+        child.tagName === 'ol'
+      );
+      
+      // If it contains block elements, render as div to avoid invalid HTML nesting
+      if (hasBlockElements) {
+        return <div className="my-6">{children}</div>;
       }
+      
+      // Otherwise render as normal paragraph
       return (
         <p className="text-lg leading-relaxed text-gray-700 mb-6 font-light tracking-wide">
           {children}
@@ -131,7 +144,7 @@ export default function ImmersiveSectionPlayer({ section, visuals, visualsMap, p
       </h3>
     ),
     
-    // Enhanced image handling
+    // Enhanced image handling - Fix hydration by ensuring proper block-level rendering
     img: ({ node, ...props }) => {
       const imageIdentifier = props.src;
       const normalizedIdentifier = imageIdentifier?.toString().toUpperCase().trim() || '';
@@ -140,46 +153,52 @@ export default function ImmersiveSectionPlayer({ section, visuals, visualsMap, p
 
       if (visual && visual.displayUrl) {
         return (
-          <SacredCard variant="glass" className="p-4 my-8">
-            <a
-              href={visual.displayUrl}
-              download
-              target="_blank"
-              rel="noopener noreferrer"
-              title={`Download ${props.alt || visual.caption}`}
-              className="block group"
-            >
-              <OptimizedImage 
-                visual={visual}
-                alt={props.alt}
-                className="group-hover:opacity-90 transition-opacity"
-              />
-            </a>
-            {visual.caption && (
-              <div className="text-center mt-4 text-sacred-blue-600 italic">
-                {visual.caption}
-              </div>
-            )}
-          </SacredCard>
+          <div className="my-8">
+            <SacredCard variant="glass" className="p-4">
+              <a
+                href={visual.displayUrl}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`Download ${props.alt || visual.caption}`}
+                className="block group"
+              >
+                <OptimizedImage 
+                  visual={visual}
+                  alt={props.alt}
+                  className="group-hover:opacity-90 transition-opacity"
+                />
+              </a>
+              {visual.caption && (
+                <div className="text-center mt-4 text-sacred-blue-600 italic">
+                  {visual.caption}
+                </div>
+              )}
+            </SacredCard>
+          </div>
         );
       }
       return (
-        <SacredCard variant="glass" className="p-6 my-8 text-center">
-          <div className="text-amber-500 text-2xl mb-2">⚠️</div>
-          <p className="text-sacred-blue-600">
-            <em>Image: {props.alt || imageIdentifier} not found</em>
-          </p>
-        </SacredCard>
+        <div className="my-8">
+          <SacredCard variant="glass" className="p-6 text-center">
+            <div className="text-amber-500 text-2xl mb-2">⚠️</div>
+            <p className="text-sacred-blue-600">
+              <em>Image: {props.alt || imageIdentifier} not found</em>
+            </p>
+          </SacredCard>
+        </div>
       );
     },
     
-    // Enhanced blockquote
+    // Enhanced blockquote - Fix hydration by ensuring proper block-level rendering
     blockquote: ({ children }) => (
-      <SacredCard variant="glass" className="p-6 my-8 border-l-4 border-sacred-gold-500">
-        <div className="text-sacred-blue-800 italic text-lg font-light">
-          {children}
-        </div>
-      </SacredCard>
+      <div className="my-8">
+        <SacredCard variant="glass" className="p-6 border-l-4 border-sacred-gold-500">
+          <div className="text-sacred-blue-800 italic text-lg font-light">
+            {children}
+          </div>
+        </SacredCard>
+      </div>
     ),
     
     // Enhanced lists
