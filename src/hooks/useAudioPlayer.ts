@@ -320,7 +320,7 @@ export function useAudioPlayer(options: AudioPlayerOptions = {}): UseAudioPlayer
     const speedOptions = [1, 1.25, 1.5, 2];
     const currentIndex = speedOptions.indexOf(speed);
     const nextIndex = (currentIndex + 1) % speedOptions.length;
-    const newSpeed = speedOptions[nextIndex]!; // Safe due to modulo operation
+    const newSpeed = speedOptions[nextIndex] ?? 1;
     setSpeed(newSpeed);
   }, [speed]);
 

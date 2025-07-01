@@ -10,7 +10,7 @@ export interface UseSectionReturn {
 }
 
 export interface SectionWithContent extends BookSection {
-  audioUrl: string | null | undefined;
+  audioUrl: string | null;
   markdownContent: string;
 }
 
