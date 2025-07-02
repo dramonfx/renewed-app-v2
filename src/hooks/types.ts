@@ -1,329 +1,324 @@
+
 // src/hooks/types.ts
 'use client';
 
 /**
- * Enhanced Type Definitions for Audio Player System
+ * Hook Types - Enhanced with Phase 5.1 Integration
  * 
- * Comprehensive type definitions for the enhanced audio player system
- * including all Phase 2 Core Audio Engine components.
+ * Comprehensive type definitions for audio hooks including enhanced
+ * Phase 5.1 types for cross-track navigation and registry integration.
  */
 
-// Re-export core engine types
-export type {
-  AudioEngineConfig,
-  AudioEngineStats,
-  AudioSource,
-  EnhancedTrack
-} from '../lib/audio/CoreAudioEngine';
+import { TrackWithUrl, AudioBookmark, TrackLoadingState, CrossTrackNavigationError } from '../types/audio';
+import { TrackRegistry } from '../lib/audio/TrackRegistry';
+import { TrackResolutionEngine } from '../lib/audio/TrackResolutionEngine';
+import { AudioCacheManager } from '../lib/audio/CachingFramework';
 
-export type {
-  BufferStrategy,
-  NetworkCondition,
-  BufferState
-} from '../lib/audio/AudioBufferManager';
+// === CORE AUDIO PLAYER TYPES ===
 
-export type {
-  AnalyticsConfig,
-  PerformanceMetric,
-  UserBehaviorEvent,
-  ErrorEvent,
-  AnalyticsSession
-} from '../lib/audio/AudioAnalytics';
-
-export type {
-  ErrorRecoveryConfig,
-  AudioError,
-  RecoveryAttempt,
-  RecoverySession
-} from '../lib/audio/AudioErrorRecovery';
-
-export type {
-  KeyboardShortcut,
-  KeyboardShortcutsConfig,
-  AudioPlayerControls
-} from '../lib/audio/AudioKeyboardShortcuts';
-
-export type {
-  UseEnhancedAudioPlayerConfig,
-  EnhancedAudioPlayerState,
-  EnhancedAudioPlayerControls
-} from './useEnhancedAudioPlayer';
-
-// Additional utility types
-export interface AudioPlayerTheme {
-  primary: string;
-  secondary: string;
-  background: string;
-  surface: string;
-  text: string;
-  textSecondary: string;
-  accent: string;
-  error: string;
-  success: string;
-  warning: string;
-}
-
-export interface AudioPlayerConfig {
-  theme?: AudioPlayerTheme;
-  showWaveform?: boolean;
-  showLyrics?: boolean;
-  showBookmarks?: boolean;
-  enableKeyboardShortcuts?: boolean;
-  enableAnalytics?: boolean;
-  enableErrorRecovery?: boolean;
-  autoPlay?: boolean;
-  loop?: boolean;
-  shuffle?: boolean;
-  crossfade?: boolean;
-  gapless?: boolean;
-}
-
-export interface PlaylistItem {
-  id: string;
-  track: EnhancedTrack;
-  addedAt: Date;
-  addedBy?: string;
-  metadata?: Record<string, any>;
-}
-
-export interface Playlist {
-  id: string;
-  name: string;
-  description?: string;
-  items: PlaylistItem[];
-  createdAt: Date;
-  updatedAt: Date;
-  isPublic: boolean;
-  owner: string;
-  tags?: string[];
-  artwork?: string;
-}
-
-export interface AudioBookmark {
-  id: string;
-  trackId: string;
-  timestamp: number;
-  title: string;
-  description?: string;
-  tags?: string[];
-  createdAt: Date;
-  updatedAt: Date;
-  userId?: string;
-}
-
-export interface AudioVisualization {
-  type: 'waveform' | 'spectrum' | 'bars' | 'circle';
-  config: {
-    color?: string;
-    backgroundColor?: string;
-    barCount?: number;
-    smoothing?: number;
-    sensitivity?: number;
-  };
-}
-
-export interface AudioLyrics {
-  trackId: string;
-  lines: {
-    timestamp: number;
-    text: string;
-    duration?: number;
-  }[];
-  language?: string;
-  source?: string;
-}
-
-// Event types
-export interface AudioPlayerEvent {
-  type: string;
-  timestamp: number;
-  data?: any;
-}
-
-export interface TrackChangeEvent extends AudioPlayerEvent {
-  type: 'trackChange';
-  data: {
-    previousTrack: EnhancedTrack | null;
-    currentTrack: EnhancedTrack;
-  };
-}
-
-export interface PlaybackStateEvent extends AudioPlayerEvent {
-  type: 'playbackState';
-  data: {
-    isPlaying: boolean;
-    isPaused: boolean;
-    currentTime: number;
-    duration: number;
-  };
-}
-
-export interface BufferEvent extends AudioPlayerEvent {
-  type: 'buffer';
-  data: {
-    bufferHealth: number;
-    loadingProgress: number;
-    networkCondition: string;
-  };
-}
-
-export interface ErrorEvent extends AudioPlayerEvent {
-  type: 'error';
-  data: {
-    error: AudioError;
-    recoveryAttempted: boolean;
-    recovered: boolean;
-  };
-}
-
-// Component prop types
-export interface AudioPlayerProps {
-  tracks: EnhancedTrack[];
-  currentTrackIndex?: number;
-  config?: AudioPlayerConfig;
-  onTrackChange?: (track: EnhancedTrack, index: number) => void;
-  onPlaybackStateChange?: (state: EnhancedAudioPlayerState) => void;
-  onError?: (error: AudioError) => void;
-  className?: string;
-  style?: React.CSSProperties;
-}
-
-export interface AudioControlsProps {
-  state: EnhancedAudioPlayerState;
-  controls: EnhancedAudioPlayerControls;
-  config?: AudioPlayerConfig;
-  className?: string;
-}
-
-export interface AudioProgressProps {
+export interface AudioPlayerState {
+  isPlaying: boolean;
   currentTime: number;
   duration: number;
-  buffered?: TimeRanges;
-  onSeek: (time: number) => void;
-  className?: string;
-}
-
-export interface AudioVolumeProps {
   volume: number;
-  muted: boolean;
-  onVolumeChange: (volume: number) => void;
-  onMuteToggle: (muted: boolean) => void;
-  className?: string;
-}
-
-export interface AudioVisualizerProps {
-  audioElement?: HTMLAudioElement;
-  visualization: AudioVisualization;
-  isPlaying: boolean;
-  className?: string;
-}
-
-export interface AudioBookmarksProps {
-  trackId: string;
-  bookmarks: AudioBookmark[];
-  currentTime: number;
-  onBookmarkAdd: (bookmark: Omit<AudioBookmark, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  onBookmarkRemove: (bookmarkId: string) => void;
-  onBookmarkSeek: (timestamp: number) => void;
-  className?: string;
-}
-
-export interface AudioLyricsProps {
-  lyrics: AudioLyrics;
-  currentTime: number;
-  onLineClick?: (timestamp: number) => void;
-  className?: string;
-}
-
-// Utility types
-export type AudioPlayerEventHandler<T extends AudioPlayerEvent = AudioPlayerEvent> = (event: T) => void;
-
-export type AudioPlayerEventMap = {
-  trackChange: TrackChangeEvent;
-  playbackState: PlaybackStateEvent;
-  buffer: BufferEvent;
-  error: ErrorEvent;
-};
-
-export type AudioPlayerEventType = keyof AudioPlayerEventMap;
-
-// State management types
-export interface AudioPlayerStore {
-  // Current state
-  currentTrack: EnhancedTrack | null;
-  playlist: Playlist | null;
-  isPlaying: boolean;
-  isPaused: boolean;
+  isMuted: boolean;
   isLoading: boolean;
-  currentTime: number;
-  duration: number;
-  volume: number;
-  muted: boolean;
+  error: string | null;
+  track: TrackWithUrl | null;
   playbackRate: number;
-  
-  // Enhanced state
-  bufferHealth: number;
-  loadingProgress: number;
-  errorState: string | null;
-  networkCondition: string;
-  
-  // UI state
-  showPlaylist: boolean;
-  showBookmarks: boolean;
-  showLyrics: boolean;
-  showVisualizer: boolean;
-  
-  // Actions
-  setCurrentTrack: (track: EnhancedTrack) => void;
-  setPlaylist: (playlist: Playlist) => void;
+}
+
+export interface AudioPlayerControls {
   play: () => Promise<void>;
   pause: () => void;
   stop: () => void;
   seek: (time: number) => void;
   setVolume: (volume: number) => void;
-  setMuted: (muted: boolean) => void;
+  toggleMute: () => void;
   setPlaybackRate: (rate: number) => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
-  togglePlaylist: () => void;
-  toggleBookmarks: () => void;
-  toggleLyrics: () => void;
-  toggleVisualizer: () => void;
+  loadTrack: (track: TrackWithUrl) => Promise<void>;
 }
 
-// API types
-export interface AudioPlayerAPI {
-  // Core methods
-  loadTrack: (track: EnhancedTrack) => Promise<void>;
-  play: () => Promise<void>;
-  pause: () => void;
-  stop: () => void;
-  seek: (time: number) => void;
-  
-  // Playlist methods
-  loadPlaylist: (playlist: Playlist) => Promise<void>;
-  addToPlaylist: (track: EnhancedTrack) => void;
-  removeFromPlaylist: (trackId: string) => void;
-  
-  // Bookmark methods
-  addBookmark: (bookmark: Omit<AudioBookmark, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  removeBookmark: (bookmarkId: string) => void;
-  getBookmarks: (trackId: string) => AudioBookmark[];
-  
-  // Analytics methods
-  getAnalytics: () => any;
-  trackEvent: (event: AudioPlayerEvent) => void;
-  
-  // Configuration methods
-  updateConfig: (config: Partial<AudioPlayerConfig>) => void;
-  getConfig: () => AudioPlayerConfig;
-  
-  // Event methods
-  addEventListener: <T extends AudioPlayerEventType>(type: T, handler: AudioPlayerEventHandler<AudioPlayerEventMap[T]>) => void;
-  removeEventListener: <T extends AudioPlayerEventType>(type: T, handler: AudioPlayerEventHandler<AudioPlayerEventMap[T]>) => void;
-  
-  // Cleanup
-  destroy: () => void;
+export interface AudioPlayerOptions {
+  autoPlay?: boolean;
+  volume?: number;
+  playbackRate?: number;
+  preload?: 'none' | 'metadata' | 'auto';
+  crossOrigin?: 'anonymous' | 'use-credentials';
+  loop?: boolean;
+  muted?: boolean;
+  onTimeUpdate?: (currentTime: number) => void;
+  onDurationChange?: (duration: number) => void;
+  onPlay?: () => void;
+  onPause?: () => void;
+  onEnded?: () => void;
+  onError?: (error: string) => void;
+  onLoadStart?: () => void;
+  onLoadedData?: () => void;
+  onCanPlay?: () => void;
+  onCanPlayThrough?: () => void;
+  onVolumeChange?: (volume: number) => void;
+  onRateChange?: (rate: number) => void;
 }
 
-export default {};
+export interface UseAudioPlayerReturn {
+  // State
+  state: AudioPlayerState;
+  
+  // Controls
+  controls: AudioPlayerControls;
+  
+  // Audio element ref
+  audioRef: React.RefObject<HTMLAudioElement>;
+  
+  // Bookmarks (basic)
+  bookmarks: AudioBookmark[];
+  addBookmark: (time: number, title?: string) => void;
+  removeBookmark: (id: string) => void;
+  jumpToBookmark: (id: string) => void;
+  
+  // Utility
+  formatTime: (time: number) => string;
+  getProgress: () => number;
+}
+
+// === PHASE 5.1 ENHANCED TYPES ===
+
+export interface AudioPlayerEnhancedState extends AudioPlayerState {
+  // Enhanced loading states
+  loadingState: TrackLoadingState;
+  resolutionProgress: number;
+  
+  // Cross-track navigation
+  isNavigatingCrossTrack: boolean;
+  navigationTarget: string | null;
+  navigationSource: string | null;
+  
+  // Registry integration
+  registryConnected: boolean;
+  availableTracks: TrackWithUrl[];
+  
+  // Performance metrics
+  loadTime: number;
+  cacheHitRate: number;
+}
+
+export interface CrossTrackNavigationOptions {
+  targetTrackSlug: string;
+  bookmarkId?: string;
+  timestamp?: number;
+  autoPlay?: boolean;
+  fadeTransition?: boolean;
+  transitionDuration?: number;
+  onNavigationStart?: (targetSlug: string) => void;
+  onNavigationComplete?: (targetSlug: string) => void;
+  onNavigationError?: (error: CrossTrackNavigationError) => void;
+}
+
+export interface AudioPlayerEnhancedControls extends AudioPlayerControls {
+  // Enhanced track loading
+  loadTrackBySlug: (slug: string) => Promise<void>;
+  preloadTrackBySlug: (slug: string) => Promise<void>;
+  
+  // Cross-track navigation
+  jumpToBookmarkCrossTrack: (options: CrossTrackNavigationOptions) => Promise<void>;
+  navigateToTrack: (trackSlug: string, options?: Partial<CrossTrackNavigationOptions>) => Promise<void>;
+  cancelCrossTrackNavigation: () => void;
+  
+  // Track resolution
+  resolveTrackBySlug: (slug: string) => Promise<TrackWithUrl | null>;
+  validateTrackReference: (slug: string) => Promise<boolean>;
+  
+  // Registry operations
+  refreshTrackRegistry: () => Promise<void>;
+  getAvailableTracks: () => TrackWithUrl[];
+  getTracksBySection: (sectionSlug: string) => Promise<TrackWithUrl[]>;
+  
+  // Performance and analytics
+  getLoadingState: (trackSlug?: string) => TrackLoadingState;
+  getCacheStats: () => any;
+  getResolutionStats: () => any;
+  
+  // Batch operations
+  preloadTracksBatch: (slugs: string[]) => Promise<void>;
+  validateTracksBatch: (slugs: string[]) => Promise<{ [slug: string]: boolean }>;
+}
+
+export interface AudioPlayerEnhancedOptions extends AudioPlayerOptions {
+  // Registry integration
+  enableRegistry?: boolean;
+  registryConfig?: any;
+  
+  // Caching options
+  enableCaching?: boolean;
+  cacheConfig?: any;
+  
+  // Resolution options
+  resolutionTimeout?: number;
+  maxRetryAttempts?: number;
+  enableFallbackApi?: boolean;
+  
+  // Cross-track navigation
+  enableCrossTrackNavigation?: boolean;
+  defaultTransitionDuration?: number;
+  enableFadeTransitions?: boolean;
+  
+  // Performance options
+  enableAnalytics?: boolean;
+  enablePreloading?: boolean;
+  maxConcurrentResolutions?: number;
+  
+  // Event handlers for enhanced features
+  onTrackResolutionStart?: (slug: string) => void;
+  onTrackResolutionComplete?: (slug: string, track: TrackWithUrl) => void;
+  onTrackResolutionError?: (slug: string, error: CrossTrackNavigationError) => void;
+  onCrossTrackNavigationStart?: (sourceSlug: string | null, targetSlug: string) => void;
+  onCrossTrackNavigationComplete?: (sourceSlug: string | null, targetSlug: string) => void;
+  onCrossTrackNavigationError?: (error: CrossTrackNavigationError) => void;
+  onRegistryUpdate?: (trackCount: number) => void;
+  onCacheUpdate?: (stats: any) => void;
+}
+
+export interface UseAudioPlayerEnhancedReturn {
+  // Enhanced state
+  state: AudioPlayerEnhancedState;
+  
+  // Enhanced controls
+  controls: AudioPlayerEnhancedControls;
+  
+  // Audio element ref
+  audioRef: React.RefObject<HTMLAudioElement>;
+  
+  // Enhanced bookmarks with cross-track support
+  bookmarks: AudioBookmark[];
+  addBookmark: (time: number, title?: string, trackSlug?: string) => void;
+  removeBookmark: (id: string) => void;
+  jumpToBookmark: (id: string) => void;
+  jumpToBookmarkCrossTrack: (id: string, options?: Partial<CrossTrackNavigationOptions>) => Promise<void>;
+  
+  // Cross-track bookmark management
+  addCrossTrackBookmark: (trackSlug: string, time: number, title?: string) => void;
+  getCrossTrackBookmarks: (trackSlug?: string) => AudioBookmark[];
+  
+  // Registry access (optional - only available if registry is enabled)
+  registry?: TrackRegistry;
+  resolutionEngine?: TrackResolutionEngine;
+  cache?: AudioCacheManager;
+  
+  // Utility functions
+  formatTime: (time: number) => string;
+  getProgress: () => number;
+  getLoadingProgress: () => number;
+  isTrackAvailable: (slug: string) => boolean;
+  getTrackMetadata: (slug: string) => TrackWithUrl | null;
+}
+
+// === BOOKMARK TYPES ===
+
+export interface BookmarkManagerState {
+  bookmarks: AudioBookmark[];
+  isLoading: boolean;
+  error: string | null;
+  lastSyncTime: number;
+}
+
+export interface BookmarkManagerControls {
+  addBookmark: (bookmark: Omit<AudioBookmark, 'id' | 'createdAt'>) => void;
+  removeBookmark: (id: string) => void;
+  updateBookmark: (id: string, updates: Partial<AudioBookmark>) => void;
+  jumpToBookmark: (id: string) => Promise<void>;
+  syncBookmarks: () => Promise<void>;
+  exportBookmarks: () => string;
+  importBookmarks: (data: string) => Promise<void>;
+}
+
+// === PLAYLIST TYPES ===
+
+export interface PlaylistState {
+  tracks: TrackWithUrl[];
+  currentIndex: number;
+  isShuffled: boolean;
+  repeatMode: 'none' | 'one' | 'all';
+  isLoading: boolean;
+  error: string | null;
+}
+
+export interface PlaylistControls {
+  addTrack: (track: TrackWithUrl) => void;
+  removeTrack: (index: number) => void;
+  moveTrack: (fromIndex: number, toIndex: number) => void;
+  playTrack: (index: number) => Promise<void>;
+  nextTrack: () => Promise<void>;
+  previousTrack: () => Promise<void>;
+  shuffle: () => void;
+  setRepeatMode: (mode: 'none' | 'one' | 'all') => void;
+  clearPlaylist: () => void;
+}
+
+// === UTILITY TYPES ===
+
+export interface AudioContextState {
+  isSupported: boolean;
+  sampleRate: number;
+  state: 'suspended' | 'running' | 'closed';
+}
+
+export interface AudioAnalyzerState {
+  frequencyData: Uint8Array;
+  timeData: Uint8Array;
+  volume: number;
+  peak: number;
+  isAnalyzing: boolean;
+}
+
+// === ERROR TYPES ===
+
+export interface AudioPlayerError {
+  code: string;
+  message: string;
+  details?: any;
+  timestamp: number;
+  recoverable: boolean;
+}
+
+// === PERFORMANCE TYPES ===
+
+export interface PerformanceMetrics {
+  loadTime: number;
+  bufferHealth: number;
+  dropoutCount: number;
+  averageBitrate: number;
+  cacheHitRate: number;
+  memoryUsage: number;
+}
+
+// === EXPORT ALL TYPES ===
+
+export type {
+  // Core types
+  AudioPlayerState,
+  AudioPlayerControls,
+  AudioPlayerOptions,
+  UseAudioPlayerReturn,
+  
+  // Enhanced types
+  AudioPlayerEnhancedState,
+  AudioPlayerEnhancedControls,
+  AudioPlayerEnhancedOptions,
+  UseAudioPlayerEnhancedReturn,
+  CrossTrackNavigationOptions,
+  
+  // Bookmark types
+  BookmarkManagerState,
+  BookmarkManagerControls,
+  
+  // Playlist types
+  PlaylistState,
+  PlaylistControls,
+  
+  // Utility types
+  AudioContextState,
+  AudioAnalyzerState,
+  AudioPlayerError,
+  PerformanceMetrics
+};
