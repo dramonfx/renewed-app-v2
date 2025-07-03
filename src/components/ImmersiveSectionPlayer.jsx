@@ -83,9 +83,9 @@ export default function ImmersiveSectionPlayer({ section, visuals, visualsMap, p
   // Ensure we have valid section data
   // Process markdown content with useMemo (always called)
   const processedContent = useMemo(() => {
-    if (!markdownContent) return null;
-    return markdownContent;
-  }, [markdownContent]);
+    if (!section?.markdownContent) return null;
+    return section.markdownContent;
+  }, [section?.markdownContent]);
 
   if (!section) {
     return (
