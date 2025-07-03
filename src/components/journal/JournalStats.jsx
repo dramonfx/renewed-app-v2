@@ -1,10 +1,10 @@
 // src/components/journal/JournalStats.jsx
 // Sacred Journal Statistics - Gentle tracking of spiritual growth
 
-'use client';
+&apos;use client&apos;;
 
-import { useMemo } from 'react';
-import { BookOpen, Calendar, TrendingUp, Sparkles } from 'lucide-react';
+import { useMemo } from &apos;react&apos;;
+import { BookOpen, Calendar, TrendingUp, Sparkles } from &apos;lucide-react&apos;;
 
 export default function JournalStats({ entries = [] }) {
   // Calculate sacred statistics
@@ -24,21 +24,21 @@ export default function JournalStats({ entries = [] }) {
     const averageWordsPerEntry =
       entries.length > 0
         ? Math.round(
-            entries.reduce((sum, entry) => sum + (entry.content?.split(' ').length || 0), 0) /
+            entries.reduce((sum, entry) => sum + (entry.content?.split(&apos; &apos;).length || 0), 0) /
               entries.length
           )
         : 0;
 
     // Find most common reflection type
     const typeCount = entries.reduce((acc, entry) => {
-      const type = entry.reflection_type || 'journal';
+      const type = entry.reflection_type || &apos;journal&apos;;
       acc[type] = (acc[type] || 0) + 1;
       return acc;
     }, {});
 
     const favoriteReflectionType = Object.keys(typeCount).reduce(
       (a, b) => (typeCount[a] > typeCount[b] ? a : b),
-      'journal'
+      &apos;journal&apos;
     );
 
     // Calculate writing streak (consecutive days with entries)
@@ -73,36 +73,36 @@ export default function JournalStats({ entries = [] }) {
   // Sacred stat cards configuration
   const statCards = [
     {
-      title: 'Total Reflections',
+      title: &apos;Total Reflections&apos;,
       value: stats.totalEntries,
       icon: BookOpen,
-      color: 'sacred-blue',
-      description: 'Sacred thoughts captured',
+      color: &apos;sacred-blue&apos;,
+      description: &apos;Sacred thoughts captured&apos;,
     },
     {
-      title: 'This Week',
+      title: &apos;This Week&apos;,
       value: stats.entriesThisWeek,
       icon: Calendar,
-      color: 'sacred-gold',
-      description: 'Recent reflections',
+      color: &apos;sacred-gold&apos;,
+      description: &apos;Recent reflections&apos;,
     },
     {
-      title: 'Writing Streak',
+      title: &apos;Writing Streak&apos;,
       value: `${stats.currentStreak} days`,
       icon: TrendingUp,
-      color: 'sacred-purple',
-      description: 'Consistent practice',
+      color: &apos;sacred-purple&apos;,
+      description: &apos;Consistent practice&apos;,
     },
     {
-      title: 'Avg. Words',
+      title: &apos;Avg. Words&apos;,
       value: stats.averageWordsPerEntry,
       icon: Sparkles,
-      color: 'sacred-blue',
-      description: 'Depth of reflection',
+      color: &apos;sacred-blue&apos;,
+      description: &apos;Depth of reflection&apos;,
     },
   ];
 
-  // Don't show stats if no entries
+  // Don&apos;t show stats if no entries
   if (stats.totalEntries === 0) {
     return null;
   }
@@ -116,7 +116,7 @@ export default function JournalStats({ entries = [] }) {
             className="sacred-glass p-6 text-center transition-shadow duration-300 hover:shadow-lg"
           >
             <div
-              className={`sacred-icon-bg-${stat.color === 'sacred-gold' ? 'gold' : ''} mx-auto mb-4 h-12 w-12`}
+              className={`sacred-icon-bg-${stat.color === &apos;sacred-gold&apos; ? &apos;gold&apos; : &apos;&apos;} mx-auto mb-4 h-12 w-12`}
             >
               <stat.icon className="h-6 w-6" />
             </div>
@@ -133,7 +133,7 @@ export default function JournalStats({ entries = [] }) {
           <div className="flex items-center gap-3">
             <Sparkles className="h-5 w-5 text-sacred-gold-500" />
             <p className="font-medium text-sacred-blue-700">
-              Beautiful work! You've written {stats.totalEntries} reflections on your spiritual
+              Beautiful work! You&apos;ve written {stats.totalEntries} reflections on your spiritual
               journey. Keep nurturing this sacred practice.
             </p>
           </div>

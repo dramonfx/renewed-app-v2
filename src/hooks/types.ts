@@ -326,6 +326,6 @@ export interface AudioPlayerAPI {
   destroy: () => void;
 }
 
-const defaultExport = {
-export default {};};
+
+const defaultExport = {};
 export default defaultExport;

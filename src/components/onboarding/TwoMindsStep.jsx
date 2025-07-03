@@ -1,11 +1,11 @@
-'use client';
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import SacredCard from '@/components/ui/sacred-card';
-import SacredButton from '@/components/ui/sacred-button';
+&apos;use client&apos;;
+import { motion } from &apos;framer-motion&apos;;
+import { useState } from &apos;react&apos;;
+import SacredCard from &apos;@/components/ui/sacred-card&apos;;
+import SacredButton from &apos;@/components/ui/sacred-button&apos;;
 
 const TwoMindsStep = ({ onNext, data = {} }) => {
-  const [selectedMind, setSelectedMind] = useState(data.selectedMind || '');
+  const [selectedMind, setSelectedMind] = useState(data.selectedMind || &apos;&apos;);
 
   const handleNext = () => {
     onNext({ selectedMind });
@@ -23,7 +23,7 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
         >
           <SacredCard variant="heavy" className="p-8 md:p-12">
             <h2 className="mb-4 font-serif text-3xl text-sacred-blue-900 md:text-4xl">
-              Understanding the{' '}
+              Understanding the{&apos; &apos;}
               <span className="bg-sacred-gradient bg-clip-text text-transparent">Two Minds</span>
             </h2>
             <p className="mx-auto max-w-2xl text-lg leading-relaxed text-sacred-blue-600">
@@ -49,10 +49,10 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
             <SacredCard
               variant="glass"
               className={`h-full p-8 transition-all duration-300 ${
-                selectedMind === 'old' ? 'bg-sacred-purple-50 ring-2 ring-sacred-purple-400' : ''
+                selectedMind === &apos;old&apos; ? &apos;bg-sacred-purple-50 ring-2 ring-sacred-purple-400&apos; : &apos;&apos;
               }`}
               hover={true}
-              onClick={() => setSelectedMind('old')}
+              onClick={() => setSelectedMind(&apos;old&apos;)}
             >
               <div className="text-center">
                 <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gray-400 shadow-lg">
@@ -69,7 +69,7 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
                   <li>• External validation seeking</li>
                   <li>• Scarcity mindset</li>
                 </ul>
-                {selectedMind === 'old' && (
+                {selectedMind === &apos;old&apos; && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -92,10 +92,10 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
             <SacredCard
               variant="glass"
               className={`h-full p-8 transition-all duration-300 ${
-                selectedMind === 'new' ? 'bg-sacred-gold-50 ring-2 ring-sacred-gold-400' : ''
+                selectedMind === &apos;new&apos; ? &apos;bg-sacred-gold-50 ring-2 ring-sacred-gold-400&apos; : &apos;&apos;
               }`}
               hover={true}
-              onClick={() => setSelectedMind('new')}
+              onClick={() => setSelectedMind(&apos;new&apos;)}
             >
               <div className="text-center">
                 <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-gradient shadow-lg">
@@ -112,7 +112,7 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
                   <li>• Inner wisdom guidance</li>
                   <li>• Abundance mindset</li>
                 </ul>
-                {selectedMind === 'new' && (
+                {selectedMind === &apos;new&apos; && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -144,8 +144,8 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
                 animate={{ opacity: 1 }}
                 className="text-sm text-sacred-blue-600"
               >
-                You've selected:{' '}
-                <strong>{selectedMind === 'old' ? 'The Old Mind' : 'The New Mind'}</strong>
+                You&apos;ve selected:{&apos; &apos;}
+                <strong>{selectedMind === &apos;old&apos; ? &apos;The Old Mind&apos; : &apos;The New Mind&apos;}</strong>
               </motion.p>
             )}
           </SacredCard>
