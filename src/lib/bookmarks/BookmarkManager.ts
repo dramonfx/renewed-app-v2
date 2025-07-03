@@ -1,4 +1,3 @@
-
 // src/lib/bookmarks/BookmarkManager.ts
 'use client';
 
@@ -557,16 +556,16 @@ export class BookmarkManager {
           
         case 'csv':
           const lines = data.split('\n');
-          const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
+          const headers = lines[0]?.split(',').map(h => h.replace(/"/g, '')) || [];
           
           for (let i = 1; i < lines.length; i++) {
-            if (!lines[i].trim()) continue;
+            if (!lines[i]?.trim()) continue;
             
-            const values = lines[i].split(',').map(v => v.replace(/"/g, ''));
+            const values = lines[i]?.split(',').map(v => v.replace(/"/g, '')) || [];
             const bookmark: Bookmark = {
               id: this.generateId(),
               trackId: values[1] || '',
-              timestamp: parseFloat(values[2]) || 0,
+              timestamp: parseFloat(values[2] || '0') || 0,
               title: values[3] || '',
               description: values[4] || undefined,
               tags: values[5] ? values[5].split(';') : [],
