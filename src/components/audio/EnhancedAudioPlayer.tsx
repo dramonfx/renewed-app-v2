@@ -1,6 +1,6 @@
+"use client";
 import type { EnhancedTrack } from '@/hooks/types';
 // src/components/audio/EnhancedAudioPlayer.tsx
-('use client');
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useEnhancedAudioPlayer } from '../../hooks/useEnhancedAudioPlayer';

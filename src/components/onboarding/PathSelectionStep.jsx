@@ -1,62 +1,62 @@
-&apos;use client&apos;;
-import { motion } from &apos;framer-motion&apos;;
-import { useState } from &apos;react&apos;;
-import SacredCard from &apos;@/components/ui/sacred-card&apos;;
-import SacredButton from &apos;@/components/ui/sacred-button&apos;;
+'use client';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import SacredCard from '@/components/ui/sacred-card';
+import SacredButton from '@/components/ui/sacred-button';
 
 const PathSelectionStep = ({ onNext, onboardingData = {}, data = {} }) => {
   // Use onboardingData if available, fallback to data prop, then to empty string
   const safeData = onboardingData || data || {};
-  const [selectedPath, setSelectedPath] = useState(safeData.selectedPath || &apos;&apos;);
+  const [selectedPath, setSelectedPath] = useState(safeData.selectedPath || '');
 
   const paths = [
     {
-      id: &apos;gentle&apos;,
-      title: &apos;The Gentle Path&apos;,
-      subtitle: &apos;Gradual transformation through daily practices&apos;,
-      icon: &apos;🌱&apos;,
+      id: 'gentle',
+      title: 'The Gentle Path',
+      subtitle: 'Gradual transformation through daily practices',
+      icon: '🌱',
       description:
-        &apos;Perfect for those who prefer steady, sustainable growth. This path focuses on building small, consistent habits that compound over time.&apos;,
+        'Perfect for those who prefer steady, sustainable growth. This path focuses on building small, consistent habits that compound over time.',
       features: [
-        &apos;Daily 5-10 minute practices&apos;,
-        &apos;Gentle guided meditations&apos;,
-        &apos;Gradual mindset shifts&apos;,
-        &apos;Sustainable lifestyle changes&apos;,
-        &apos;Self-compassion focus&apos;,
+        'Daily 5-10 minute practices',
+        'Gentle guided meditations',
+        'Gradual mindset shifts',
+        'Sustainable lifestyle changes',
+        'Self-compassion focus',
       ],
-      color: &apos;sacred-gold&apos;,
+      color: 'sacred-gold',
     },
     {
-      id: &apos;balanced&apos;,
-      title: &apos;The Balanced Path&apos;,
-      subtitle: &apos;Structured approach with flexibility&apos;,
-      icon: &apos;⚖️&apos;,
+      id: 'balanced',
+      title: 'The Balanced Path',
+      subtitle: 'Structured approach with flexibility',
+      icon: '⚖️',
       description:
-        &apos;A harmonious blend of structure and adaptability. This path provides clear guidance while allowing you to customize your journey.&apos;,
+        'A harmonious blend of structure and adaptability. This path provides clear guidance while allowing you to customize your journey.',
       features: [
-        &apos;Weekly structured sessions&apos;,
-        &apos;Flexible practice schedule&apos;,
-        &apos;Balanced inner and outer work&apos;,
-        &apos;Community support&apos;,
-        &apos;Progress tracking&apos;,
+        'Weekly structured sessions',
+        'Flexible practice schedule',
+        'Balanced inner and outer work',
+        'Community support',
+        'Progress tracking',
       ],
-      color: &apos;sacred-blue&apos;,
+      color: 'sacred-blue',
     },
     {
-      id: &apos;intensive&apos;,
-      title: &apos;The Intensive Path&apos;,
-      subtitle: &apos;Deep transformation through immersion&apos;,
-      icon: &apos;🔥&apos;,
+      id: 'intensive',
+      title: 'The Intensive Path',
+      subtitle: 'Deep transformation through immersion',
+      icon: '🔥',
       description:
-        &apos;For those ready for profound change. This path involves deeper practices and more significant lifestyle shifts.&apos;,
+        'For those ready for profound change. This path involves deeper practices and more significant lifestyle shifts.',
       features: [
-        &apos;Daily intensive practices&apos;,
-        &apos;Deep shadow work&apos;,
-        &apos;Lifestyle transformation&apos;,
-        &apos;Advanced techniques&apos;,
-        &apos;Accelerated growth&apos;,
+        'Daily intensive practices',
+        'Deep shadow work',
+        'Lifestyle transformation',
+        'Advanced techniques',
+        'Accelerated growth',
       ],
-      color: &apos;sacred-purple&apos;,
+      color: 'sacred-purple',
     },
   ];
 
@@ -70,23 +70,23 @@ const PathSelectionStep = ({ onNext, onboardingData = {}, data = {} }) => {
 
   const getColorClasses = (color, isSelected) => {
     const baseClasses = {
-      &apos;sacred-gold&apos;: {
-        ring: isSelected ? &apos;ring-2 ring-sacred-gold-400&apos; : &apos;&apos;,
-        bg: isSelected ? &apos;bg-sacred-gold-50&apos; : &apos;&apos;,
-        icon: &apos;bg-sacred-gold-gradient&apos;,
-        accent: &apos;text-sacred-gold-600&apos;,
+      'sacred-gold': {
+        ring: isSelected ? 'ring-2 ring-sacred-gold-400' : '',
+        bg: isSelected ? 'bg-sacred-gold-50' : '',
+        icon: 'bg-sacred-gold-gradient',
+        accent: 'text-sacred-gold-600',
       },
-      &apos;sacred-blue&apos;: {
-        ring: isSelected ? &apos;ring-2 ring-sacred-blue-400&apos; : &apos;&apos;,
-        bg: isSelected ? &apos;bg-sacred-blue-50&apos; : &apos;&apos;,
-        icon: &apos;bg-sacred-gradient&apos;,
-        accent: &apos;text-sacred-blue-600&apos;,
+      'sacred-blue': {
+        ring: isSelected ? 'ring-2 ring-sacred-blue-400' : '',
+        bg: isSelected ? 'bg-sacred-blue-50' : '',
+        icon: 'bg-sacred-gradient',
+        accent: 'text-sacred-blue-600',
       },
-      &apos;sacred-purple&apos;: {
-        ring: isSelected ? &apos;ring-2 ring-sacred-purple-400&apos; : &apos;&apos;,
-        bg: isSelected ? &apos;bg-sacred-purple-50&apos; : &apos;&apos;,
-        icon: &apos;bg-sacred-purple-gradient&apos;,
-        accent: &apos;text-sacred-purple-600&apos;,
+      'sacred-purple': {
+        ring: isSelected ? 'ring-2 ring-sacred-purple-400' : '',
+        bg: isSelected ? 'bg-sacred-purple-50' : '',
+        icon: 'bg-sacred-purple-gradient',
+        accent: 'text-sacred-purple-600',
       },
     };
     return baseClasses[color];
@@ -104,7 +104,7 @@ const PathSelectionStep = ({ onNext, onboardingData = {}, data = {} }) => {
         >
           <SacredCard variant="heavy" className="p-8 md:p-12">
             <h2 className="mb-4 font-serif text-3xl text-sacred-blue-900 md:text-4xl">
-              Choose Your Sacred{&apos; &apos;}
+              Choose Your Sacred{' '}
               <span className="bg-sacred-gradient bg-clip-text text-transparent">Path</span>
             </h2>
             <p className="mx-auto max-w-2xl text-lg leading-relaxed text-sacred-blue-600">
@@ -199,7 +199,7 @@ const PathSelectionStep = ({ onNext, onboardingData = {}, data = {} }) => {
           >
             <SacredCard variant="glass" className="p-6">
               <h4 className="mb-3 font-serif text-lg text-sacred-blue-900">
-                You&apos;ve chosen: {paths.find((p) => p.id === selectedPath)?.title}
+                You've chosen: {paths.find((p) => p.id === selectedPath)?.title}
               </h4>
               <p className="text-sacred-blue-600">
                 This path will be customized based on your intentions and assessment responses. You

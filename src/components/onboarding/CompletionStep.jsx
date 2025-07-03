@@ -1,8 +1,8 @@
-&apos;use client&apos;;
-import { motion } from &apos;framer-motion&apos;;
-import { useEffect, useState } from &apos;react&apos;;
-import SacredCard from &apos;@/components/ui/sacred-card&apos;;
-import SacredButton from &apos;@/components/ui/sacred-button&apos;;
+'use client';
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import SacredCard from '@/components/ui/sacred-card';
+import SacredButton from '@/components/ui/sacred-button';
 
 const CompletionStep = ({ onboardingData = {}, data = {} }) => {
   // Use onboardingData if available, fallback to data prop
@@ -10,9 +10,9 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
 
   const getPathInfo = () => {
     const pathMap = {
-      gentle: { name: &apos;The Gentle Path&apos;, icon: &apos;🌱&apos;, color: &apos;sacred-gold&apos; },
-      balanced: { name: &apos;The Balanced Path&apos;, icon: &apos;⚖️&apos;, color: &apos;sacred-blue&apos; },
-      intensive: { name: &apos;The Intensive Path&apos;, icon: &apos;🔥&apos;, color: &apos;sacred-purple&apos; },
+      gentle: { name: 'The Gentle Path', icon: '🌱', color: 'sacred-gold' },
+      balanced: { name: 'The Balanced Path', icon: '⚖️', color: 'sacred-blue' },
+      intensive: { name: 'The Intensive Path', icon: '🔥', color: 'sacred-purple' },
     };
     return pathMap[safeData.selectedPath] || pathMap.balanced;
   };
@@ -37,13 +37,13 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
                   <span className="text-3xl text-white">{pathInfo.icon}</span>
                 </div>
                 <h1 className="mb-4 font-serif text-3xl text-sacred-blue-900 md:text-4xl">
-                  Welcome to Your{&apos; &apos;}
+                  Welcome to Your{' '}
                   <span className="bg-sacred-gradient bg-clip-text text-transparent">
                     Sacred Journey
                   </span>
                 </h1>
                 <p className="text-lg text-sacred-blue-600">
-                  Your transformation begins now. You&apos;re ready to embark on this sacred path of
+                  Your transformation begins now. You're ready to embark on this sacred path of
                   renewal.
                 </p>
               </div>
@@ -92,7 +92,7 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
                     <span className="text-xl text-white">🎯</span>
                   </div>
                   <span className="font-medium text-sacred-blue-900">
-                    {intentionCount} {intentionCount === 1 ? &apos;Intention&apos; : &apos;Intentions&apos;} Set
+                    {intentionCount} {intentionCount === 1 ? 'Intention' : 'Intentions'} Set
                   </span>
                 </div>
               </motion.div>
@@ -213,11 +213,11 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
             <SacredButton
               onClick={() => {
                 // Store completion in localStorage
-                if (typeof window !== &apos;undefined&apos;) {
-                  localStorage.setItem(&apos;renewedOnboardingCompleted&apos;, &apos;true&apos;);
-                  localStorage.setItem(&apos;renewedOnboardingData&apos;, JSON.stringify(safeData));
+                if (typeof window !== 'undefined') {
+                  localStorage.setItem('renewedOnboardingCompleted', 'true');
+                  localStorage.setItem('renewedOnboardingData', JSON.stringify(safeData));
                   // Redirect to dashboard
-                  window.location.href = &apos;/dashboard&apos;;
+                  window.location.href = '/dashboard';
                 }
               }}
               variant="gold"

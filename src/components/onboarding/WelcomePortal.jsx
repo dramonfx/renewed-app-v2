@@ -32,13 +32,13 @@ const WelcomePortal = ({ onNext, journeyData = {} }) => {
   };
 
   return (
-    <div className=&quot;relative flex min-h-screen items-center justify-center overflow-hidden p-4&quot;>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden p-4">
       {/* Sacred Portal Background */}
-      <div className=&quot;pointer-events-none absolute inset-0&quot;>
+      <div className="pointer-events-none absolute inset-0">
         <PortalBackground phase={portalPhase} />
       </div>
 
-      <div className=&quot;relative z-10 mx-auto w-full max-w-5xl text-center&quot;>
+      <div className="relative z-10 mx-auto w-full max-w-5xl text-center">
         {/* Approach Phase */}
         {portalPhase === 'approach' && (
           <motion.div
@@ -46,34 +46,34 @@ const WelcomePortal = ({ onNext, journeyData = {} }) => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.5, ease: 'easeOut' }}
           >
-            <SacredCard variant=&quot;heavy&quot; className=&quot;p-12 md:p-16&quot;>
+            <SacredCard variant="heavy" className="p-12 md:p-16">
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 1 }}
               >
-                <div className=&quot;relative mx-auto mb-8 h-32 w-32&quot;>
+                <div className="relative mx-auto mb-8 h-32 w-32">
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                    className=&quot;absolute inset-0 rounded-full border-4 border-sacred-gold-300/30&quot;
+                    className="absolute inset-0 rounded-full border-4 border-sacred-gold-300/30"
                   />
                   <motion.div
                     animate={{ rotate: -360 }}
                     transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-                    className=&quot;absolute inset-2 rounded-full border-2 border-sacred-purple-300/40&quot;
+                    className="absolute inset-2 rounded-full border-2 border-sacred-purple-300/40"
                   />
-                  <div className=&quot;absolute inset-6 flex items-center justify-center rounded-full bg-sacred-gradient shadow-2xl&quot;>
-                    <span className=&quot;text-4xl text-white&quot;>🌟</span>
+                  <div className="absolute inset-6 flex items-center justify-center rounded-full bg-sacred-gradient shadow-2xl">
+                    <span className="text-4xl text-white">🌟</span>
                   </div>
                 </div>
-                <h1 className=&quot;mb-4 font-serif text-4xl leading-tight text-sacred-blue-900 md:text-6xl&quot;>
+                <h1 className="mb-4 font-serif text-4xl leading-tight text-sacred-blue-900 md:text-6xl">
                   You Stand Before the{' '}
-                  <span className=&quot;bg-sacred-gradient bg-clip-text text-transparent&quot;>
+                  <span className="bg-sacred-gradient bg-clip-text text-transparent">
                     Sacred Portal
                   </span>
                 </h1>
-                <p className=&quot;text-xl leading-relaxed text-sacred-blue-600 md:text-2xl&quot;>
+                <p className="text-xl leading-relaxed text-sacred-blue-600 md:text-2xl">
                   A threshold between who you have been and who you are becoming
                 </p>
               </motion.div>
@@ -89,39 +89,39 @@ const WelcomePortal = ({ onNext, journeyData = {} }) => {
             exit={{ opacity: 0, y: -50 }}
             transition={{ duration: 1.2, ease: 'easeOut' }}
           >
-            <SacredCard variant=&quot;heavy&quot; className=&quot;p-12 md:p-16&quot;>
+            <SacredCard variant="heavy" className="p-12 md:p-16">
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3, duration: 0.8 }}
               >
-                <div className=&quot;animate-sacred-pulse mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-sacred-gradient shadow-2xl&quot;>
-                  <span className=&quot;text-3xl text-white&quot;>✨</span>
+                <div className="animate-sacred-pulse mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-sacred-gradient shadow-2xl">
+                  <span className="text-3xl text-white">✨</span>
                 </div>
-                <h2 className=&quot;mb-6 font-serif text-3xl text-sacred-blue-900 md:text-4xl&quot;>
+                <h2 className="mb-6 font-serif text-3xl text-sacred-blue-900 md:text-4xl">
                   This Journey Will Transform You
                 </h2>
-                <div className=&quot;mb-10 grid gap-8 md:grid-cols-3&quot;>
+                <div className="mb-10 grid gap-8 md:grid-cols-3">
                   <SacredPromise
-                    icon=&quot;🕊️&quot;
-                    title=&quot;Find Peace&quot;
-                    description=&quot;Release the burdens of your old mind and discover tranquility within&quot;
+                    icon="🕊️"
+                    title="Find Peace"
+                    description="Release the burdens of your old mind and discover tranquility within"
                     delay={0.1}
                   />
                   <SacredPromise
-                    icon=&quot;🛡️&quot;
-                    title=&quot;Gain Clarity&quot;
-                    description=&quot;See through illusion and connect with your authentic truth&quot;
+                    icon="🛡️"
+                    title="Gain Clarity"
+                    description="See through illusion and connect with your authentic truth"
                     delay={0.3}
                   />
                   <SacredPromise
-                    icon=&quot;⭐&quot;
-                    title=&quot;Embrace Renewal&quot;
-                    description=&quot;Step into the fullness of your spiritual potential&quot;
+                    icon="⭐"
+                    title="Embrace Renewal"
+                    description="Step into the fullness of your spiritual potential"
                     delay={0.5}
                   />
                 </div>
-                <p className=&quot;text-lg leading-relaxed text-sacred-blue-600&quot;>
+                <p className="text-lg leading-relaxed text-sacred-blue-600">
                   Beyond this portal lies a journey of sacred transformation— from the reactive
                   patterns of the natural mind to the conscious wisdom of the spiritual mind.
                 </p>
@@ -137,13 +137,13 @@ const WelcomePortal = ({ onNext, journeyData = {} }) => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: 'easeOut' }}
           >
-            <SacredCard variant=&quot;heavy&quot; className=&quot;p-12 md:p-16&quot;>
+            <SacredCard variant="heavy" className="p-12 md:p-16">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <div className=&quot;relative mx-auto mb-8 h-28 w-28&quot;>
+                <div className="relative mx-auto mb-8 h-28 w-28">
                   <motion.div
                     animate={{
                       scale: [1, 1.1, 1],
@@ -154,18 +154,18 @@ const WelcomePortal = ({ onNext, journeyData = {} }) => {
                       repeat: Infinity,
                       ease: 'easeInOut',
                     }}
-                    className=&quot;absolute inset-0 rounded-full bg-sacred-gradient shadow-2xl&quot;
+                    className="absolute inset-0 rounded-full bg-sacred-gradient shadow-2xl"
                   />
-                  <div className=&quot;absolute inset-0 flex items-center justify-center&quot;>
-                    <span className=&quot;text-4xl text-white&quot;>🚪</span>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-4xl text-white">🚪</span>
                   </div>
                 </div>
 
-                <h2 className=&quot;mb-6 font-serif text-3xl text-sacred-blue-900 md:text-4xl&quot;>
+                <h2 className="mb-6 font-serif text-3xl text-sacred-blue-900 md:text-4xl">
                   Are You Ready to Cross the Threshold?
                 </h2>
 
-                <p className=&quot;mx-auto mb-8 max-w-3xl text-xl leading-relaxed text-sacred-blue-600&quot;>
+                <p className="mx-auto mb-8 max-w-3xl text-xl leading-relaxed text-sacred-blue-600">
                   This sacred journey will guide you through the deepest questions of existence,
                   help you choose your path of transformation, and set intentions that will
                   illuminate your way forward.
@@ -177,18 +177,18 @@ const WelcomePortal = ({ onNext, journeyData = {} }) => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8 }}
-                  className=&quot;mt-10&quot;
+                  className="mt-10"
                 >
                   <SacredButton
                     onClick={handleCrossThreshold}
                     disabled={!isReady}
-                    variant=&quot;primary&quot;
-                    size=&quot;lg&quot;
-                    className=&quot;px-12 py-4 text-xl shadow-2xl&quot;
+                    variant="primary"
+                    size="lg"
+                    className="px-12 py-4 text-xl shadow-2xl"
                   >
                     Cross the Sacred Threshold ✨
                   </SacredButton>
-                  <p className=&quot;mt-4 text-sm text-sacred-blue-500&quot;>
+                  <p className="mt-4 text-sm text-sacred-blue-500">
                     Your transformation begins with a single sacred step
                   </p>
                 </motion.div>
@@ -203,22 +203,22 @@ const WelcomePortal = ({ onNext, journeyData = {} }) => {
             initial={{ opacity: 1, scale: 1 }}
             animate={{ opacity: 0, scale: 1.1 }}
             transition={{ duration: 1.5, ease: 'easeOut' }}
-            className=&quot;text-center&quot;
+            className="text-center"
           >
-            <SacredCard variant=&quot;heavy&quot; className=&quot;p-16&quot;>
-              <div className=&quot;mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full bg-sacred-gradient shadow-2xl&quot;>
+            <SacredCard variant="heavy" className="p-16">
+              <div className="mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full bg-sacred-gradient shadow-2xl">
                 <motion.span
                   animate={{ rotate: 360 }}
                   transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                  className=&quot;text-5xl text-white&quot;
+                  className="text-5xl text-white"
                 >
                   ✨
                 </motion.span>
               </div>
-              <h2 className=&quot;mb-4 font-serif text-3xl text-sacred-blue-900&quot;>
+              <h2 className="mb-4 font-serif text-3xl text-sacred-blue-900">
                 Crossing Into Sacred Space...
               </h2>
-              <p className=&quot;text-lg text-sacred-blue-600&quot;>
+              <p className="text-lg text-sacred-blue-600">
                 Your journey of transformation begins now
               </p>
             </SacredCard>
@@ -236,12 +236,12 @@ const SacredPromise = ({ icon, title, description, delay }) => (
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay, duration: 0.6 }}
   >
-    <SacredCard variant=&quot;glass&quot; className=&quot;h-full p-6 text-center&quot;>
-      <div className=&quot;mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-gradient shadow-lg&quot;>
-        <span className=&quot;text-2xl text-white&quot;>{icon}</span>
+    <SacredCard variant="glass" className="h-full p-6 text-center">
+      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-gradient shadow-lg">
+        <span className="text-2xl text-white">{icon}</span>
       </div>
-      <h3 className=&quot;mb-3 font-serif text-xl text-sacred-blue-900&quot;>{title}</h3>
-      <p className=&quot;text-sm leading-relaxed text-sacred-blue-600&quot;>{description}</p>
+      <h3 className="mb-3 font-serif text-xl text-sacred-blue-900">{title}</h3>
+      <p className="text-sm leading-relaxed text-sacred-blue-600">{description}</p>
     </SacredCard>
   </motion.div>
 );
@@ -253,12 +253,12 @@ const SacredCommitment = () => (
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.5 }}
   >
-    <SacredCard variant=&quot;glass&quot; className=&quot;mx-auto mb-8 max-w-2xl p-6&quot;>
-      <h4 className=&quot;mb-4 font-serif text-lg text-sacred-blue-900&quot;>Sacred Commitment</h4>
-      <p className=&quot;text-sm italic leading-relaxed text-sacred-blue-600&quot;>
-        &quot;I open my heart to transformation. I release my attachment to old patterns and embrace the
+    <SacredCard variant="glass" className="mx-auto mb-8 max-w-2xl p-6">
+      <h4 className="mb-4 font-serif text-lg text-sacred-blue-900">Sacred Commitment</h4>
+      <p className="text-sm italic leading-relaxed text-sacred-blue-600">
+        "I open my heart to transformation. I release my attachment to old patterns and embrace the
         wisdom that awaits. I trust in this sacred process and commit to walking this path with
-        courage and authenticity.&quot;
+        courage and authenticity."
       </p>
     </SacredCard>
   </motion.div>
@@ -267,10 +267,10 @@ const SacredCommitment = () => (
 // Portal Background Component
 const PortalBackground = ({ phase }) => {
   return (
-    <div className=&quot;absolute inset-0 overflow-hidden&quot;>
+    <div className="absolute inset-0 overflow-hidden">
       {/* Sacred geometry that responds to phase */}
       <motion.div
-        className=&quot;absolute inset-0&quot;
+        className="absolute inset-0"
         animate={{
           opacity: phase === 'threshold' ? 0.3 : 0.1,
           scale: phase === 'crossing' ? 1.5 : 1,
@@ -278,11 +278,11 @@ const PortalBackground = ({ phase }) => {
         transition={{ duration: 2 }}
       >
         {/* Sacred circles */}
-        <div className=&quot;absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform&quot;>
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform">
           {Array.from({ length: 5 }, (_, i) => (
             <motion.div
               key={i}
-              className=&quot;absolute rounded-full border border-sacred-gold-300/20&quot;
+              className="absolute rounded-full border border-sacred-gold-300/20"
               style={{
                 width: `${100 + i * 100}px`,
                 height: `${100 + i * 100}px`,
@@ -306,7 +306,7 @@ const PortalBackground = ({ phase }) => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.4 }}
-          className=&quot;absolute inset-0 bg-sacred-gradient&quot;
+          className="absolute inset-0 bg-sacred-gradient"
           style={{
             background:
               'radial-gradient(circle at center, rgba(168, 85, 247, 0.1) 0%, transparent 70%)',
