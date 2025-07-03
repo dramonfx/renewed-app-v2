@@ -1,4 +1,3 @@
-
 // src/hooks/useSection.ts
 'use client';
 
@@ -46,7 +45,7 @@ export function useSection(slug: string | null): UseSectionReturn {
           const { data: audioData, error: audioError } = await supabase.storage
             .from('book-assets')
             .createSignedUrl(section.audio_file_path, 60 * 60);
-          
+
           if (audioError) {
             console.error('Audio Signed URL Error:', audioError.message);
           } else if (audioData) {
@@ -60,7 +59,7 @@ export function useSection(slug: string | null): UseSectionReturn {
           const { data: blobData, error: mdFileDownloadError } = await supabase.storage
             .from('book-assets')
             .download(section.text_file_path);
-          
+
           if (mdFileDownloadError) {
             console.error('Markdown File Download Error:', mdFileDownloadError.message);
             markdownContent = `Could not load text content. Error: ${mdFileDownloadError.message}`;
@@ -74,7 +73,9 @@ export function useSection(slug: string | null): UseSectionReturn {
           }
         } else if (section.text_file_path) {
           markdownContent = 'Content is not in Markdown format or path is incorrect.';
-          console.warn("Text file is not a .md file, plain text rendering might occur or fail if expecting markdown.");
+          console.warn(
+            'Text file is not a .md file, plain text rendering might occur or fail if expecting markdown.'
+          );
         }
 
         const sectionWithContent: SectionWithContent = {

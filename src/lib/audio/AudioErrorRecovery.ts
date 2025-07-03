@@ -3,7 +3,7 @@
 
 /**
  * Audio Error Recovery System - Enhanced Error Handling & Recovery
- * 
+ *
  * Provides intelligent error recovery mechanisms for audio playback issues,
  * network problems, and resource failures with fallback strategies.
  */
@@ -60,7 +60,7 @@ export class AudioErrorRecovery {
       enableNetworkRecovery: true,
       enableResourceRecovery: true,
       enableUserNotifications: true,
-      ...config
+      ...config,
     };
   }
 
@@ -72,7 +72,7 @@ export class AudioErrorRecovery {
 
     if (error instanceof MediaError || (error as any).target?.error) {
       const mediaError = error instanceof MediaError ? error : (error as any).target.error;
-      
+
       audioError = {
         type: this.getErrorType(mediaError.code),
         code: mediaError.code,
@@ -80,7 +80,7 @@ export class AudioErrorRecovery {
         timestamp: Date.now(),
         trackId: audioElement.src,
         url: audioElement.src,
-        recoverable: this.isRecoverable(mediaError.code)
+        recoverable: this.isRecoverable(mediaError.code),
       };
     } else {
       audioError = {
@@ -90,7 +90,7 @@ export class AudioErrorRecovery {
         timestamp: Date.now(),
         trackId: audioElement.src,
         url: audioElement.src,
-        recoverable: true
+        recoverable: true,
       };
     }
 
@@ -158,10 +158,10 @@ export class AudioErrorRecovery {
     trackId: string
   ): Promise<boolean> {
     if (!audioError.recoverable) {
-      this.emit('recoveryFailed', { 
-        trackId, 
-        error: audioError, 
-        reason: 'Error not recoverable' 
+      this.emit('recoveryFailed', {
+        trackId,
+        error: audioError,
+        reason: 'Error not recoverable',
       });
       return false;
     }
@@ -174,7 +174,7 @@ export class AudioErrorRecovery {
         startTime: Date.now(),
         totalAttempts: 0,
         attempts: [],
-        finalOutcome: 'failure'
+        finalOutcome: 'failure',
       };
       this.activeSessions.set(trackId, session);
     }
@@ -183,11 +183,11 @@ export class AudioErrorRecovery {
     if (session.totalAttempts >= this.config.maxRetryAttempts) {
       session.finalOutcome = 'failure';
       session.endTime = Date.now();
-      this.emit('recoveryFailed', { 
-        trackId, 
-        error: audioError, 
+      this.emit('recoveryFailed', {
+        trackId,
+        error: audioError,
         reason: 'Max attempts exceeded',
-        session 
+        session,
       });
       return false;
     }
@@ -196,33 +196,33 @@ export class AudioErrorRecovery {
 
     // Determine recovery strategy based on error type
     const strategy = this.selectRecoveryStrategy(audioError, session.totalAttempts);
-    
+
     const attempt: RecoveryAttempt = {
       attemptNumber: session.totalAttempts,
       timestamp: Date.now(),
       strategy,
-      success: false
+      success: false,
     };
 
     try {
       // Calculate delay with progressive backoff
       const delay = this.calculateDelay(session.totalAttempts);
-      
-      this.emit('recoveryAttempt', { 
-        trackId, 
-        attempt: session.totalAttempts, 
-        strategy, 
-        delay 
+
+      this.emit('recoveryAttempt', {
+        trackId,
+        attempt: session.totalAttempts,
+        strategy,
+        delay,
       });
 
       // Wait before retry
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
 
       // Execute recovery strategy
       const success = await this.executeRecoveryStrategy(
-        strategy, 
-        audioElement, 
-        audioError, 
+        strategy,
+        audioElement,
+        audioError,
         session
       );
 
@@ -233,28 +233,27 @@ export class AudioErrorRecovery {
         session.finalOutcome = 'success';
         session.endTime = Date.now();
         this.activeSessions.delete(trackId);
-        
-        this.emit('recoverySuccess', { 
-          trackId, 
-          strategy, 
+
+        this.emit('recoverySuccess', {
+          trackId,
+          strategy,
           attempts: session.totalAttempts,
-          session 
+          session,
         });
-        
+
         return true;
       }
 
       // If this strategy failed, try again with a different strategy
       return this.attemptRecovery(audioError, audioElement, trackId);
-
     } catch (error) {
       attempt.error = error instanceof Error ? error.message : 'Unknown recovery error';
       session.attempts.push(attempt);
-      
-      this.emit('recoveryError', { 
-        trackId, 
-        strategy, 
-        error: attempt.error 
+
+      this.emit('recoveryError', {
+        trackId,
+        strategy,
+        error: attempt.error,
       });
 
       return false;
@@ -270,17 +269,17 @@ export class AudioErrorRecovery {
         if (attemptNumber === 1) return 'reload';
         if (attemptNumber === 2) return 'fallback-url';
         return 'network-recovery';
-        
+
       case 'abort':
         return 'reload';
-        
+
       case 'resource':
         if (attemptNumber === 1) return 'fallback-url';
         return 'format-detection';
-        
+
       case 'decode':
         return 'fallback-url';
-        
+
       default:
         return 'reload';
     }
@@ -298,16 +297,16 @@ export class AudioErrorRecovery {
     switch (strategy) {
       case 'reload':
         return this.executeReload(audioElement);
-        
+
       case 'fallback-url':
         return this.executeFallbackUrl(audioElement, session);
-        
+
       case 'network-recovery':
         return this.executeNetworkRecovery(audioElement);
-        
+
       case 'format-detection':
         return this.executeFormatDetection(audioElement);
-        
+
       default:
         throw new Error(`Unknown recovery strategy: ${strategy}`);
     }
@@ -324,7 +323,7 @@ export class AudioErrorRecovery {
       const onLoadedData = () => {
         audioElement.removeEventListener('loadeddata', onLoadedData);
         audioElement.removeEventListener('error', onError);
-        
+
         // Restore playback position
         audioElement.currentTime = currentTime;
         resolve(true);
@@ -351,7 +350,7 @@ export class AudioErrorRecovery {
    * Execute fallback URL strategy
    */
   private async executeFallbackUrl(
-    audioElement: HTMLAudioElement, 
+    audioElement: HTMLAudioElement,
     session: RecoverySession
   ): Promise<boolean> {
     if (!this.config.fallbackUrls.length) {
@@ -359,11 +358,11 @@ export class AudioErrorRecovery {
     }
 
     const usedFallbacks = session.attempts
-      .filter(attempt => attempt.strategy === 'fallback-url' && attempt.success)
-      .map(attempt => session.fallbackUsed);
+      .filter((attempt) => attempt.strategy === 'fallback-url' && attempt.success)
+      .map((attempt) => session.fallbackUsed);
 
     const availableFallbacks = this.config.fallbackUrls.filter(
-      url => !usedFallbacks.includes(url)
+      (url) => !usedFallbacks.includes(url)
     );
 
     if (!availableFallbacks.length) {
@@ -382,7 +381,7 @@ export class AudioErrorRecovery {
       const onLoadedData = () => {
         audioElement.removeEventListener('loadeddata', onLoadedData);
         audioElement.removeEventListener('error', onError);
-        
+
         // Restore playback position
         audioElement.currentTime = currentTime;
         resolve(true);
@@ -417,9 +416,9 @@ export class AudioErrorRecovery {
           window.removeEventListener('online', onOnline);
           resolve(this.executeReload(audioElement));
         };
-        
+
         window.addEventListener('online', onOnline);
-        
+
         // Timeout after 30 seconds
         setTimeout(() => {
           window.removeEventListener('online', onOnline);
@@ -438,7 +437,7 @@ export class AudioErrorRecovery {
     // Try to detect if the browser supports the current audio format
     const currentUrl = audioElement.src;
     const fileExtension = currentUrl.split('.').pop()?.toLowerCase();
-    
+
     if (!fileExtension) {
       return false;
     }
@@ -458,14 +457,14 @@ export class AudioErrorRecovery {
    */
   private getMimeTypeFromExtension(extension: string): string {
     const mimeTypes: Record<string, string> = {
-      'mp3': 'audio/mpeg',
-      'wav': 'audio/wav',
-      'ogg': 'audio/ogg',
-      'aac': 'audio/aac',
-      'm4a': 'audio/mp4',
-      'flac': 'audio/flac'
+      mp3: 'audio/mpeg',
+      wav: 'audio/wav',
+      ogg: 'audio/ogg',
+      aac: 'audio/aac',
+      m4a: 'audio/mp4',
+      flac: 'audio/flac',
     };
-    
+
     return mimeTypes[extension] || 'audio/*';
   }
 
@@ -492,19 +491,22 @@ export class AudioErrorRecovery {
     commonErrors: Array<{ type: string; count: number }>;
   } {
     const allSessions = Array.from(this.activeSessions.values());
-    const completedSessions = allSessions.filter(session => session.endTime);
-    
-    const successfulSessions = completedSessions.filter(
-      session => session.finalOutcome === 'success'
-    );
-    
-    const successRate = completedSessions.length > 0 
-      ? (successfulSessions.length / completedSessions.length) * 100 
-      : 0;
+    const completedSessions = allSessions.filter((session) => session.endTime);
 
-    const averageAttempts = completedSessions.length > 0
-      ? completedSessions.reduce((sum, session) => sum + session.totalAttempts, 0) / completedSessions.length
-      : 0;
+    const successfulSessions = completedSessions.filter(
+      (session) => session.finalOutcome === 'success'
+    );
+
+    const successRate =
+      completedSessions.length > 0
+        ? (successfulSessions.length / completedSessions.length) * 100
+        : 0;
+
+    const averageAttempts =
+      completedSessions.length > 0
+        ? completedSessions.reduce((sum, session) => sum + session.totalAttempts, 0) /
+          completedSessions.length
+        : 0;
 
     // This would need to be tracked separately in a real implementation
     const commonErrors: Array<{ type: string; count: number }> = [];
@@ -514,7 +516,7 @@ export class AudioErrorRecovery {
       totalSessions: allSessions.length,
       successRate,
       averageAttempts,
-      commonErrors
+      commonErrors,
     };
   }
 
@@ -541,7 +543,7 @@ export class AudioErrorRecovery {
   private emit(event: string, data?: any): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
-      listeners.forEach(listener => listener(data));
+      listeners.forEach((listener) => listener(data));
     }
   }
 

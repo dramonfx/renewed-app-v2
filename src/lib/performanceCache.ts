@@ -1,4 +1,3 @@
-
 // src/lib/performanceCache.ts
 
 interface CacheItem<T> {
@@ -26,7 +25,8 @@ class PerformanceCache {
   private defaultTTL: number;
   private stats: Omit<CacheStats, 'hitRate' | 'size'>;
 
-  constructor(maxSize: number = 50, defaultTTL: number = 300000) { // 5 minutes default TTL
+  constructor(maxSize: number = 50, defaultTTL: number = 300000) {
+    // 5 minutes default TTL
     this.cache = new Map();
     this.timers = new Map();
     this.maxSize = maxSize;
@@ -35,7 +35,7 @@ class PerformanceCache {
       hits: 0,
       misses: 0,
       sets: 0,
-      evictions: 0
+      evictions: 0,
     };
   }
 
@@ -99,7 +99,7 @@ class PerformanceCache {
 
   clear(): void {
     // Clear all timers
-    this.timers.forEach(timer => clearTimeout(timer));
+    this.timers.forEach((timer) => clearTimeout(timer));
     this.timers.clear();
     this.cache.clear();
   }
@@ -109,14 +109,15 @@ class PerformanceCache {
   }
 
   getStats(): CacheStats {
-    const hitRate = this.stats.hits + this.stats.misses > 0 
-      ? (this.stats.hits / (this.stats.hits + this.stats.misses) * 100).toFixed(2)
-      : '0';
-    
+    const hitRate =
+      this.stats.hits + this.stats.misses > 0
+        ? ((this.stats.hits / (this.stats.hits + this.stats.misses)) * 100).toFixed(2)
+        : '0';
+
     return {
       ...this.stats,
       hitRate: `${hitRate}%`,
-      size: this.cache.size
+      size: this.cache.size,
     };
   }
 
@@ -124,14 +125,14 @@ class PerformanceCache {
   cleanup(): number {
     const now = Date.now();
     const expiredKeys: string[] = [];
-    
+
     this.cache.forEach((item, key) => {
       if (now > item.expiry) {
         expiredKeys.push(key);
       }
     });
-    
-    expiredKeys.forEach(key => this.delete(key));
+
+    expiredKeys.forEach((key) => this.delete(key));
     return expiredKeys.length;
   }
 
@@ -139,12 +140,12 @@ class PerformanceCache {
   has(key: string): boolean {
     const item = this.cache.get(key);
     if (!item) return false;
-    
+
     if (Date.now() > item.expiry) {
       this.delete(key);
       return false;
     }
-    
+
     return true;
   }
 
@@ -152,13 +153,13 @@ class PerformanceCache {
   keys(): string[] {
     const validKeys: string[] = [];
     const now = Date.now();
-    
+
     this.cache.forEach((item, key) => {
       if (now <= item.expiry) {
         validKeys.push(key);
       }
     });
-    
+
     return validKeys;
   }
 
@@ -176,7 +177,6 @@ if (typeof window !== 'undefined') {
   setInterval(() => {
     const cleaned = performanceCache.cleanup();
     if (cleaned > 0) {
-      console.log(`Performance cache cleaned up ${cleaned} expired entries`);
     }
   }, 300000); // 5 minutes
 }

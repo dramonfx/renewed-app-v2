@@ -1,7 +1,6 @@
-
 /**
  * Onboarding Data Schema and Initial State
- * 
+ *
  * This file defines the complete structure of onboarding data
  * and provides the initial state with proper defaults.
  */
@@ -34,24 +33,24 @@ export type OnboardingStepKey = 'twoMinds' | 'assessment' | 'intentions' | 'path
 export const INITIAL_ONBOARDING_DATA: OnboardingData = {
   // From TwoMindsStep - which mind the user identifies with most
   selectedMind: '',
-  
+
   // From AssessmentStep - user's current state assessment responses
   assessment: {
     stress_level: '',
     life_satisfaction: '',
-    growth_desire: ''
+    growth_desire: '',
   },
-  
+
   // From IntentionsStep - array of selected intentions (predefined IDs and custom strings)
   intentions: [],
-  
+
   // From PathSelectionStep - selected transformation path
   selectedPath: '',
-  
+
   // Additional metadata for tracking progress
   completedSteps: [],
   startedAt: null,
-  completedAt: null
+  completedAt: null,
 };
 
 /**
@@ -59,7 +58,7 @@ export const INITIAL_ONBOARDING_DATA: OnboardingData = {
  * Ensures data structure integrity during updates
  */
 export function updateOnboardingData(
-  currentData: Partial<OnboardingData>, 
+  currentData: Partial<OnboardingData>,
   newData: Partial<OnboardingData>
 ): OnboardingData {
   return {
@@ -70,31 +69,34 @@ export function updateOnboardingData(
     assessment: {
       ...INITIAL_ONBOARDING_DATA.assessment,
       ...(currentData.assessment || {}),
-      ...(newData.assessment || {})
-    }
+      ...(newData.assessment || {}),
+    },
   };
 }
 
 /**
  * Validation helpers for each step
  */
-export const validateStepData: Record<OnboardingStepKey, (data: Partial<OnboardingData>) => boolean> = {
+export const validateStepData: Record<
+  OnboardingStepKey,
+  (data: Partial<OnboardingData>) => boolean
+> = {
   twoMinds: (data: Partial<OnboardingData>): boolean => Boolean(data.selectedMind),
-  
+
   assessment: (data: Partial<OnboardingData>): boolean => {
     const assessment = data.assessment || {};
     return Boolean(
-      (assessment as any).stress_level && 
-      (assessment as any).life_satisfaction && 
-      (assessment as any).growth_desire
+      (assessment as any).stress_level &&
+        (assessment as any).life_satisfaction &&
+        (assessment as any).growth_desire
     );
   },
-  
+
   intentions: (data: Partial<OnboardingData>): boolean => {
     return Array.isArray(data.intentions) && data.intentions.length > 0;
   },
-  
-  pathSelection: (data: Partial<OnboardingData>): boolean => Boolean(data.selectedPath)
+
+  pathSelection: (data: Partial<OnboardingData>): boolean => Boolean(data.selectedPath),
 };
 
 /**
@@ -109,14 +111,17 @@ export function getSafeStepData(onboardingData: Partial<OnboardingData> = {}): O
     selectedPath: onboardingData.selectedPath || '',
     completedSteps: onboardingData.completedSteps || [],
     startedAt: onboardingData.startedAt || null,
-    completedAt: onboardingData.completedAt || null
+    completedAt: onboardingData.completedAt || null,
   };
 }
 
 /**
  * Check if a specific step is completed
  */
-export function isStepCompleted(stepKey: OnboardingStepKey, data: Partial<OnboardingData>): boolean {
+export function isStepCompleted(
+  stepKey: OnboardingStepKey,
+  data: Partial<OnboardingData>
+): boolean {
   return validateStepData[stepKey](data);
 }
 
@@ -125,13 +130,13 @@ export function isStepCompleted(stepKey: OnboardingStepKey, data: Partial<Onboar
  */
 export function getNextIncompleteStep(data: Partial<OnboardingData>): OnboardingStepKey | null {
   const stepOrder: OnboardingStepKey[] = ['twoMinds', 'assessment', 'intentions', 'pathSelection'];
-  
+
   for (const step of stepOrder) {
     if (!isStepCompleted(step, data)) {
       return step;
     }
   }
-  
+
   return null; // All steps completed
 }
 
@@ -140,9 +145,9 @@ export function getNextIncompleteStep(data: Partial<OnboardingData>): Onboarding
  */
 export function calculateOnboardingProgress(data: Partial<OnboardingData>): number {
   const totalSteps = 4;
-  const completedSteps = Object.keys(validateStepData).filter(step => 
+  const completedSteps = Object.keys(validateStepData).filter((step) =>
     validateStepData[step as OnboardingStepKey](data)
   ).length;
-  
+
   return Math.round((completedSteps / totalSteps) * 100);
 }

@@ -4,7 +4,7 @@ import React from 'react';
 
 /**
  * Performance Monitoring and Optimization Utilities
- * 
+ *
  * Provides comprehensive performance tracking, monitoring, and optimization
  * utilities for the Sacred Journey application.
  */
@@ -44,7 +44,7 @@ const PERFORMANCE_THRESHOLDS = {
   MEMORY_WARNING: 50 * 1024 * 1024, // 50MB
   LCP_WARNING: 2500, // 2.5 seconds
   FID_WARNING: 100, // 100ms
-  CLS_WARNING: 0.1 // 0.1 score
+  CLS_WARNING: 0.1, // 0.1 score
 } as const;
 
 /**
@@ -90,7 +90,7 @@ class PerformanceMonitor {
           unit: 'ms',
           timestamp: Date.now(),
           category: 'load',
-          details: { element: lastEntry.element?.tagName }
+          details: { element: lastEntry.element?.tagName },
         });
       });
 
@@ -103,7 +103,7 @@ class PerformanceMonitor {
           unit: 'ms',
           timestamp: Date.now(),
           category: 'interaction',
-          details: { eventType: firstEntry.name }
+          details: { eventType: firstEntry.name },
         });
       });
 
@@ -122,24 +122,24 @@ class PerformanceMonitor {
             unit: 'count',
             timestamp: Date.now(),
             category: 'render',
-            details: { affectedElements: entries.length }
+            details: { affectedElements: entries.length },
           });
         }
       });
 
       // Long Tasks
       this.createObserver('longtask', (entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
           this.recordMetric({
             name: 'Long Task',
             value: entry.duration,
             unit: 'ms',
             timestamp: Date.now(),
             category: 'render',
-            details: { 
+            details: {
               startTime: entry.startTime,
-              name: entry.name 
-            }
+              name: entry.name,
+            },
           });
         });
       });
@@ -156,11 +156,10 @@ class PerformanceMonitor {
           details: {
             domContentLoaded: nav.domContentLoadedEventEnd - nav.fetchStart,
             interactive: nav.domInteractive - nav.fetchStart,
-            type: nav.type
-          }
+            type: nav.type,
+          },
         });
       });
-
     } catch (error) {
       console.warn('Failed to initialize performance observers:', error);
     }
@@ -186,9 +185,8 @@ class PerformanceMonitor {
    */
   startMonitoring(): void {
     if (this.isMonitoring) return;
-    
+
     this.isMonitoring = true;
-    console.log('🚀 Performance monitoring started');
 
     // Monitor memory usage periodically
     if ('memory' in performance) {
@@ -202,8 +200,8 @@ class PerformanceMonitor {
           category: 'memory',
           details: {
             totalHeapSize: memory.totalJSHeapSize,
-            heapLimit: memory.jsHeapSizeLimit
-          }
+            heapLimit: memory.jsHeapSizeLimit,
+          },
         });
       }, 30000); // Every 30 seconds
     }
@@ -214,9 +212,8 @@ class PerformanceMonitor {
    */
   stopMonitoring(): void {
     this.isMonitoring = false;
-    this.observers.forEach(observer => observer.disconnect());
+    this.observers.forEach((observer) => observer.disconnect());
     this.observers = [];
-    console.log('🛑 Performance monitoring stopped');
   }
 
   /**
@@ -224,10 +221,10 @@ class PerformanceMonitor {
    */
   recordMetric(metric: PerformanceMetric): void {
     this.metrics.push(metric);
-    
+
     // Check for performance issues
     this.checkThresholds(metric);
-    
+
     // Keep only last 1000 metrics to prevent memory leaks
     if (this.metrics.length > 1000) {
       this.metrics = this.metrics.slice(-1000);
@@ -235,7 +232,6 @@ class PerformanceMonitor {
 
     // Log in development
     if (process.env.NODE_ENV === 'development') {
-      console.log(`📊 ${metric.name}: ${metric.value}${metric.unit}`, metric.details);
     }
   }
 
@@ -274,7 +270,7 @@ class PerformanceMonitor {
         metric: metric.name,
         value: `${metric.value}${metric.unit}`,
         threshold: `${threshold}${metric.unit}`,
-        details: metric.details
+        details: metric.details,
       });
 
       // Report to analytics if available
@@ -282,7 +278,7 @@ class PerformanceMonitor {
         (window as any).gtag('event', 'performance_warning', {
           metric_name: metric.name,
           metric_value: metric.value,
-          threshold: threshold
+          threshold: threshold,
         });
       }
     }
@@ -291,9 +287,13 @@ class PerformanceMonitor {
   /**
    * Record component render performance
    */
-  recordComponentRender(componentName: string, renderTime: number, props?: Record<string, any>): void {
+  recordComponentRender(
+    componentName: string,
+    renderTime: number,
+    props?: Record<string, any>
+  ): void {
     const existing = this.componentMetrics.get(componentName);
-    
+
     if (existing) {
       existing.renderTime = renderTime;
       existing.renderCount++;
@@ -305,7 +305,7 @@ class PerformanceMonitor {
         renderTime,
         renderCount: 1,
         lastRender: Date.now(),
-        props
+        props,
       });
     }
 
@@ -316,7 +316,7 @@ class PerformanceMonitor {
       unit: 'ms',
       timestamp: Date.now(),
       category: 'render',
-      details: { componentName, props }
+      details: { componentName, props },
     });
   }
 
@@ -328,7 +328,7 @@ class PerformanceMonitor {
     components: ComponentPerformance[];
     warnings: PerformanceMetric[];
   } {
-    const warnings = this.metrics.filter(metric => {
+    const warnings = this.metrics.filter((metric) => {
       switch (metric.name) {
         case 'LCP':
           return metric.value > PERFORMANCE_THRESHOLDS.LCP_WARNING;
@@ -348,7 +348,7 @@ class PerformanceMonitor {
     return {
       metrics: this.metrics.slice(-100), // Last 100 metrics
       components: Array.from(this.componentMetrics.values()),
-      warnings
+      warnings,
     };
   }
 
@@ -364,13 +364,17 @@ class PerformanceMonitor {
    * Export metrics for analysis
    */
   exportMetrics(): string {
-    return JSON.stringify({
-      metrics: this.metrics,
-      components: Array.from(this.componentMetrics.entries()),
-      timestamp: Date.now(),
-      userAgent: navigator.userAgent,
-      url: window.location.href
-    }, null, 2);
+    return JSON.stringify(
+      {
+        metrics: this.metrics,
+        components: Array.from(this.componentMetrics.entries()),
+        timestamp: Date.now(),
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+      },
+      null,
+      2
+    );
   }
 }
 
@@ -407,18 +411,16 @@ export function usePerformanceMonitor(componentName: string) {
         value,
         unit,
         timestamp: Date.now(),
-        category: 'render'
+        category: 'render',
       });
-    }
+    },
   };
 }
 
 /**
  * Higher-order component for automatic performance monitoring
  */
-export function withPerformanceMonitoring<P extends object>(
-  Component: React.ComponentType<P>
-) {
+export function withPerformanceMonitoring<P extends object>(Component: React.ComponentType<P>) {
   const WrappedComponent = React.forwardRef<any, P>((props, ref) => {
     const componentName = Component.displayName || Component.name || 'Unknown';
     usePerformanceMonitor(componentName);
@@ -427,7 +429,7 @@ export function withPerformanceMonitoring<P extends object>(
   });
 
   WrappedComponent.displayName = `withPerformanceMonitoring(${Component.displayName || Component.name})`;
-  
+
   return WrappedComponent;
 }
 
@@ -438,21 +440,18 @@ export const performanceUtils = {
   /**
    * Measure function execution time
    */
-  measureFunction: <T extends (...args: any[]) => any>(
-    fn: T,
-    name?: string
-  ): T => {
+  measureFunction: <T extends (...args: any[]) => any>(fn: T, name?: string): T => {
     return ((...args: Parameters<T>) => {
       const start = performance.now();
       const result = fn(...args);
       const duration = performance.now() - start;
-      
+
       performanceMonitor.recordMetric({
         name: name || fn.name || 'Function Execution',
         value: duration,
         unit: 'ms',
         timestamp: Date.now(),
-        category: 'render'
+        category: 'render',
       });
 
       return result;
@@ -462,21 +461,18 @@ export const performanceUtils = {
   /**
    * Measure async function execution time
    */
-  measureAsyncFunction: <T extends (...args: any[]) => Promise<any>>(
-    fn: T,
-    name?: string
-  ): T => {
+  measureAsyncFunction: <T extends (...args: any[]) => Promise<any>>(fn: T, name?: string): T => {
     return (async (...args: Parameters<T>) => {
       const start = performance.now();
       const result = await fn(...args);
       const duration = performance.now() - start;
-      
+
       performanceMonitor.recordMetric({
         name: name || fn.name || 'Async Function Execution',
         value: duration,
         unit: 'ms',
         timestamp: Date.now(),
-        category: 'render'
+        category: 'render',
       });
 
       return result;
@@ -501,13 +497,13 @@ export const performanceUtils = {
         performance.measure(name, startMark, endMark);
         const entries = performance.getEntriesByName(name, 'measure');
         const lastEntry = entries[entries.length - 1];
-        
+
         performanceMonitor.recordMetric({
           name,
           value: lastEntry.duration,
           unit: 'ms',
           timestamp: Date.now(),
-          category: 'render'
+          category: 'render',
         });
 
         return lastEntry.duration;
@@ -516,7 +512,7 @@ export const performanceUtils = {
       console.warn('Failed to measure performance:', error);
     }
     return null;
-  }
+  },
 };
 
 /**
@@ -525,13 +521,11 @@ export const performanceUtils = {
 export function initializePerformanceMonitoring(): void {
   if (typeof window !== 'undefined') {
     performanceMonitor.startMonitoring();
-    
+
     // Auto-stop on page unload
     window.addEventListener('beforeunload', () => {
       performanceMonitor.stopMonitoring();
     });
-
-    console.log('🚀 Performance monitoring initialized');
   }
 }
 
@@ -539,5 +533,5 @@ export function initializePerformanceMonitoring(): void {
 export type {
   PerformanceMetric as PerfMetric,
   ComponentPerformance as CompPerformance,
-  PagePerformance as PagePerf
+  PagePerformance as PagePerf,
 };

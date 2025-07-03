@@ -1,4 +1,3 @@
-
 // src/contexts/AuthContext.tsx
 'use client'; // This context will be used by client components
 
@@ -45,14 +44,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const { data, error } = await supabase.auth.getSession();
         if (error) {
-          console.error("Error getting session:", error.message);
+          console.error('Error getting session:', error.message);
           setLoading(false);
           return;
         }
-        setUser(data?.session?.user as User ?? null);
+        setUser((data?.session?.user as User) ?? null);
         setLoading(false);
       } catch (error) {
-        console.error("Unexpected error getting session:", error);
+        console.error('Unexpected error getting session:', error);
         setLoading(false);
       }
     };
@@ -60,17 +59,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     getSession();
 
     // Listen for changes in auth state (login, logout)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: string, session: any) => {
-        console.log('Auth event:', event, session);
-        setUser(session?.user as User ?? null);
-        setLoading(false); // Ensure loading is false after auth state change
-        
-        // Optional: Redirect based on event
-        // if (event === 'SIGNED_IN') router.push('/book');
-        // if (event === 'SIGNED_OUT') router.push('/');
-      }
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event: string, session: any) => {
+      setUser((session?.user as User) ?? null);
+      setLoading(false); // Ensure loading is false after auth state change
+
+      // Optional: Redirect based on event
+      // if (event === 'SIGNED_IN') router.push('/book');
+      // if (event === 'SIGNED_OUT') router.push('/');
+    });
 
     // Cleanup listener on component unmount
     return () => {
@@ -82,36 +80,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signUp = async (email: string, password: string): Promise<AuthResult> => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({ 
-        email, 
-        password 
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
       });
       setLoading(false);
-      return { 
-        user: data?.user as User ?? null, 
-        session: data?.session ?? null, 
-        error 
+      return {
+        user: (data?.user as User) ?? null,
+        session: data?.session ?? null,
+        error,
       };
     } catch (error) {
       setLoading(false);
       console.error('Error during signup:', error);
-      return { 
-        user: null, 
-        session: null, 
-        error 
+      return {
+        user: null,
+        session: null,
+        error,
       };
     }
   };
 
   // Login function with optional redirect
-  const login = async (email: string, password: string, redirectPath?: string): Promise<AuthResult> => {
+  const login = async (
+    email: string,
+    password: string,
+    redirectPath?: string
+  ): Promise<AuthResult> => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ 
-        email, 
-        password 
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      
+
       if (!error && data?.user) {
         // Handle redirect after successful login
         const targetPath = redirectPath || '/dashboard';
@@ -119,20 +121,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           router.push(targetPath);
         }, 500); // Small delay to show success state
       }
-      
+
       setLoading(false);
-      return { 
-        user: data?.user as User ?? null, 
-        session: data?.session ?? null, 
-        error 
+      return {
+        user: (data?.user as User) ?? null,
+        session: data?.session ?? null,
+        error,
       };
     } catch (error) {
       setLoading(false);
       console.error('Error during login:', error);
-      return { 
-        user: null, 
-        session: null, 
-        error 
+      return {
+        user: null,
+        session: null,
+        error,
       };
     }
   };
@@ -178,7 +180,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 // Custom hook to use the AuthContext
 export const useAuth = (): AuthContextValue => {
   const context = useContext(AuthContext);
-  if (context === undefined || context === null) { // Check for null as well
+  if (context === undefined || context === null) {
+    // Check for null as well
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;

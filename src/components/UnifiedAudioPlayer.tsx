@@ -3,20 +3,20 @@
 import React, { MouseEvent } from 'react';
 import type { JSX } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Play, 
-  Pause, 
-  SkipBack, 
+import {
+  Play,
+  Pause,
+  SkipBack,
   SkipForward,
-  RotateCcw,    // Skip Backward 10s
-  RotateCw,     // Skip Forward 10s
+  RotateCcw, // Skip Backward 10s
+  RotateCw, // Skip Forward 10s
   Bookmark,
   BookmarkCheck,
   Gauge,
   Trash2,
   Volume2,
   VolumeX,
-  X
+  X,
 } from 'lucide-react';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
@@ -92,26 +92,21 @@ interface TrackNavigationProps {
 /**
  * Bookmark Item Component
  */
-const BookmarkItem: React.FC<BookmarkItemProps> = ({ 
-  bookmark, 
-  onJump, 
-  onDelete, 
-  formatTime 
-}) => (
-  <div className="flex items-center justify-between p-2 bg-white/20 rounded-lg mb-2">
+const BookmarkItem: React.FC<BookmarkItemProps> = ({ bookmark, onJump, onDelete, formatTime }) => (
+  <div className="mb-2 flex items-center justify-between rounded-lg bg-white/20 p-2">
     <button
       onClick={() => onJump(bookmark.time)}
-      className="flex-1 text-left text-sm text-sacred-blue-700 hover:text-sacred-blue-900 transition-colors"
+      className="flex-1 text-left text-sm text-sacred-blue-700 transition-colors hover:text-sacred-blue-900"
     >
-      <BookmarkCheck className="w-3 h-3 inline mr-2" />
+      <BookmarkCheck className="mr-2 inline h-3 w-3" />
       {bookmark.label || `Bookmark at ${formatTime(bookmark.time)}`}
     </button>
     <button
       onClick={() => onDelete(bookmark.id)}
-      className="text-red-400 hover:text-red-600 transition-colors ml-2"
+      className="ml-2 text-red-400 transition-colors hover:text-red-600"
       aria-label="Delete bookmark"
     >
-      <Trash2 className="w-4 h-4" />
+      <Trash2 className="h-4 w-4" />
     </button>
   </div>
 );
@@ -119,19 +114,19 @@ const BookmarkItem: React.FC<BookmarkItemProps> = ({
 /**
  * Volume Control Component
  */
-const VolumeControl: React.FC<VolumeControlProps> = ({ 
-  volume, 
-  isMuted, 
-  onVolumeChange, 
-  onToggleMute 
+const VolumeControl: React.FC<VolumeControlProps> = ({
+  volume,
+  isMuted,
+  onVolumeChange,
+  onToggleMute,
 }) => (
   <div className="flex items-center space-x-2">
     <button
       onClick={onToggleMute}
-      className="text-sacred-blue-600 hover:text-sacred-blue-800 transition-colors"
-      aria-label={isMuted ? "Unmute" : "Mute"}
+      className="text-sacred-blue-600 transition-colors hover:text-sacred-blue-800"
+      aria-label={isMuted ? 'Unmute' : 'Mute'}
     >
-      {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+      {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
     </button>
     <input
       type="range"
@@ -140,7 +135,7 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
       step="0.05"
       value={isMuted ? 0 : volume}
       onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
-      className="w-16 h-1 bg-sacred-blue-200 rounded-lg appearance-none cursor-pointer slider"
+      className="slider h-1 w-16 cursor-pointer appearance-none rounded-lg bg-sacred-blue-200"
       aria-label="Volume control"
     />
   </div>
@@ -151,14 +146,14 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
  */
 const SpeedControl: React.FC<SpeedControlProps> = ({ speed, onSpeedChange }) => {
   const speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
-  
+
   return (
     <div className="flex items-center space-x-2">
-      <Gauge className="w-4 h-4 text-sacred-blue-600" />
+      <Gauge className="h-4 w-4 text-sacred-blue-600" />
       <select
         value={speed}
         onChange={(e) => onSpeedChange(parseFloat(e.target.value))}
-        className="text-xs bg-white/20 border border-sacred-blue-300 rounded px-2 py-1 text-sacred-blue-700 focus:outline-none focus:ring-2 focus:ring-sacred-blue-500"
+        className="rounded border border-sacred-blue-300 bg-white/20 px-2 py-1 text-xs text-sacred-blue-700 focus:outline-none focus:ring-2 focus:ring-sacred-blue-500"
         aria-label="Playback speed"
       >
         {speedOptions.map((speedOption) => (
@@ -181,7 +176,7 @@ const TrackNavigation: React.FC<TrackNavigationProps> = ({
   canGoBack,
   canGoForward,
   onPrevious,
-  onNext
+  onNext,
 }) => (
   <div className="space-y-3">
     {/* Track Navigation Buttons */}
@@ -194,9 +189,9 @@ const TrackNavigation: React.FC<TrackNavigationProps> = ({
         className="opacity-80 hover:opacity-100"
         aria-label="Previous track"
       >
-        <SkipBack className="w-4 h-4" />
+        <SkipBack className="h-4 w-4" />
       </SacredButton>
-      
+
       <SacredButton
         variant="ghost"
         size="sm"
@@ -205,18 +200,18 @@ const TrackNavigation: React.FC<TrackNavigationProps> = ({
         className="opacity-80 hover:opacity-100"
         aria-label="Next track"
       >
-        <SkipForward className="w-4 h-4" />
+        <SkipForward className="h-4 w-4" />
       </SacredButton>
     </div>
 
     {/* Track List */}
     {tracks.length > 1 && (
-      <div className="max-h-32 overflow-y-auto space-y-1">
+      <div className="max-h-32 space-y-1 overflow-y-auto">
         {tracks.map((track, index) => (
           <button
             key={track.id}
             onClick={() => onTrackSelect(index)}
-            className={`w-full text-left text-xs p-2 rounded transition-colors ${
+            className={`w-full rounded p-2 text-left text-xs transition-colors ${
               index === currentTrackIndex
                 ? 'bg-sacred-blue-200 text-sacred-blue-900'
                 : 'bg-white/10 text-sacred-blue-700 hover:bg-white/20'
@@ -232,17 +227,17 @@ const TrackNavigation: React.FC<TrackNavigationProps> = ({
 
 /**
  * Unified Audio Player Component
- * 
+ *
  * A single, comprehensive audio player component that provides consistent UI/UX
  * across all audio contexts in the application. Enhanced with full TypeScript
  * support and improved error handling.
  */
-export default function UnifiedAudioPlayer({ 
+export default function UnifiedAudioPlayer({
   mode = 'full',
   singleTrackSlug = null,
   className = '',
   onTrackChange,
-  onPlayStateChange
+  onPlayStateChange,
 }: UnifiedAudioPlayerProps): JSX.Element {
   // Validate props
   if (mode === 'single' && !singleTrackSlug) {
@@ -254,7 +249,7 @@ export default function UnifiedAudioPlayer({
     autoLoad: true,
     autoPlay: false,
     mode: mode,
-    ...(mode === 'single' && singleTrackSlug && { singleTrackSlug })
+    ...(mode === 'single' && singleTrackSlug && { singleTrackSlug }),
   };
 
   // Get all state and functions from the useAudioPlayer hook
@@ -273,10 +268,10 @@ export default function UnifiedAudioPlayer({
     isLoading,
     error,
     bookmarks,
-    
+
     // Audio element ref
     audioRef,
-    
+
     // Control functions
     playPause,
     nextTrack,
@@ -292,9 +287,9 @@ export default function UnifiedAudioPlayer({
     clearBookmarks,
     setVolume,
     toggleMute,
-    
+
     // Utility functions
-    formatTime
+    formatTime,
   } = useAudioPlayer(hookOptions);
 
   // Notify parent of track changes
@@ -310,13 +305,13 @@ export default function UnifiedAudioPlayer({
   // Handle progress bar click for seeking
   const handleProgressClick = (e: MouseEvent<HTMLDivElement>): void => {
     if (!duration || !currentTrack) return;
-    
+
     const progressBar = e.currentTarget;
     const rect = progressBar.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const percentClicked = clickX / rect.width;
     const newTime = percentClicked * duration;
-    
+
     seek(newTime);
   };
 
@@ -328,7 +323,7 @@ export default function UnifiedAudioPlayer({
   // Handle bookmark save
   const handleSaveBookmark = (): void => {
     if (!currentTrack || !currentTime) return;
-    
+
     const label = `${currentTrack.title} - ${formatTime(currentTime)}`;
     saveBookmark(currentTime, label);
   };
@@ -346,14 +341,10 @@ export default function UnifiedAudioPlayer({
     return (
       <SacredCard variant="glass" className={`p-6 ${className}`}>
         <div className="text-center text-red-600">
-          <VolumeX className="w-12 h-12 mx-auto mb-3 opacity-50" />
+          <VolumeX className="mx-auto mb-3 h-12 w-12 opacity-50" />
           <p className="font-semibold">Audio Unavailable</p>
-          <p className="text-sm opacity-75 mt-1">{error}</p>
-          <SacredButton
-            variant="primary"
-            className="mt-4"
-            onClick={() => window.location.reload()}
-          >
+          <p className="mt-1 text-sm opacity-75">{error}</p>
+          <SacredButton variant="primary" className="mt-4" onClick={() => window.location.reload()}>
             Try Again
           </SacredButton>
         </div>
@@ -365,8 +356,8 @@ export default function UnifiedAudioPlayer({
   if (isLoading) {
     return (
       <SacredCard variant="glass" className={`p-6 ${className}`}>
-        <div className="text-center py-8">
-          <div className="animate-spin w-8 h-8 border-2 border-sacred-blue-500 border-t-transparent rounded-full mx-auto mb-3"></div>
+        <div className="py-8 text-center">
+          <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-sacred-blue-500 border-t-transparent"></div>
           <p className="text-sacred-blue-600">Loading audio...</p>
         </div>
       </SacredCard>
@@ -378,9 +369,9 @@ export default function UnifiedAudioPlayer({
     return (
       <SacredCard variant="glass" className={`p-6 ${className}`}>
         <div className="text-center text-sacred-blue-600">
-          <Volume2 className="w-12 h-12 mx-auto mb-3 opacity-50" />
+          <Volume2 className="mx-auto mb-3 h-12 w-12 opacity-50" />
           <p className="font-semibold">No Audio Available</p>
-          <p className="text-sm opacity-75 mt-1">
+          <p className="mt-1 text-sm opacity-75">
             Audio content is not available for this section.
           </p>
         </div>
@@ -391,18 +382,13 @@ export default function UnifiedAudioPlayer({
   return (
     <SacredCard variant="glass" className={`overflow-hidden ${className}`}>
       {/* Hidden audio element */}
-      <audio
-        ref={audioRef}
-        preload="metadata"
-        className="hidden"
-        aria-label="Audio player"
-      />
+      <audio ref={audioRef} preload="metadata" className="hidden" aria-label="Audio player" />
 
-      <div className="p-6 space-y-6">
+      <div className="space-y-6 p-6">
         {/* Current Track Info */}
         {currentTrack && (
           <div className="text-center">
-            <h3 className="text-lg font-semibold text-sacred-blue-900 mb-1">
+            <h3 className="mb-1 text-lg font-semibold text-sacred-blue-900">
               {currentTrack.title}
             </h3>
             {mode === 'full' && tracks.length > 1 && (
@@ -415,8 +401,8 @@ export default function UnifiedAudioPlayer({
 
         {/* Progress Bar */}
         <div className="space-y-2">
-          <div 
-            className="w-full h-2 bg-sacred-blue-200 rounded-full cursor-pointer overflow-hidden"
+          <div
+            className="h-2 w-full cursor-pointer overflow-hidden rounded-full bg-sacred-blue-200"
             onClick={handleProgressClick}
             role="progressbar"
             aria-valuemin={0}
@@ -424,15 +410,15 @@ export default function UnifiedAudioPlayer({
             aria-valuenow={currentTime}
             aria-label="Audio progress"
           >
-            <motion.div 
-              className="h-full bg-gradient-to-r from-sacred-blue-500 to-sacred-blue-600 rounded-full"
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-sacred-blue-500 to-sacred-blue-600"
               style={{ width: `${progressPercent}%` }}
               initial={{ width: 0 }}
               animate={{ width: `${progressPercent}%` }}
               transition={{ duration: 0.1 }}
             />
           </div>
-          
+
           <div className="flex justify-between text-xs text-sacred-blue-600">
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(duration)}</span>
@@ -450,7 +436,7 @@ export default function UnifiedAudioPlayer({
             className="opacity-80 hover:opacity-100"
             aria-label="Skip backward 10 seconds"
           >
-            <RotateCcw className="w-5 h-5" />
+            <RotateCcw className="h-5 w-5" />
           </SacredButton>
 
           {/* Play/Pause Button */}
@@ -461,13 +447,9 @@ export default function UnifiedAudioPlayer({
             disabled={!currentTrack}
             loading={isLoading}
             className="relative"
-            aria-label={isPlaying ? "Pause" : "Play"}
+            aria-label={isPlaying ? 'Pause' : 'Play'}
           >
-            {isPlaying ? (
-              <Pause className="w-6 h-6" />
-            ) : (
-              <Play className="w-6 h-6 ml-1" />
-            )}
+            {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="ml-1 h-6 w-6" />}
           </SacredButton>
 
           {/* Skip Forward 10s */}
@@ -479,7 +461,7 @@ export default function UnifiedAudioPlayer({
             className="opacity-80 hover:opacity-100"
             aria-label="Skip forward 10 seconds"
           >
-            <RotateCw className="w-5 h-5" />
+            <RotateCw className="h-5 w-5" />
           </SacredButton>
         </div>
 
@@ -494,10 +476,7 @@ export default function UnifiedAudioPlayer({
           />
 
           {/* Speed Control */}
-          <SpeedControl
-            speed={speed}
-            onSpeedChange={changeSpeed}
-          />
+          <SpeedControl speed={speed} onSpeedChange={changeSpeed} />
 
           {/* Bookmark Button */}
           <SacredButton
@@ -508,7 +487,7 @@ export default function UnifiedAudioPlayer({
             className="opacity-80 hover:opacity-100"
             aria-label="Save bookmark"
           >
-            <Bookmark className="w-4 h-4" />
+            <Bookmark className="h-4 w-4" />
           </SacredButton>
         </div>
 
@@ -543,8 +522,8 @@ export default function UnifiedAudioPlayer({
                 </SacredButton>
               )}
             </div>
-            
-            <div className="max-h-32 overflow-y-auto space-y-1">
+
+            <div className="max-h-32 space-y-1 overflow-y-auto">
               {bookmarks.map((bookmark) => (
                 <BookmarkItem
                   key={bookmark.id}
@@ -563,11 +542,11 @@ export default function UnifiedAudioPlayer({
 }
 
 // Export component types for external use
-export type { 
-  UnifiedAudioPlayerProps as AudioPlayerProps, 
+export type {
+  UnifiedAudioPlayerProps as AudioPlayerProps,
   AudioPlayerMode as PlayerMode,
   BookmarkItemProps,
   VolumeControlProps,
   SpeedControlProps,
-  TrackNavigationProps
+  TrackNavigationProps,
 };

@@ -3,7 +3,7 @@
 
 /**
  * Bookmark Manager - Phase 3 Core System
- * 
+ *
  * Advanced bookmark management system with real-time synchronization,
  * search capabilities, and collaborative features.
  */
@@ -100,12 +100,12 @@ export class BookmarkManager {
       maxBookmarks: 1000,
       enableOfflineMode: true,
       enableExport: true,
-      ...config
+      ...config,
     };
 
     this.initializeDefaultCategories();
     this.setupNetworkMonitoring();
-    
+
     if (this.config.enableSync) {
       this.startSyncTimer();
     }
@@ -123,7 +123,7 @@ export class BookmarkManager {
         icon: '❤️',
         description: 'Your favorite moments',
         isDefault: true,
-        createdAt: new Date()
+        createdAt: new Date(),
       },
       {
         id: 'important',
@@ -132,7 +132,7 @@ export class BookmarkManager {
         icon: '⭐',
         description: 'Important sections',
         isDefault: true,
-        createdAt: new Date()
+        createdAt: new Date(),
       },
       {
         id: 'notes',
@@ -141,7 +141,7 @@ export class BookmarkManager {
         icon: '📝',
         description: 'Personal notes',
         isDefault: true,
-        createdAt: new Date()
+        createdAt: new Date(),
       },
       {
         id: 'share',
@@ -150,11 +150,11 @@ export class BookmarkManager {
         icon: '🔗',
         description: 'Moments to share',
         isDefault: true,
-        createdAt: new Date()
-      }
+        createdAt: new Date(),
+      },
     ];
 
-    defaultCategories.forEach(category => {
+    defaultCategories.forEach((category) => {
       this.categories.set(category.id, category);
     });
   }
@@ -224,11 +224,11 @@ export class BookmarkManager {
       isPublic: options.isPublic || false,
       createdAt: new Date(),
       updatedAt: new Date(),
-      metadata: options.metadata
+      metadata: options.metadata,
     };
 
     this.bookmarks.set(bookmark.id, bookmark);
-    
+
     if (this.config.autoSave) {
       this.queueForSync(bookmark.id);
     }
@@ -252,11 +252,11 @@ export class BookmarkManager {
     const updatedBookmark: Bookmark = {
       ...bookmark,
       ...updates,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     this.bookmarks.set(bookmarkId, updatedBookmark);
-    
+
     if (this.config.autoSave) {
       this.queueForSync(bookmarkId);
     }
@@ -275,7 +275,7 @@ export class BookmarkManager {
     }
 
     this.bookmarks.delete(bookmarkId);
-    
+
     if (this.config.autoSave) {
       this.queueForSync(bookmarkId, 'delete');
     }
@@ -295,7 +295,7 @@ export class BookmarkManager {
    */
   public getTrackBookmarks(trackId: string): Bookmark[] {
     return Array.from(this.bookmarks.values())
-      .filter(bookmark => bookmark.trackId === trackId)
+      .filter((bookmark) => bookmark.trackId === trackId)
       .sort((a, b) => a.timestamp - b.timestamp);
   }
 
@@ -308,57 +308,57 @@ export class BookmarkManager {
     // Filter by query (title, description, tags)
     if (options.query) {
       const query = options.query.toLowerCase();
-      results = results.filter(bookmark => 
-        bookmark.title.toLowerCase().includes(query) ||
-        bookmark.description?.toLowerCase().includes(query) ||
-        bookmark.tags.some(tag => tag.toLowerCase().includes(query))
+      results = results.filter(
+        (bookmark) =>
+          bookmark.title.toLowerCase().includes(query) ||
+          bookmark.description?.toLowerCase().includes(query) ||
+          bookmark.tags.some((tag) => tag.toLowerCase().includes(query))
       );
     }
 
     // Filter by tags
     if (options.tags && options.tags.length > 0) {
-      results = results.filter(bookmark =>
-        options.tags!.some(tag => bookmark.tags.includes(tag))
+      results = results.filter((bookmark) =>
+        options.tags!.some((tag) => bookmark.tags.includes(tag))
       );
     }
 
     // Filter by categories
     if (options.categories && options.categories.length > 0) {
-      results = results.filter(bookmark =>
-        options.categories!.includes(bookmark.category)
-      );
+      results = results.filter((bookmark) => options.categories!.includes(bookmark.category));
     }
 
     // Filter by date range
     if (options.dateRange) {
-      results = results.filter(bookmark =>
-        bookmark.createdAt >= options.dateRange!.start &&
-        bookmark.createdAt <= options.dateRange!.end
+      results = results.filter(
+        (bookmark) =>
+          bookmark.createdAt >= options.dateRange!.start &&
+          bookmark.createdAt <= options.dateRange!.end
       );
     }
 
     // Filter by track ID
     if (options.trackId) {
-      results = results.filter(bookmark => bookmark.trackId === options.trackId);
+      results = results.filter((bookmark) => bookmark.trackId === options.trackId);
     }
 
     // Filter by user ID
     if (options.userId) {
-      results = results.filter(bookmark => bookmark.userId === options.userId);
+      results = results.filter((bookmark) => bookmark.userId === options.userId);
     }
 
     // Filter by public status
     if (options.isPublic !== undefined) {
-      results = results.filter(bookmark => bookmark.isPublic === options.isPublic);
+      results = results.filter((bookmark) => bookmark.isPublic === options.isPublic);
     }
 
     // Sort results
     const sortBy = options.sortBy || 'createdAt';
     const sortOrder = options.sortOrder || 'desc';
-    
+
     results.sort((a, b) => {
       let aValue: any, bValue: any;
-      
+
       switch (sortBy) {
         case 'createdAt':
         case 'updatedAt':
@@ -411,7 +411,7 @@ export class BookmarkManager {
       icon,
       description,
       isDefault: false,
-      createdAt: new Date()
+      createdAt: new Date(),
     };
 
     this.categories.set(category.id, category);
@@ -423,8 +423,7 @@ export class BookmarkManager {
    * Get all categories
    */
   public getCategories(): BookmarkCategory[] {
-    return Array.from(this.categories.values())
-      .sort((a, b) => a.name.localeCompare(b.name));
+    return Array.from(this.categories.values()).sort((a, b) => a.name.localeCompare(b.name));
   }
 
   /**
@@ -444,7 +443,7 @@ export class BookmarkManager {
       tags: [],
       createdAt: new Date(),
       updatedAt: new Date(),
-      collaborators: []
+      collaborators: [],
     };
 
     this.collections.set(collection.id, collection);
@@ -477,20 +476,33 @@ export class BookmarkManager {
    */
   public exportBookmarks(format: 'json' | 'csv' | 'xml' = 'json'): string {
     const bookmarks = Array.from(this.bookmarks.values());
-    
+
     switch (format) {
       case 'json':
-        return JSON.stringify({
-          bookmarks,
-          categories: Array.from(this.categories.values()),
-          collections: Array.from(this.collections.values()),
-          exportedAt: new Date().toISOString(),
-          version: '1.0'
-        }, null, 2);
-        
+        return JSON.stringify(
+          {
+            bookmarks,
+            categories: Array.from(this.categories.values()),
+            collections: Array.from(this.collections.values()),
+            exportedAt: new Date().toISOString(),
+            version: '1.0',
+          },
+          null,
+          2
+        );
+
       case 'csv':
-        const headers = ['ID', 'Track ID', 'Timestamp', 'Title', 'Description', 'Tags', 'Category', 'Created At'];
-        const rows = bookmarks.map(bookmark => [
+        const headers = [
+          'ID',
+          'Track ID',
+          'Timestamp',
+          'Title',
+          'Description',
+          'Tags',
+          'Category',
+          'Created At',
+        ];
+        const rows = bookmarks.map((bookmark) => [
           bookmark.id,
           bookmark.trackId,
           bookmark.timestamp.toString(),
@@ -498,32 +510,36 @@ export class BookmarkManager {
           bookmark.description || '',
           bookmark.tags.join(';'),
           bookmark.category,
-          bookmark.createdAt.toISOString()
+          bookmark.createdAt.toISOString(),
         ]);
-        
-        return [headers, ...rows].map(row => 
-          row.map(cell => `"${cell.toString().replace(/"/g, '""')}"`).join(',')
-        ).join('\n');
-        
+
+        return [headers, ...rows]
+          .map((row) => row.map((cell) => `"${cell.toString().replace(/"/g, '""')}"`).join(','))
+          .join('\n');
+
       case 'xml':
-        const xmlBookmarks = bookmarks.map(bookmark => `
+        const xmlBookmarks = bookmarks
+          .map(
+            (bookmark) => `
     <bookmark>
       <id>${bookmark.id}</id>
       <trackId>${bookmark.trackId}</trackId>
       <timestamp>${bookmark.timestamp}</timestamp>
       <title><![CDATA[${bookmark.title}]]></title>
       <description><![CDATA[${bookmark.description || ''}]]></description>
-      <tags>${bookmark.tags.map(tag => `<tag>${tag}</tag>`).join('')}</tags>
+      <tags>${bookmark.tags.map((tag) => `<tag>${tag}</tag>`).join('')}</tags>
       <category>${bookmark.category}</category>
       <createdAt>${bookmark.createdAt.toISOString()}</createdAt>
-    </bookmark>`).join('');
-        
+    </bookmark>`
+          )
+          .join('');
+
         return `<?xml version="1.0" encoding="UTF-8"?>
 <bookmarks>
   <exportedAt>${new Date().toISOString()}</exportedAt>
   <version>1.0</version>${xmlBookmarks}
 </bookmarks>`;
-        
+
       default:
         throw new Error(`Unsupported export format: ${format}`);
     }
@@ -534,7 +550,7 @@ export class BookmarkManager {
    */
   public async importBookmarks(data: string, format: 'json' | 'csv' = 'json'): Promise<number> {
     let importedCount = 0;
-    
+
     try {
       switch (format) {
         case 'json':
@@ -545,23 +561,23 @@ export class BookmarkManager {
                 ...bookmarkData,
                 id: this.generateId(), // Generate new ID to avoid conflicts
                 createdAt: new Date(bookmarkData.createdAt),
-                updatedAt: new Date(bookmarkData.updatedAt || bookmarkData.createdAt)
+                updatedAt: new Date(bookmarkData.updatedAt || bookmarkData.createdAt),
               };
-              
+
               this.bookmarks.set(bookmark.id, bookmark);
               importedCount++;
             }
           }
           break;
-          
+
         case 'csv':
           const lines = data.split('\n');
-          const headers = lines[0]?.split(',').map(h => h.replace(/"/g, '')) || [];
-          
+          const headers = lines[0]?.split(',').map((h) => h.replace(/"/g, '')) || [];
+
           for (let i = 1; i < lines.length; i++) {
             if (!lines[i]?.trim()) continue;
-            
-            const values = lines[i]?.split(',').map(v => v.replace(/"/g, '')) || [];
+
+            const values = lines[i]?.split(',').map((v) => v.replace(/"/g, '')) || [];
             const bookmark: Bookmark = {
               id: this.generateId(),
               trackId: values[1] || '',
@@ -572,21 +588,20 @@ export class BookmarkManager {
               category: values[6] || 'notes',
               isPublic: false,
               createdAt: new Date(values[7] || Date.now()),
-              updatedAt: new Date()
+              updatedAt: new Date(),
             };
-            
+
             this.bookmarks.set(bookmark.id, bookmark);
             importedCount++;
           }
           break;
-          
+
         default:
           throw new Error(`Unsupported import format: ${format}`);
       }
-      
+
       this.emit('bookmarksImported', { count: importedCount });
       return importedCount;
-      
     } catch (error) {
       throw new Error(`Import failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -595,7 +610,10 @@ export class BookmarkManager {
   /**
    * Queue bookmark for synchronization
    */
-  private queueForSync(bookmarkId: string, operation: 'create' | 'update' | 'delete' = 'update'): void {
+  private queueForSync(
+    bookmarkId: string,
+    operation: 'create' | 'update' | 'delete' = 'update'
+  ): void {
     if (this.config.enableSync) {
       this.syncQueue.add(`${operation}:${bookmarkId}`);
     }
@@ -614,14 +632,14 @@ export class BookmarkManager {
       // Here you would implement actual sync with your backend
       // For now, we'll just emit events
       this.emit('syncStarted', { operations });
-      
+
       // Simulate sync delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       this.emit('syncCompleted', { operations });
     } catch (error) {
       // Re-queue failed operations
-      operations.forEach(op => this.syncQueue.add(op));
+      operations.forEach((op) => this.syncQueue.add(op));
       this.emit('syncFailed', { error, operations });
     }
   }
@@ -656,7 +674,7 @@ export class BookmarkManager {
   private emit(event: string, data?: any): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
-      listeners.forEach(listener => listener(data));
+      listeners.forEach((listener) => listener(data));
     }
   }
 
@@ -672,18 +690,18 @@ export class BookmarkManager {
   } {
     const bookmarks = Array.from(this.bookmarks.values());
     const now = Date.now();
-    const dayAgo = now - (24 * 60 * 60 * 1000);
+    const dayAgo = now - 24 * 60 * 60 * 1000;
 
     const bookmarksByCategory: Record<string, number> = {};
     const bookmarksByTrack: Record<string, number> = {};
 
-    bookmarks.forEach(bookmark => {
+    bookmarks.forEach((bookmark) => {
       bookmarksByCategory[bookmark.category] = (bookmarksByCategory[bookmark.category] || 0) + 1;
       bookmarksByTrack[bookmark.trackId] = (bookmarksByTrack[bookmark.trackId] || 0) + 1;
     });
 
-    const recentActivity = bookmarks.filter(bookmark => 
-      bookmark.createdAt.getTime() > dayAgo || bookmark.updatedAt.getTime() > dayAgo
+    const recentActivity = bookmarks.filter(
+      (bookmark) => bookmark.createdAt.getTime() > dayAgo || bookmark.updatedAt.getTime() > dayAgo
     ).length;
 
     return {
@@ -691,7 +709,7 @@ export class BookmarkManager {
       bookmarksByCategory,
       bookmarksByTrack,
       recentActivity,
-      syncQueueSize: this.syncQueue.size
+      syncQueueSize: this.syncQueue.size,
     };
   }
 

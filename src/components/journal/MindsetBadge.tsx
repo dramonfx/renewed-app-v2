@@ -1,4 +1,3 @@
-
 // src/components/journal/MindsetBadge.tsx
 // Sacred Mindset Badge - Display mindset state on journal entries
 
@@ -39,11 +38,11 @@ interface SizeConfig {
   icon: string;
 }
 
-export default function MindsetBadge({ 
-  mindset, 
-  size = 'normal', 
-  showIcon = true, 
-  showText = true 
+export default function MindsetBadge({
+  mindset,
+  size = 'normal',
+  showIcon = true,
+  showText = true,
 }: MindsetBadgeProps): React.ReactElement | null {
   if (!mindset) return null;
 
@@ -57,8 +56,8 @@ export default function MindsetBadge({
         bg: 'bg-red-100',
         text: 'text-red-700',
         border: 'border-red-200',
-        icon: 'text-red-600'
-      }
+        icon: 'text-red-600',
+      },
     },
     transition: {
       label: 'In Transition',
@@ -68,8 +67,8 @@ export default function MindsetBadge({
         bg: 'bg-amber-100',
         text: 'text-amber-700',
         border: 'border-amber-200',
-        icon: 'text-amber-600'
-      }
+        icon: 'text-amber-600',
+      },
     },
     spiritual: {
       label: 'Spiritual Mind',
@@ -79,9 +78,9 @@ export default function MindsetBadge({
         bg: 'bg-emerald-100',
         text: 'text-emerald-700',
         border: 'border-emerald-200',
-        icon: 'text-emerald-600'
-      }
-    }
+        icon: 'text-emerald-600',
+      },
+    },
   };
 
   const config = mindsetConfig[mindset.toLowerCase()];
@@ -94,24 +93,24 @@ export default function MindsetBadge({
     small: {
       container: 'px-2 py-1',
       text: 'text-xs',
-      icon: 'w-3 h-3'
+      icon: 'w-3 h-3',
     },
     normal: {
       container: 'px-3 py-1.5',
       text: 'text-sm',
-      icon: 'w-4 h-4'
+      icon: 'w-4 h-4',
     },
     large: {
       container: 'px-4 py-2',
       text: 'text-base',
-      icon: 'w-5 h-5'
-    }
+      icon: 'w-5 h-5',
+    },
   };
 
   const currentSize = sizeConfig[size] || sizeConfig.normal;
 
   return (
-    <div 
+    <div
       className={`
         inline-flex items-center gap-1.5 rounded-full border font-semibold
         ${config.colors.bg} ${config.colors.text} ${config.colors.border}
@@ -119,14 +118,8 @@ export default function MindsetBadge({
       `}
       title={`Mindset: ${config.label}`}
     >
-      {showIcon && (
-        <Icon className={`${currentSize.icon} ${config.colors.icon}`} />
-      )}
-      {showText && (
-        <span>
-          {size === 'small' ? config.shortLabel : config.label}
-        </span>
-      )}
+      {showIcon && <Icon className={`${currentSize.icon} ${config.colors.icon}`} />}
+      {showText && <span>{size === 'small' ? config.shortLabel : config.label}</span>}
     </div>
   );
 }

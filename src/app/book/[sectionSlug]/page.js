@@ -8,9 +8,9 @@ import { performanceCache } from '@/lib/performanceCache';
 const withTimeout = (promise, timeoutMs = 10000) => {
   return Promise.race([
     promise,
-    new Promise((_, reject) => 
+    new Promise((_, reject) =>
       setTimeout(() => reject(new Error(`Request timeout after ${timeoutMs}ms`)), timeoutMs)
-    )
+    ),
   ]);
 };
 
@@ -60,12 +60,12 @@ const circuitBreaker = new CircuitBreaker();
 
 export default async function SectionPage({ params }) {
   const startTime = Date.now();
-  
+
   try {
     // Pass the full params object to client component to avoid Next.js 15 static analysis error
     const awaitedParams = await params;
     const { sectionSlug } = awaitedParams;
-    
+
     if (!sectionSlug) {
       notFound();
     }
@@ -73,10 +73,10 @@ export default async function SectionPage({ params }) {
     // Check cache first
     const cacheKey = `section_${sectionSlug}`;
     const cachedData = performanceCache.get(cacheKey);
-    
+
     if (cachedData) {
       return (
-        <SectionPageClient 
+        <SectionPageClient
           section={cachedData.section}
           visuals={cachedData.visuals}
           visualsMap={cachedData.visualsMap}
@@ -88,11 +88,7 @@ export default async function SectionPage({ params }) {
     // Use circuit breaker for database operations
     const sectionData = await circuitBreaker.execute(async () => {
       return await withTimeout(
-        supabase
-          .from('sections')
-          .select('*')
-          .eq('slug', sectionSlug)
-          .single(),
+        supabase.from('sections').select('*').eq('slug', sectionSlug).single(),
         5000 // 5 second timeout for section fetch
       );
     });
@@ -107,28 +103,26 @@ export default async function SectionPage({ params }) {
     // Optimized parallel operations with individual timeouts
     const [audioResult, markdownResult, visualsResult] = await Promise.allSettled([
       // Audio with shorter timeout
-      section.audio_file_path 
+      section.audio_file_path
         ? withTimeout(
-            supabase.storage
-              .from('book-assets')
-              .createSignedUrl(section.audio_file_path, 60 * 60),
+            supabase.storage.from('book-assets').createSignedUrl(section.audio_file_path, 60 * 60),
             3000 // 3 second timeout for audio
-          ).catch(error => ({ data: null, error }))
+          ).catch((error) => ({ data: null, error }))
         : Promise.resolve({ data: null, error: null }),
-      
+
       // Markdown with chunking and size limits
       section.text_file_path && section.text_file_path.endsWith('.md')
         ? withTimeout(
             processMarkdownContent(section.text_file_path),
             8000 // 8 second timeout for markdown
-          ).catch(error => ({ content: 'Content temporarily unavailable', error }))
-        : Promise.resolve({ 
-            content: section.text_file_path 
-              ? 'Content is not in Markdown format or path is incorrect.' 
+          ).catch((error) => ({ content: 'Content temporarily unavailable', error }))
+        : Promise.resolve({
+            content: section.text_file_path
+              ? 'Content is not in Markdown format or path is incorrect.'
               : 'Text content not available for this section.',
-            error: null 
+            error: null,
           }),
-      
+
       // Visuals with timeout
       withTimeout(
         supabase
@@ -137,7 +131,7 @@ export default async function SectionPage({ params }) {
           .eq('section_id', section.id)
           .order('display_order', { ascending: true }),
         5000 // 5 second timeout for visuals
-      ).catch(error => ({ data: [], error }))
+      ).catch((error) => ({ data: [], error })),
     ]);
 
     // Process results with error handling
@@ -165,18 +159,18 @@ export default async function SectionPage({ params }) {
     // Optimized visual processing with early returns
     let visualsWithUrls = [];
     let visualsMap = {};
-    
+
     if (visualsData.length > 0) {
       // Limit visual processing to prevent timeouts
       const MAX_VISUALS = 20;
       const limitedVisuals = visualsData.slice(0, MAX_VISUALS);
-      
+
       try {
         visualsWithUrls = await processVisualsOptimized(limitedVisuals);
-        
+
         // Create visuals map for markdown rendering with normalized keys
         // Use plain object instead of Map to avoid serialization issues
-        visualsWithUrls.forEach(vis => {
+        visualsWithUrls.forEach((vis) => {
           if (vis.markdown_tag && vis.displayUrl) {
             // Normalize the key on server side to avoid client-side processing
             const normalizedKey = vis.markdown_tag.toString().toUpperCase().trim();
@@ -193,22 +187,21 @@ export default async function SectionPage({ params }) {
     const finalSectionData = {
       ...section,
       audioUrl,
-      markdownContent
+      markdownContent,
     };
 
     // Cache the result
     const cacheData = {
       section: finalSectionData,
       visuals: visualsWithUrls,
-      visualsMap
+      visualsMap,
     };
     performanceCache.set(cacheKey, cacheData, 300000); // 5 minute cache
 
     const totalTime = Date.now() - startTime;
-    console.log(`Section ${sectionSlug} loaded in ${totalTime}ms`);
 
     return (
-      <SectionPageClient 
+      <SectionPageClient
         section={finalSectionData}
         visuals={visualsWithUrls}
         visualsMap={visualsMap}
@@ -233,7 +226,7 @@ async function processMarkdownContent(textFilePath) {
     if (error) {
       return { content: `Could not load text content. Error: ${error.message}`, error };
     }
-    
+
     if (!blobData) {
       return { content: 'Text content not available for this section.', error: null };
     }
@@ -245,18 +238,18 @@ async function processMarkdownContent(textFilePath) {
       const reader = blobData.stream().getReader();
       let content = '';
       let totalSize = 0;
-      
+
       try {
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          
+
           totalSize += value.length;
           if (totalSize > MAX_SIZE) {
             content += '\n\n[Content truncated due to size limits]';
             break;
           }
-          
+
           content += new TextDecoder().decode(value);
         }
         return { content, error: null };
@@ -278,42 +271,45 @@ async function processMarkdownContent(textFilePath) {
 async function processVisualsOptimized(visuals) {
   const CONCURRENT_LIMIT = 3; // Process max 3 visuals at once
   const results = [];
-  
+
   for (let i = 0; i < visuals.length; i += CONCURRENT_LIMIT) {
     const batch = visuals.slice(i, i + CONCURRENT_LIMIT);
-    
+
     const batchPromises = batch.map(async (visual) => {
       if (!visual.file_path) {
         return { ...visual, displayUrl: null, error: 'No file path for visual' };
       }
-      
+
       try {
         const { data: signedUrlData, error: signedUrlError } = await withTimeout(
-          supabase.storage
-            .from('book-assets')
-            .createSignedUrl(visual.file_path, 60 * 60),
+          supabase.storage.from('book-assets').createSignedUrl(visual.file_path, 60 * 60),
           2000 // 2 second timeout per visual
         );
 
         if (signedUrlError) {
-          console.error(`Error creating signed URL for visual ${visual.file_path}:`, signedUrlError.message);
+          console.error(
+            `Error creating signed URL for visual ${visual.file_path}:`,
+            signedUrlError.message
+          );
           return { ...visual, displayUrl: null, error: signedUrlError.message };
         }
-        
+
         return { ...visual, displayUrl: signedUrlData.signedUrl };
       } catch (error) {
         console.error(`Timeout or error processing visual ${visual.file_path}:`, error);
         return { ...visual, displayUrl: null, error: error.message };
       }
     });
-    
+
     const batchResults = await Promise.allSettled(batchPromises);
-    const processedBatch = batchResults.map(result => 
-      result.status === 'fulfilled' ? result.value : { displayUrl: null, error: 'Processing failed' }
+    const processedBatch = batchResults.map((result) =>
+      result.status === 'fulfilled'
+        ? result.value
+        : { displayUrl: null, error: 'Processing failed' }
     );
-    
+
     results.push(...processedBatch);
   }
-  
+
   return results;
 }

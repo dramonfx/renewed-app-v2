@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -33,22 +32,22 @@ export default function DashboardPage() {
       description: 'Pick up where you left off in your spiritual journey',
       icon: '📖',
       href: '/book',
-      variant: 'primary'
+      variant: 'primary',
     },
     {
       title: 'Audio Experience',
       description: 'Listen to the full audiobook with guided reflections',
       icon: '🎧',
       href: '/full-audio-player',
-      variant: 'gold'
+      variant: 'gold',
     },
     {
       title: 'Journey Progress',
       description: 'Track your spiritual growth and transformation',
       icon: '📊',
       href: '#',
-      variant: 'ghost'
-    }
+      variant: 'ghost',
+    },
   ];
 
   const recentSections = [
@@ -60,7 +59,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen p-6 lg:p-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="mx-auto max-w-6xl">
         {/* Welcome Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -71,16 +70,16 @@ export default function DashboardPage() {
           <SacredCard variant="heavy" className="p-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl md:text-4xl font-serif text-sacred-blue-900 mb-2">
+                <h1 className="mb-2 font-serif text-3xl text-sacred-blue-900 md:text-4xl">
                   {greeting}, {user?.email?.split('@')[0] || 'Fellow Traveler'}!
                 </h1>
-                <p className="text-sacred-blue-600 text-lg">
+                <p className="text-lg text-sacred-blue-600">
                   Welcome to your spiritual transformation dashboard. Your journey continues here.
                 </p>
               </div>
               <div className="hidden md:block">
-                <div className="w-20 h-20 rounded-full bg-sacred-gradient flex items-center justify-center shadow-lg">
-                  <span className="text-white text-3xl">🕊️</span>
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-sacred-gradient shadow-lg">
+                  <span className="text-3xl text-white">🕊️</span>
                 </div>
               </div>
             </div>
@@ -94,8 +93,8 @@ export default function DashboardPage() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="mb-8"
         >
-          <h2 className="text-2xl font-serif text-sacred-blue-900 mb-6">Quick Actions</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <h2 className="mb-6 font-serif text-2xl text-sacred-blue-900">Quick Actions</h2>
+          <div className="grid gap-6 md:grid-cols-3">
             {quickActions.map((action, index) => (
               <motion.div
                 key={action.title}
@@ -103,37 +102,32 @@ export default function DashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 * index }}
               >
-                <SacredCard 
-                  variant="glass" 
-                  className="p-6 h-full hover:shadow-xl transition-all duration-300"
+                <SacredCard
+                  variant="glass"
+                  className="h-full p-6 transition-all duration-300 hover:shadow-xl"
                   hover={!!action.href}
                   onClick={action.href !== '#' ? () => router.push(action.href) : undefined}
                 >
                   <div className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-gradient flex items-center justify-center shadow-lg">
-                      <span className="text-white text-2xl">{action.icon}</span>
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-gradient shadow-lg">
+                      <span className="text-2xl text-white">{action.icon}</span>
                     </div>
-                    <h3 className="text-xl font-serif text-sacred-blue-900 mb-3">
-                      {action.title}
-                    </h3>
-                    <p className="text-sacred-blue-600 mb-4 text-sm leading-relaxed">
+                    <h3 className="mb-3 font-serif text-xl text-sacred-blue-900">{action.title}</h3>
+                    <p className="mb-4 text-sm leading-relaxed text-sacred-blue-600">
                       {action.description}
                     </p>
                     {action.href !== '#' && (
-                      <SacredButton
-                        variant={action.variant}
-                        size="sm"
-                        className="w-full"
-                      >
-                        {action.title === 'Continue Reading' ? 'Open Guidebook' : 
-                         action.title === 'Audio Experience' ? 'Start Listening' : 'View Progress'}
+                      <SacredButton variant={action.variant} size="sm" className="w-full">
+                        {action.title === 'Continue Reading'
+                          ? 'Open Guidebook'
+                          : action.title === 'Audio Experience'
+                            ? 'Start Listening'
+                            : 'View Progress'}
                       </SacredButton>
                     )}
                     {action.href === '#' && (
-                      <div className="bg-sacred-blue-100 rounded-lg p-3">
-                        <div className="text-sm text-sacred-blue-700">
-                          Coming soon...
-                        </div>
+                      <div className="rounded-lg bg-sacred-blue-100 p-3">
+                        <div className="text-sm text-sacred-blue-700">Coming soon...</div>
                       </div>
                     )}
                   </div>
@@ -149,7 +143,7 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
         >
-          <h2 className="text-2xl font-serif text-sacred-blue-900 mb-6">Your Reading Progress</h2>
+          <h2 className="mb-6 font-serif text-2xl text-sacred-blue-900">Your Reading Progress</h2>
           <SacredCard variant="heavy" className="p-6">
             <div className="space-y-4">
               {recentSections.map((section, index) => (
@@ -158,31 +152,41 @@ export default function DashboardPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.4, delay: 0.1 * index }}
-                  className="flex items-center justify-between p-4 rounded-lg bg-white/50 hover:bg-white/70 transition-colors cursor-pointer"
+                  className="flex cursor-pointer items-center justify-between rounded-lg bg-white/50 p-4 transition-colors hover:bg-white/70"
                   onClick={() => router.push(`/book/${section.slug}`)}
                 >
                   <div className="flex-1">
-                    <h4 className="text-lg font-serif text-sacred-blue-900 mb-1">
+                    <h4 className="mb-1 font-serif text-lg text-sacred-blue-900">
                       {section.title}
                     </h4>
                     <div className="flex items-center space-x-3">
-                      <div className="flex-1 bg-sacred-blue-100 rounded-full h-2">
-                        <div 
-                          className="bg-sacred-gradient h-2 rounded-full transition-all duration-500"
+                      <div className="h-2 flex-1 rounded-full bg-sacred-blue-100">
+                        <div
+                          className="h-2 rounded-full bg-sacred-gradient transition-all duration-500"
                           style={{ width: `${section.progress}%` }}
                         />
                       </div>
-                      <span className="text-sm text-sacred-blue-600 font-medium">
+                      <span className="text-sm font-medium text-sacred-blue-600">
                         {section.progress}%
                       </span>
                     </div>
                   </div>
                   <div className="ml-4">
                     <SacredButton
-                      variant={section.progress === 0 ? 'primary' : section.progress === 100 ? 'ghost' : 'gold'}
+                      variant={
+                        section.progress === 0
+                          ? 'primary'
+                          : section.progress === 100
+                            ? 'ghost'
+                            : 'gold'
+                      }
                       size="sm"
                     >
-                      {section.progress === 0 ? 'Start' : section.progress === 100 ? 'Review' : 'Continue'}
+                      {section.progress === 0
+                        ? 'Start'
+                        : section.progress === 100
+                          ? 'Review'
+                          : 'Continue'}
                     </SacredButton>
                   </div>
                 </motion.div>

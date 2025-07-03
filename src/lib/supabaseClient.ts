@@ -1,7 +1,14 @@
-
 // src/lib/supabaseClient.ts
 import { createClient, SupabaseClient, AuthSession, User } from '@supabase/supabase-js';
-import { mockSections, mockMarkdownContent, mockVisuals, mockJournalEntries, mockAudioTracks, MockSection, MockVisual } from './mockData';
+import {
+  mockSections,
+  mockMarkdownContent,
+  mockVisuals,
+  mockJournalEntries,
+  mockAudioTracks,
+  MockSection,
+  MockVisual,
+} from './mockData';
 import type { JournalEntry, AudioTrack } from '@/types';
 
 // Database type definitions
@@ -50,19 +57,28 @@ interface MockQueryBuilder<T> {
 // Mock storage interface
 interface MockStorage {
   from(bucket: string): {
-    createSignedUrl(path: string, expiresIn: number): Promise<MockQueryResult<{ signedUrl: string }>>;
+    createSignedUrl(
+      path: string,
+      expiresIn: number
+    ): Promise<MockQueryResult<{ signedUrl: string }>>;
     download(path: string): Promise<MockQueryResult<Blob>>;
   };
 }
 
 // Mock auth interface
 interface MockAuth {
-  onAuthStateChange(callback: (event: string, session: AuthSession | null) => void): { 
-    data: { subscription: { unsubscribe: () => void } } 
+  onAuthStateChange(callback: (event: string, session: AuthSession | null) => void): {
+    data: { subscription: { unsubscribe: () => void } };
   };
   getSession(): Promise<MockQueryResult<{ session: AuthSession | null }>>;
-  signUp(credentials: { email: string; password: string }): Promise<MockQueryResult<{ user: User | null; session: AuthSession | null }>>;
-  signInWithPassword(credentials: { email: string; password: string }): Promise<MockQueryResult<{ user: User | null; session: AuthSession | null }>>;
+  signUp(credentials: {
+    email: string;
+    password: string;
+  }): Promise<MockQueryResult<{ user: User | null; session: AuthSession | null }>>;
+  signInWithPassword(credentials: {
+    email: string;
+    password: string;
+  }): Promise<MockQueryResult<{ user: User | null; session: AuthSession | null }>>;
   signOut(): Promise<{ error: any | null }>;
   getUser(): Promise<MockQueryResult<{ user: User | null }>>;
 }
@@ -85,18 +101,18 @@ if (supabaseUrl && supabaseAnonKey) {
   supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 } else {
   // Use the new, smarter mock client if credentials are NOT found
-  console.warn("Supabase environment variables not found. Using mock data for development.");
+  console.warn('Supabase environment variables not found. Using mock data for development.');
 
   const createMockQueryBuilder = <T>(initialData: T[]): MockQueryBuilder<T> => {
     let data = [...initialData]; // Create a mutable copy
 
     const builder: MockQueryBuilder<T> = {
       // Chaining methods: they modify the data and return the builder itself.
-      select: function(columns?: string) { 
-        return this; 
+      select: function (columns?: string) {
+        return this;
       }, // Mock doesn't need to filter columns
-      
-      order: function(column: string, options: { ascending?: boolean } = {}) {
+
+      order: function (column: string, options: { ascending?: boolean } = {}) {
         // A simple mock sort implementation
         data.sort((a: any, b: any) => {
           if (a[column] < b[column]) return options.ascending ? -1 : 1;
@@ -105,26 +121,26 @@ if (supabaseUrl && supabaseAnonKey) {
         });
         return this;
       },
-      
-      limit: function(count: number) {
+
+      limit: function (count: number) {
         data = data.slice(0, count);
         return this;
       },
-      
-      eq: function(column: string, value: any) {
+
+      eq: function (column: string, value: any) {
         data = data.filter((item: any) => String(item[column]) === String(value));
         return this;
       },
 
       // Terminator methods: they return the final data in a promise.
-      single: function(): Promise<MockQueryResult<T>> {
+      single: function (): Promise<MockQueryResult<T>> {
         return Promise.resolve({ data: data[0] || null, error: null });
       },
 
       // This allows the builder to be awaited directly
-      then: function(resolve: (result: MockQueryResult<T[]>) => void) {
+      then: function (resolve: (result: MockQueryResult<T[]>) => void) {
         resolve({ data, error: null });
-      }
+      },
     };
     return builder;
   };
@@ -150,10 +166,10 @@ if (supabaseUrl && supabaseAnonKey) {
       }
       return createMockQueryBuilder([]) as MockQueryBuilder<T>;
     },
-    
+
     storage: {
       from: (bucket: string) => ({
-        createSignedUrl: (path: string, expiresIn: number) => 
+        createSignedUrl: (path: string, expiresIn: number) =>
           Promise.resolve({ data: { signedUrl: `/mock-assets/${path}` }, error: null }),
         download: (path: string) => {
           const content = mockMarkdownContent[path] || 'Mock content not found.';
@@ -162,27 +178,28 @@ if (supabaseUrl && supabaseAnonKey) {
         },
       }),
     },
-    
+
     auth: {
-      onAuthStateChange: (callback: (event: string, session: AuthSession | null) => void) => ({ 
-        data: { subscription: { unsubscribe: () => {} } } 
+      onAuthStateChange: (callback: (event: string, session: AuthSession | null) => void) => ({
+        data: { subscription: { unsubscribe: () => {} } },
       }),
       getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-      signUp: (credentials: { email: string; password: string }) => 
-        Promise.resolve({ 
-          data: { user: null, session: null }, 
-          error: { message: 'Mock mode - no real authentication' } 
+      signUp: (credentials: { email: string; password: string }) =>
+        Promise.resolve({
+          data: { user: null, session: null },
+          error: { message: 'Mock mode - no real authentication' },
         }),
-      signInWithPassword: (credentials: { email: string; password: string }) => 
-        Promise.resolve({ 
-          data: { user: null, session: null }, 
-          error: { message: 'Mock mode - no real authentication' } 
+      signInWithPassword: (credentials: { email: string; password: string }) =>
+        Promise.resolve({
+          data: { user: null, session: null },
+          error: { message: 'Mock mode - no real authentication' },
         }),
       signOut: () => Promise.resolve({ error: null }),
-      getUser: () => Promise.resolve({ 
-        data: { user: null }, 
-        error: { message: 'Mock mode - no real authentication' } 
-      }),
+      getUser: () =>
+        Promise.resolve({
+          data: { user: null },
+          error: { message: 'Mock mode - no real authentication' },
+        }),
     },
   };
 

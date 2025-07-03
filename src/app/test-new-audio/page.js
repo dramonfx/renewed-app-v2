@@ -1,4 +1,3 @@
-
 'use client';
 
 import { motion } from 'framer-motion';
@@ -8,8 +7,7 @@ import UnifiedAudioPlayer from '@/components/UnifiedAudioPlayer';
 export default function TestNewAudioPage() {
   return (
     <div className="min-h-screen p-6 lg:p-8">
-      <div className="max-w-6xl mx-auto space-y-12">
-        
+      <div className="mx-auto max-w-6xl space-y-12">
         {/* Test Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -18,16 +16,16 @@ export default function TestNewAudioPage() {
         >
           <SacredCard variant="heavy" className="p-8">
             <div className="text-center">
-              <h1 className="text-3xl md:text-4xl font-serif text-sacred-blue-900 mb-4">
+              <h1 className="mb-4 font-serif text-3xl text-sacred-blue-900 md:text-4xl">
                 🧪 Golden Snippet Audio System Test
               </h1>
-              <p className="text-sacred-blue-600 text-lg max-w-2xl mx-auto mb-4">
+              <p className="mx-auto mb-4 max-w-2xl text-lg text-sacred-blue-600">
                 Testing the new audio system powered by proven golden snippet Supabase integration.
                 This should load real signed URLs instead of mock data.
               </p>
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 max-w-xl mx-auto">
-                <p className="text-green-700 text-sm font-semibold">✅ Golden Snippet Features:</p>
-                <ul className="text-green-600 text-sm mt-2 space-y-1">
+              <div className="mx-auto max-w-xl rounded-lg border border-green-200 bg-green-50 p-4">
+                <p className="text-sm font-semibold text-green-700">✅ Golden Snippet Features:</p>
+                <ul className="mt-2 space-y-1 text-sm text-green-600">
                   <li>• Direct environment variable access</li>
                   <li>• Real Supabase signed URLs (not mock)</li>
                   <li>• Proven working database queries</li>
@@ -46,7 +44,7 @@ export default function TestNewAudioPage() {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <SacredCard variant="heavy" className="p-8">
-            <h2 className="text-2xl font-serif text-sacred-blue-900 mb-6 text-center">
+            <h2 className="mb-6 text-center font-serif text-2xl text-sacred-blue-900">
               🎧 Full Audiobook Player Test
             </h2>
             <UnifiedAudioPlayer mode="full" />
@@ -60,10 +58,10 @@ export default function TestNewAudioPage() {
           transition={{ duration: 0.6, delay: 0.4 }}
         >
           <SacredCard variant="heavy" className="p-8">
-            <h2 className="text-2xl font-serif text-sacred-blue-900 mb-6 text-center">
+            <h2 className="mb-6 text-center font-serif text-2xl text-sacred-blue-900">
               🎵 Single Section Player Test (Prologue)
             </h2>
-            <div className="max-w-2xl mx-auto">
+            <div className="mx-auto max-w-2xl">
               <UnifiedAudioPlayer mode="single" singleTrackSlug="00_prologue" />
             </div>
           </SacredCard>
@@ -76,21 +74,22 @@ export default function TestNewAudioPage() {
           transition={{ duration: 0.6, delay: 0.6 }}
         >
           <SacredCard variant="glass" className="p-6">
-            <h3 className="text-lg font-serif text-sacred-blue-900 mb-4 text-center">
+            <h3 className="mb-4 text-center font-serif text-lg text-sacred-blue-900">
               🔍 Debug Information
             </h3>
-            <div className="grid md:grid-cols-2 gap-4 text-sm">
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-blue-900 mb-2">Environment Check</h4>
+            <div className="grid gap-4 text-sm md:grid-cols-2">
+              <div className="rounded-lg bg-blue-50 p-4">
+                <h4 className="mb-2 font-semibold text-blue-900">Environment Check</h4>
                 <p className="text-blue-700">
                   Supabase URL: {process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅ Set' : '❌ Missing'}
                 </p>
                 <p className="text-blue-700">
-                  Supabase Key: {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing'}
+                  Supabase Key:{' '}
+                  {process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing'}
                 </p>
               </div>
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-purple-900 mb-2">System Status</h4>
+              <div className="rounded-lg bg-purple-50 p-4">
+                <h4 className="mb-2 font-semibold text-purple-900">System Status</h4>
                 <p className="text-purple-700">Hook: useAudioPlayer (Golden Snippet)</p>
                 <p className="text-purple-700">Pattern: Direct createClient usage</p>
                 <p className="text-purple-700">URLs: Real signed URLs (not mock)</p>
@@ -98,7 +97,6 @@ export default function TestNewAudioPage() {
             </div>
           </SacredCard>
         </motion.div>
-
       </div>
     </div>
   );

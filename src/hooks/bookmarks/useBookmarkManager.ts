@@ -1,13 +1,17 @@
-
 // src/hooks/bookmarks/useBookmarkManager.ts
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { BookmarkManager, Bookmark, BookmarkCategory, BookmarkManagerConfig } from '../../lib/bookmarks/BookmarkManager';
+import {
+  BookmarkManager,
+  Bookmark,
+  BookmarkCategory,
+  BookmarkManagerConfig,
+} from '../../lib/bookmarks/BookmarkManager';
 
 /**
  * Enhanced Bookmark Manager Hook - Phase 3
- * 
+ *
  * React hook for managing bookmarks with real-time synchronization,
  * search capabilities, and state management.
  */
@@ -54,7 +58,12 @@ export interface BookmarkManagerActions {
   getTrackBookmarks: (trackId: string) => Bookmark[];
   exportBookmarks: (format?: 'json' | 'csv' | 'xml') => string;
   importBookmarks: (data: string, format?: 'json' | 'csv') => Promise<number>;
-  createCategory: (name: string, color: string, icon: string, description?: string) => Promise<BookmarkCategory>;
+  createCategory: (
+    name: string,
+    color: string,
+    icon: string,
+    description?: string
+  ) => Promise<BookmarkCategory>;
   refreshData: () => void;
   clearError: () => void;
 }
@@ -69,7 +78,7 @@ export function useBookmarkManager(
     isLoading: true,
     error: null,
     syncStatus: 'idle',
-    stats: null
+    stats: null,
   });
 
   // Initialize bookmark manager
@@ -83,67 +92,70 @@ export function useBookmarkManager(
       maxBookmarks: 1000,
       enableOfflineMode: true,
       enableExport: true,
-      ...config
+      ...config,
     });
 
     managerRef.current = manager;
 
     // Setup event listeners
     const handleBookmarkCreated = ({ bookmark }: { bookmark: Bookmark }) => {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
-        bookmarks: [...prev.bookmarks, bookmark].sort((a, b) => a.timestamp - b.timestamp)
+        bookmarks: [...prev.bookmarks, bookmark].sort((a, b) => a.timestamp - b.timestamp),
       }));
       updateStats();
     };
 
     const handleBookmarkUpdated = ({ bookmark }: { bookmark: Bookmark }) => {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
-        bookmarks: prev.bookmarks.map(b => b.id === bookmark.id ? bookmark : b)
+        bookmarks: prev.bookmarks.map((b) => (b.id === bookmark.id ? bookmark : b)),
       }));
       updateStats();
     };
 
     const handleBookmarkDeleted = ({ bookmark }: { bookmark: Bookmark }) => {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
-        bookmarks: prev.bookmarks.filter(b => b.id !== bookmark.id)
+        bookmarks: prev.bookmarks.filter((b) => b.id !== bookmark.id),
       }));
       updateStats();
     };
 
     const handleCategoryCreated = ({ category }: { category: BookmarkCategory }) => {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
-        categories: [...prev.categories, category].sort((a, b) => a.name.localeCompare(b.name))
+        categories: [...prev.categories, category].sort((a, b) => a.name.localeCompare(b.name)),
       }));
     };
 
     const handleSyncStarted = () => {
-      setState(prev => ({ ...prev, syncStatus: 'syncing' }));
+      setState((prev) => ({ ...prev, syncStatus: 'syncing' }));
     };
 
     const handleSyncCompleted = () => {
-      setState(prev => ({ ...prev, syncStatus: 'success' }));
+      setState((prev) => ({ ...prev, syncStatus: 'success' }));
       setTimeout(() => {
-        setState(prev => ({ ...prev, syncStatus: 'idle' }));
+        setState((prev) => ({ ...prev, syncStatus: 'idle' }));
       }, 2000);
     };
 
     const handleSyncFailed = ({ error }: { error: any }) => {
-      setState(prev => ({ 
-        ...prev, 
+      setState((prev) => ({
+        ...prev,
         syncStatus: 'error',
-        error: `Sync failed: ${error.message || 'Unknown error'}`
+        error: `Sync failed: ${error.message || 'Unknown error'}`,
       }));
     };
 
     const handleNetworkStatusChanged = ({ isOnline }: { isOnline: boolean }) => {
       if (!isOnline) {
-        setState(prev => ({ ...prev, error: 'You are offline. Changes will sync when connection is restored.' }));
+        setState((prev) => ({
+          ...prev,
+          error: 'You are offline. Changes will sync when connection is restored.',
+        }));
       } else {
-        setState(prev => ({ ...prev, error: null }));
+        setState((prev) => ({ ...prev, error: null }));
       }
     };
 
@@ -178,7 +190,7 @@ export function useBookmarkManager(
   const loadInitialData = useCallback(async () => {
     if (!managerRef.current) return;
 
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
+    setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
       // Load from local storage if enabled
@@ -188,26 +200,25 @@ export function useBookmarkManager(
 
       // Load categories
       const categories = managerRef.current.getCategories();
-      
+
       // Load bookmarks (filtered by track if specified)
-      const bookmarks = config.trackId 
+      const bookmarks = config.trackId
         ? managerRef.current.getTrackBookmarks(config.trackId)
         : managerRef.current.searchBookmarks();
 
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         bookmarks,
         categories,
-        isLoading: false
+        isLoading: false,
       }));
 
       updateStats();
-
     } catch (error) {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         isLoading: false,
-        error: error instanceof Error ? error.message : 'Failed to load bookmarks'
+        error: error instanceof Error ? error.message : 'Failed to load bookmarks',
       }));
     }
   }, [config.trackId, config.enableLocalStorage]);
@@ -246,7 +257,7 @@ export function useBookmarkManager(
     if (!managerRef.current) return;
 
     const stats = managerRef.current.getStats();
-    setState(prev => ({ ...prev, stats }));
+    setState((prev) => ({ ...prev, stats }));
   }, []);
 
   // Save to local storage when bookmarks change
@@ -257,65 +268,76 @@ export function useBookmarkManager(
   }, [state.bookmarks, saveToLocalStorage]);
 
   // Actions
-  const createBookmark = useCallback(async (
-    trackId: string,
-    timestamp: number,
-    title: string,
-    options: {
-      description?: string;
-      tags?: string[];
-      category?: string;
-      isPublic?: boolean;
-    } = {}
-  ): Promise<Bookmark> => {
-    if (!managerRef.current) {
-      throw new Error('Bookmark manager not initialized');
-    }
+  const createBookmark = useCallback(
+    async (
+      trackId: string,
+      timestamp: number,
+      title: string,
+      options: {
+        description?: string;
+        tags?: string[];
+        category?: string;
+        isPublic?: boolean;
+      } = {}
+    ): Promise<Bookmark> => {
+      if (!managerRef.current) {
+        throw new Error('Bookmark manager not initialized');
+      }
 
-    setState(prev => ({ ...prev, error: null }));
+      setState((prev) => ({ ...prev, error: null }));
 
-    try {
-      const bookmark = await managerRef.current.createBookmark(trackId, timestamp, title, options);
-      return bookmark;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create bookmark';
-      setState(prev => ({ ...prev, error: errorMessage }));
-      throw error;
-    }
-  }, []);
+      try {
+        const bookmark = await managerRef.current.createBookmark(
+          trackId,
+          timestamp,
+          title,
+          options
+        );
+        return bookmark;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to create bookmark';
+        setState((prev) => ({ ...prev, error: errorMessage }));
+        throw error;
+      }
+    },
+    []
+  );
 
-  const updateBookmark = useCallback(async (
-    bookmarkId: string,
-    updates: Partial<Omit<Bookmark, 'id' | 'createdAt' | 'updatedAt'>>
-  ): Promise<Bookmark> => {
-    if (!managerRef.current) {
-      throw new Error('Bookmark manager not initialized');
-    }
+  const updateBookmark = useCallback(
+    async (
+      bookmarkId: string,
+      updates: Partial<Omit<Bookmark, 'id' | 'createdAt' | 'updatedAt'>>
+    ): Promise<Bookmark> => {
+      if (!managerRef.current) {
+        throw new Error('Bookmark manager not initialized');
+      }
 
-    setState(prev => ({ ...prev, error: null }));
+      setState((prev) => ({ ...prev, error: null }));
 
-    try {
-      const bookmark = await managerRef.current.updateBookmark(bookmarkId, updates);
-      return bookmark;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update bookmark';
-      setState(prev => ({ ...prev, error: errorMessage }));
-      throw error;
-    }
-  }, []);
+      try {
+        const bookmark = await managerRef.current.updateBookmark(bookmarkId, updates);
+        return bookmark;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to update bookmark';
+        setState((prev) => ({ ...prev, error: errorMessage }));
+        throw error;
+      }
+    },
+    []
+  );
 
   const deleteBookmark = useCallback(async (bookmarkId: string): Promise<void> => {
     if (!managerRef.current) {
       throw new Error('Bookmark manager not initialized');
     }
 
-    setState(prev => ({ ...prev, error: null }));
+    setState((prev) => ({ ...prev, error: null }));
 
     try {
       await managerRef.current.deleteBookmark(bookmarkId);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to delete bookmark';
-      setState(prev => ({ ...prev, error: errorMessage }));
+      setState((prev) => ({ ...prev, error: errorMessage }));
       throw error;
     }
   }, []);
@@ -325,7 +347,7 @@ export function useBookmarkManager(
 
     return managerRef.current.searchBookmarks({
       query,
-      ...filters
+      ...filters,
     });
   }, []);
 
@@ -341,52 +363,58 @@ export function useBookmarkManager(
     return managerRef.current.exportBookmarks(format);
   }, []);
 
-  const importBookmarks = useCallback(async (data: string, format: 'json' | 'csv' = 'json'): Promise<number> => {
-    if (!managerRef.current) {
-      throw new Error('Bookmark manager not initialized');
-    }
+  const importBookmarks = useCallback(
+    async (data: string, format: 'json' | 'csv' = 'json'): Promise<number> => {
+      if (!managerRef.current) {
+        throw new Error('Bookmark manager not initialized');
+      }
 
-    setState(prev => ({ ...prev, error: null }));
+      setState((prev) => ({ ...prev, error: null }));
 
-    try {
-      const count = await managerRef.current.importBookmarks(data, format);
-      loadInitialData(); // Refresh data after import
-      return count;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to import bookmarks';
-      setState(prev => ({ ...prev, error: errorMessage }));
-      throw error;
-    }
-  }, [loadInitialData]);
+      try {
+        const count = await managerRef.current.importBookmarks(data, format);
+        loadInitialData(); // Refresh data after import
+        return count;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to import bookmarks';
+        setState((prev) => ({ ...prev, error: errorMessage }));
+        throw error;
+      }
+    },
+    [loadInitialData]
+  );
 
-  const createCategory = useCallback(async (
-    name: string,
-    color: string,
-    icon: string,
-    description?: string
-  ): Promise<BookmarkCategory> => {
-    if (!managerRef.current) {
-      throw new Error('Bookmark manager not initialized');
-    }
+  const createCategory = useCallback(
+    async (
+      name: string,
+      color: string,
+      icon: string,
+      description?: string
+    ): Promise<BookmarkCategory> => {
+      if (!managerRef.current) {
+        throw new Error('Bookmark manager not initialized');
+      }
 
-    setState(prev => ({ ...prev, error: null }));
+      setState((prev) => ({ ...prev, error: null }));
 
-    try {
-      const category = await managerRef.current.createCategory(name, color, icon, description);
-      return category;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create category';
-      setState(prev => ({ ...prev, error: errorMessage }));
-      throw error;
-    }
-  }, []);
+      try {
+        const category = await managerRef.current.createCategory(name, color, icon, description);
+        return category;
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to create category';
+        setState((prev) => ({ ...prev, error: errorMessage }));
+        throw error;
+      }
+    },
+    []
+  );
 
   const refreshData = useCallback(() => {
     loadInitialData();
   }, [loadInitialData]);
 
   const clearError = useCallback(() => {
-    setState(prev => ({ ...prev, error: null }));
+    setState((prev) => ({ ...prev, error: null }));
   }, []);
 
   const actions: BookmarkManagerActions = {
@@ -399,7 +427,7 @@ export function useBookmarkManager(
     importBookmarks,
     createCategory,
     refreshData,
-    clearError
+    clearError,
   };
 
   return [state, actions];

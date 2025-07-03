@@ -53,29 +53,29 @@ export interface WizardLayoutProps {
  */
 const backgroundVariants = {
   light: {
-    containerClass: "bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50",
+    containerClass: 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50',
     elements: [
-      "absolute top-20 left-20 w-64 h-64 bg-blue-200/30 rounded-full blur-3xl",
-      "absolute bottom-20 right-20 w-80 h-80 bg-purple-200/20 rounded-full blur-3xl",
-      "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-100/40 rounded-full blur-3xl"
-    ]
+      'absolute top-20 left-20 w-64 h-64 bg-blue-200/30 rounded-full blur-3xl',
+      'absolute bottom-20 right-20 w-80 h-80 bg-purple-200/20 rounded-full blur-3xl',
+      'absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-100/40 rounded-full blur-3xl',
+    ],
   },
   dark: {
-    containerClass: "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900",
+    containerClass: 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900',
     elements: [
-      "absolute top-20 left-20 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl",
-      "absolute bottom-20 right-20 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl",
-      "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"
-    ]
+      'absolute top-20 left-20 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl',
+      'absolute bottom-20 right-20 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl',
+      'absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl',
+    ],
   },
   gradient: {
-    containerClass: "bg-gradient-to-br from-sacred-blue-50 via-sacred-gold-50 to-sacred-blue-100",
+    containerClass: 'bg-gradient-to-br from-sacred-blue-50 via-sacred-gold-50 to-sacred-blue-100',
     elements: [
-      "absolute top-20 left-20 w-64 h-64 bg-sacred-blue-200/30 rounded-full blur-3xl",
-      "absolute bottom-20 right-20 w-80 h-80 bg-sacred-gold-200/20 rounded-full blur-3xl",
-      "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-sacred-blue-100/40 rounded-full blur-3xl"
-    ]
-  }
+      'absolute top-20 left-20 w-64 h-64 bg-sacred-blue-200/30 rounded-full blur-3xl',
+      'absolute bottom-20 right-20 w-80 h-80 bg-sacred-gold-200/20 rounded-full blur-3xl',
+      'absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-sacred-blue-100/40 rounded-full blur-3xl',
+    ],
+  },
 };
 
 /**
@@ -85,18 +85,18 @@ const stepAnimationVariants = {
   enter: {
     opacity: 0,
     y: 20,
-    scale: 0.95
+    scale: 0.95,
   },
   center: {
     opacity: 1,
     y: 0,
-    scale: 1
+    scale: 1,
   },
   exit: {
     opacity: 0,
     y: -20,
-    scale: 1.05
-  }
+    scale: 1.05,
+  },
 };
 
 /**
@@ -115,51 +115,43 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   totalSteps,
   progress,
   stepName,
-  stepSubtitle
+  stepSubtitle,
 }) => (
-  <div className="relative z-20 w-full bg-white/80 backdrop-blur-sm border-b border-white/50 py-4">
-    <div className="max-w-4xl mx-auto px-6">
-      <div className="flex items-center justify-between mb-2">
+  <div className="relative z-20 w-full border-b border-white/50 bg-white/80 py-4 backdrop-blur-sm">
+    <div className="mx-auto max-w-4xl px-6">
+      <div className="mb-2 flex items-center justify-between">
         <div className="flex flex-col">
           <span className="text-sm font-medium text-slate-600">
             Step {currentStep + 1} of {totalSteps}
           </span>
           {stepName && (
-            <span className="text-lg font-semibold text-slate-800 mt-1">
-              {stepName}
-            </span>
+            <span className="mt-1 text-lg font-semibold text-slate-800">{stepName}</span>
           )}
-          {stepSubtitle && (
-            <span className="text-sm text-slate-600 mt-1">
-              {stepSubtitle}
-            </span>
-          )}
+          {stepSubtitle && <span className="mt-1 text-sm text-slate-600">{stepSubtitle}</span>}
         </div>
-        <span className="text-sm font-medium text-slate-600">
-          {Math.round(progress)}% Complete
-        </span>
+        <span className="text-sm font-medium text-slate-600">{Math.round(progress)}% Complete</span>
       </div>
-      
-      <div className="w-full bg-slate-200 rounded-full h-2">
+
+      <div className="h-2 w-full rounded-full bg-slate-200">
         <motion.div
-          className="bg-gradient-to-r from-sacred-blue-500 to-sacred-blue-600 h-2 rounded-full"
+          className="h-2 rounded-full bg-gradient-to-r from-sacred-blue-500 to-sacred-blue-600"
           initial={{ width: 0 }}
           animate={{ width: `${Math.max(0, Math.min(100, progress))}%` }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         />
       </div>
-      
+
       {/* Step indicators */}
-      <div className="flex justify-between mt-4">
+      <div className="mt-4 flex justify-between">
         {Array.from({ length: totalSteps }, (_, index) => (
           <div
             key={index}
-            className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+            className={`h-3 w-3 rounded-full transition-colors duration-300 ${
               index <= currentStep
                 ? 'bg-sacred-blue-500'
                 : index === currentStep + 1
-                ? 'bg-sacred-blue-300'
-                : 'bg-slate-300'
+                  ? 'bg-sacred-blue-300'
+                  : 'bg-slate-300'
             }`}
           />
         ))}
@@ -170,7 +162,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
 /**
  * Wizard Layout Component
- * 
+ *
  * A comprehensive layout component for multi-step wizards/onboarding flows.
  * Enhanced with TypeScript, performance monitoring, error boundaries, and
  * accessibility features.
@@ -192,7 +184,7 @@ export default function WizardLayout({
   error = null,
   stepSubtitle,
   backgroundVariant = 'light',
-  animateTransitions = true
+  animateTransitions = true,
 }: WizardLayoutProps): JSX.Element {
   // Performance monitoring
   usePerformanceMonitor('WizardLayout');
@@ -200,9 +192,11 @@ export default function WizardLayout({
   // Validate props
   React.useEffect(() => {
     if (currentStep < 0 || currentStep >= totalSteps) {
-      console.warn(`WizardLayout: currentStep (${currentStep}) is out of bounds for totalSteps (${totalSteps})`);
+      console.warn(
+        `WizardLayout: currentStep (${currentStep}) is out of bounds for totalSteps (${totalSteps})`
+      );
     }
-    
+
     if (progress < 0 || progress > 100) {
       console.warn(`WizardLayout: progress (${progress}) should be between 0 and 100`);
     }
@@ -246,17 +240,15 @@ export default function WizardLayout({
     <ErrorBoundary
       onError={(error) => console.error('WizardLayout error:', error)}
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="flex min-h-screen items-center justify-center bg-gray-50">
           <div className="text-center">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              Unable to load wizard
-            </h2>
+            <h2 className="mb-2 text-xl font-semibold text-gray-800">Unable to load wizard</h2>
             <p className="text-gray-600">Please refresh the page to try again.</p>
           </div>
         </div>
       }
     >
-      <div className={`min-h-screen relative overflow-hidden ${className}`}>
+      <div className={`relative min-h-screen overflow-hidden ${className}`}>
         {/* Background */}
         <div className={`absolute inset-0 ${backgroundConfig.containerClass}`}>
           {/* Soft background elements */}
@@ -277,8 +269,8 @@ export default function WizardLayout({
         )}
 
         {/* Main Content Area */}
-        <div className="relative z-10 min-h-screen pt-8 pb-16">
-          <div className="max-w-4xl mx-auto px-6">
+        <div className="relative z-10 min-h-screen pb-16 pt-8">
+          <div className="mx-auto max-w-4xl px-6">
             {/* Action Buttons */}
             <div className="mb-8 flex items-center justify-between">
               {/* Back Button */}
@@ -295,7 +287,7 @@ export default function WizardLayout({
                     className="flex items-center gap-2"
                     aria-label={`Go back to step ${currentStep}`}
                   >
-                    <ArrowLeft className="w-5 h-5" />
+                    <ArrowLeft className="h-5 w-5" />
                     <span className="font-medium">Back</span>
                   </SacredButton>
                 </motion.div>
@@ -313,11 +305,11 @@ export default function WizardLayout({
                     className="flex items-center gap-2"
                     aria-label="Get help"
                   >
-                    <HelpCircle className="w-4 h-4" />
+                    <HelpCircle className="h-4 w-4" />
                     <span className="hidden sm:inline">Help</span>
                   </SacredButton>
                 )}
-                
+
                 {onHome && (
                   <SacredButton
                     variant="ghost"
@@ -326,7 +318,7 @@ export default function WizardLayout({
                     className="flex items-center gap-2"
                     aria-label="Go to homepage"
                   >
-                    <Home className="w-4 h-4" />
+                    <Home className="h-4 w-4" />
                     <span className="hidden sm:inline">Home</span>
                   </SacredButton>
                 )}
@@ -341,14 +333,18 @@ export default function WizardLayout({
                 animate={stepAnimationVariants.center}
                 exit={animateTransitions ? stepAnimationVariants.exit : false}
                 transition={{ duration: 0.6, ease: 'easeOut' }}
-                className="bg-white rounded-2xl shadow-xl overflow-hidden"
+                className="overflow-hidden rounded-2xl bg-white shadow-xl"
               >
                 {/* Error State */}
                 {error && (
-                  <div className="bg-red-50 border-b border-red-200 p-4">
+                  <div className="border-b border-red-200 bg-red-50 p-4">
                     <div className="flex items-center text-red-800">
-                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      <svg className="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       <span className="text-sm font-medium">{error}</span>
                     </div>
@@ -357,31 +353,23 @@ export default function WizardLayout({
 
                 {/* Loading Overlay */}
                 {isLoading && (
-                  <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+                  <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm">
                     <div className="flex flex-col items-center space-y-3">
-                      <div className="animate-spin w-8 h-8 border-2 border-sacred-blue-500 border-t-transparent rounded-full" />
-                      <p className="text-sm text-sacred-blue-600 font-medium">
-                        Loading...
-                      </p>
+                      <div className="h-8 w-8 animate-spin rounded-full border-2 border-sacred-blue-500 border-t-transparent" />
+                      <p className="text-sm font-medium text-sacred-blue-600">Loading...</p>
                     </div>
                   </div>
                 )}
 
                 {/* Main Content */}
-                <div className="p-8 md:p-12 relative">
-                  {children}
-                </div>
+                <div className="relative p-8 md:p-12">{children}</div>
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
 
         {/* Accessibility announcements */}
-        <div
-          aria-live="polite"
-          aria-atomic="true"
-          className="sr-only"
-        >
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
           {stepName ? `Current step: ${stepName}` : `Step ${currentStep + 1} of ${totalSteps}`}
           {progress && `, ${Math.round(progress)}% complete`}
         </div>

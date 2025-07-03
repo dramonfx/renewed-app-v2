@@ -5,7 +5,7 @@ import type { EnhancedTrack, AudioEngineConfig } from './CoreAudioEngine';
 
 /**
  * Audio Buffer Manager - Smart Buffering System
- * 
+ *
  * Manages intelligent audio buffering with network awareness,
  * adaptive strategies, and performance optimization.
  */
@@ -56,28 +56,28 @@ export class AudioBufferManager {
       name: 'Conservative',
       bufferAhead: 10,
       preloadNext: false,
-      aggressiveness: 'low'
+      aggressiveness: 'low',
     });
 
     strategies.set('balanced', {
       name: 'Balanced',
       bufferAhead: 30,
       preloadNext: true,
-      aggressiveness: 'medium'
+      aggressiveness: 'medium',
     });
 
     strategies.set('aggressive', {
       name: 'Aggressive',
       bufferAhead: 60,
       preloadNext: true,
-      aggressiveness: 'high'
+      aggressiveness: 'high',
     });
 
     strategies.set('wifi-optimized', {
       name: 'WiFi Optimized',
       bufferAhead: 120,
       preloadNext: true,
-      aggressiveness: 'high'
+      aggressiveness: 'high',
     });
 
     return strategies;
@@ -91,11 +91,12 @@ export class AudioBufferManager {
 
     try {
       // @ts-ignore - Navigator connection API
-      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-      
+      const connection =
+        navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+
       if (connection) {
         this.updateNetworkCondition(connection);
-        
+
         connection.addEventListener('change', () => {
           this.updateNetworkCondition(connection);
           this.adaptBufferingStrategy();
@@ -114,7 +115,7 @@ export class AudioBufferManager {
       type: connection.type || 'unknown',
       downlink: connection.downlink || 0,
       effectiveType: connection.effectiveType || 'unknown',
-      rtt: connection.rtt || 0
+      rtt: connection.rtt || 0,
     };
   }
 
@@ -138,7 +139,6 @@ export class AudioBufferManager {
     const newStrategy = this.strategies.get(strategyName);
     if (newStrategy && newStrategy !== this.currentStrategy) {
       this.currentStrategy = newStrategy;
-      console.log(`🔄 Switched to ${newStrategy.name} buffering strategy`);
     }
   }
 
@@ -194,7 +194,7 @@ export class AudioBufferManager {
       bufferHealth,
       isBuffering: audioElement.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA,
       bufferProgress,
-      estimatedTotal: duration
+      estimatedTotal: duration,
     };
 
     this.bufferStates.set(trackId, bufferState);
@@ -217,10 +217,14 @@ export class AudioBufferManager {
    */
   private getBufferHealthThreshold(): number {
     switch (this.currentStrategy.aggressiveness) {
-      case 'low': return 20;
-      case 'medium': return 40;
-      case 'high': return 60;
-      default: return 40;
+      case 'low':
+        return 20;
+      case 'medium':
+        return 40;
+      case 'high':
+        return 60;
+      default:
+        return 40;
     }
   }
 
@@ -232,7 +236,7 @@ export class AudioBufferManager {
       return 5000; // Default 5 second estimate
     }
 
-    const downloadSpeedBps = this.networkInfo.downlink * 1024 * 1024 / 8; // Convert Mbps to bytes/sec
+    const downloadSpeedBps = (this.networkInfo.downlink * 1024 * 1024) / 8; // Convert Mbps to bytes/sec
     const estimatedTime = (trackSizeBytes / downloadSpeedBps) * 1000; // Convert to ms
 
     // Add RTT and safety margin
@@ -285,7 +289,6 @@ export class AudioBufferManager {
   public async manageBuffer(currentTrack: any, nextTrack?: any): Promise<void> {
     // This method provides buffer management coordination
     // It could trigger preloading and buffer optimization strategies
-    console.log('Managing buffer for tracks:', currentTrack?.id, nextTrack?.id);
   }
 
   /**
@@ -305,15 +308,16 @@ export class AudioBufferManager {
     averageBufferHealth: number;
   } {
     const states = Array.from(this.bufferStates.values());
-    const averageBufferHealth = states.length > 0
-      ? states.reduce((sum, state) => sum + state.bufferHealth, 0) / states.length
-      : 100;
+    const averageBufferHealth =
+      states.length > 0
+        ? states.reduce((sum, state) => sum + state.bufferHealth, 0) / states.length
+        : 100;
 
     return {
       currentStrategy: this.currentStrategy.name,
       networkType: this.networkInfo?.effectiveType || 'unknown',
       downlink: this.networkInfo?.downlink || 0,
-      averageBufferHealth
+      averageBufferHealth,
     };
   }
 }

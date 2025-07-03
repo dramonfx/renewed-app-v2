@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -16,10 +15,8 @@ export default function FullAudioPlayerPageNew() {
     async function fetchChartVisual() {
       setChartLoading(true);
       setChartError(null);
-      
+
       try {
-        console.log('🔍 Loading Mind Transformation Chart via Golden Snippet API...');
-        
         // Fetch from our golden snippet API route (matches audio-tracks pattern)
         const response = await fetch('/api/chart-visual');
         const data = await response.json();
@@ -36,13 +33,10 @@ export default function FullAudioPlayerPageNew() {
           throw new Error('Chart data received but no image URL available');
         }
 
-        console.log('✅ Successfully loaded chart via Golden Snippet API');
-        
         setChartVisual({
           src: data.chart.src,
-          alt: data.chart.alt || 'Mind Transformation Chart'
+          alt: data.chart.alt || 'Mind Transformation Chart',
         });
-
       } catch (e) {
         console.error('❌ Failed to load chart visual:', e);
         setChartError(e.message || 'An unexpected error occurred.');
@@ -56,7 +50,7 @@ export default function FullAudioPlayerPageNew() {
 
   return (
     <div className="min-h-screen p-6 lg:p-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="mx-auto max-w-6xl">
         {/* Page Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -66,11 +60,11 @@ export default function FullAudioPlayerPageNew() {
         >
           <SacredCard variant="heavy" className="p-8">
             <div className="text-center">
-              <h1 className="text-3xl md:text-4xl font-serif text-sacred-blue-900 mb-4">
+              <h1 className="mb-4 font-serif text-3xl text-sacred-blue-900 md:text-4xl">
                 Full Audiobook Experience
               </h1>
-              <p className="text-sacred-blue-600 text-lg max-w-2xl mx-auto mb-2">
-                Immerse yourself in the complete spiritual journey. Listen to the entire guidebook 
+              <p className="mx-auto mb-2 max-w-2xl text-lg text-sacred-blue-600">
+                Immerse yourself in the complete spiritual journey. Listen to the entire guidebook
                 with advanced playbook controls, bookmarks, and progress tracking.
               </p>
               <p className="text-xs text-sacred-blue-500">
@@ -99,10 +93,10 @@ export default function FullAudioPlayerPageNew() {
           >
             <SacredCard variant="heavy" className="p-8">
               <div className="text-center">
-                <h2 className="text-2xl font-serif text-sacred-blue-900 mb-6">
+                <h2 className="mb-6 font-serif text-2xl text-sacred-blue-900">
                   Mind Transformation Chart
                 </h2>
-                <div className="relative w-full max-w-4xl mx-auto">
+                <div className="relative mx-auto w-full max-w-4xl">
                   <Image
                     src={chartVisual.src}
                     alt={chartVisual.alt}
@@ -113,10 +107,10 @@ export default function FullAudioPlayerPageNew() {
                     priority
                   />
                 </div>
-                <p className="text-sacred-blue-600 mt-4 text-sm">
+                <p className="mt-4 text-sm text-sacred-blue-600">
                   Reference this chart as you progress through your spiritual transformation journey
                 </p>
-                <p className="text-xs text-sacred-blue-400 mt-2">
+                <p className="mt-2 text-xs text-sacred-blue-400">
                   ✨ Chart loaded using Golden Snippet pattern
                 </p>
               </div>
@@ -128,7 +122,7 @@ export default function FullAudioPlayerPageNew() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-8"
+            className="py-8 text-center"
           >
             <SacredCard variant="glass" className="p-6">
               <div className="space-y-2">
@@ -143,7 +137,7 @@ export default function FullAudioPlayerPageNew() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-8"
+            className="py-8 text-center"
           >
             <SacredCard variant="glass" className="p-6">
               <div className="space-y-2">

@@ -1,4 +1,3 @@
-
 export default function WorkshopPage() {
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>

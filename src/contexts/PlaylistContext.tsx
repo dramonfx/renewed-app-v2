@@ -7,9 +7,7 @@ import { createContext, useContext, useState, useCallback, useMemo, ReactNode } 
 interface Track {
   id: string | number; // Or whatever your section ID type is
   title: string;
-  slug?: string; // Keep slug if AudioPlayer.jsx uses it for progress keys
   audioUrl: string | null; // This will be the signed URL
-  // Add any other track properties your AudioPlayer.jsx might expect from the 'track' object
 }
 
 interface PlaylistContextType {
@@ -35,18 +33,21 @@ export const PlaylistProvider = ({ children, initialTracks }: PlaylistProviderPr
   // Use the tracks passed in from the server-side fetched data
   const tracks = useMemo(() => initialTracks || [], [initialTracks]);
 
-  const playIdx = useCallback((i: number) => {
-    if (i >= 0 && i < tracks.length) {
-      setCurrentIdx(i);
-    }
-  }, [tracks.length]);
+  const playIdx = useCallback(
+    (i: number) => {
+      if (i >= 0 && i < tracks.length) {
+        setCurrentIdx(i);
+      }
+    },
+    [tracks.length]
+  );
 
   const next = useCallback(() => {
-    setCurrentIdx(i => (i + 1 < tracks.length ? i + 1 : i));
+    setCurrentIdx((i) => (i + 1 < tracks.length ? i + 1 : i));
   }, [tracks.length]);
 
   const prev = useCallback(() => {
-    setCurrentIdx(i => (i - 1 >= 0 ? i - 1 : i));
+    setCurrentIdx((i) => (i - 1 >= 0 ? i - 1 : i));
   }, []);
 
   // Optional: Add isPlaying state if your AudioPlayer needs to sync it via context

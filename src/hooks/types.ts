@@ -26,7 +26,7 @@ export type {
   AnalyticsConfig,
   PerformanceMetric,
   UserBehaviorEvent,
-  ErrorEvent,
+  AudioErrorEvent,
   AnalyticsSession
 } from '../lib/audio/AudioAnalytics';
 
@@ -326,4 +326,6 @@ export interface AudioPlayerAPI {
   destroy: () => void;
 }
 
-export default {};
+const defaultExport = {
+export default {};};
+export default defaultExport;

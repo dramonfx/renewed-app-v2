@@ -1,5 +1,6 @@
+import type { EnhancedTrack } from '@/hooks/types';
 // src/components/audio/EnhancedAudioPlayer.tsx
-'use client';
+('use client');
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useEnhancedAudioPlayer } from '../../hooks/useEnhancedAudioPlayer';
@@ -7,7 +8,7 @@ import type { EnhancedTrack, AudioPlayerProps } from '../../hooks/types';
 
 /**
  * Enhanced Audio Player Component - Phase 2
- * 
+ *
  * Advanced audio player component with Sacred Blue theme integration,
  * comprehensive controls, and enhanced features.
  */
@@ -35,16 +36,16 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
   showPlaylist = false,
   className = '',
   onTrackChange,
-  onPlaybackStateChange
+  onPlaybackStateChange,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(currentTrackIndex);
   const [showPlaylistPanel, setShowPlaylistPanel] = useState(showPlaylist);
-  
+
   const [state, controls] = useEnhancedAudioPlayer({
     autoPlay,
     analytics: true,
     keyboardShortcuts: true,
-    errorRecovery: true
+    errorRecovery: true,
   });
 
   // Load initial track
@@ -92,15 +93,21 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
     }
   }, [currentIndex]);
 
-  const handleSeek = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const time = parseFloat(event.target.value);
-    controls.seek(time);
-  }, [controls]);
+  const handleSeek = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const time = parseFloat(event.target.value);
+      controls.seek(time);
+    },
+    [controls]
+  );
 
-  const handleVolumeChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const volume = parseFloat(event.target.value);
-    controls.setVolume(volume);
-  }, [controls]);
+  const handleVolumeChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const volume = parseFloat(event.target.value);
+      controls.setVolume(volume);
+    },
+    [controls]
+  );
 
   const handleTrackSelect = useCallback((index: number) => {
     setCurrentIndex(index);
@@ -109,7 +116,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
 
   const formatTime = useCallback((time: number): string => {
     if (!isFinite(time)) return '0:00';
-    
+
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
@@ -184,8 +191,13 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
         }
 
         @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.5;
+          }
         }
 
         .progress-section {
@@ -416,8 +428,12 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
         }
 
         @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
         }
       `}</style>
 
@@ -428,14 +444,19 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
           <div className="track-artist">{currentTrack.metadata?.artist || 'Unknown Artist'}</div>
           <div className="track-status">
             <div className="status-indicator">
-              <div className={`status-dot ${
-                state.isLoading ? 'loading' : 
-                state.errorState ? 'error' : ''
-              }`}></div>
+              <div
+                className={`status-dot ${
+                  state.isLoading ? 'loading' : state.errorState ? 'error' : ''
+                }`}
+              ></div>
               <span>
-                {state.isLoading ? 'Loading...' :
-                 state.errorState ? 'Error' :
-                 state.isPlaying ? 'Playing' : 'Paused'}
+                {state.isLoading
+                  ? 'Loading...'
+                  : state.errorState
+                    ? 'Error'
+                    : state.isPlaying
+                      ? 'Playing'
+                      : 'Paused'}
               </span>
             </div>
             <div>Buffer: {Math.round(state.bufferHealth)}%</div>
@@ -444,11 +465,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
       )}
 
       {/* Error Message */}
-      {state.errorState && (
-        <div className="error-message">
-          {state.errorState}
-        </div>
-      )}
+      {state.errorState && <div className="error-message">{state.errorState}</div>}
 
       {/* Loading Indicator */}
       {state.isLoading && (
@@ -462,10 +479,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
       {showProgress && currentTrack && (
         <div className="progress-section">
           <div className="progress-container">
-            <div 
-              className="buffer-indicator" 
-              style={{ width: `${getBufferProgress()}%` }}
-            ></div>
+            <div className="buffer-indicator" style={{ width: `${getBufferProgress()}%` }}></div>
             <input
               type="range"
               className="progress-bar"
@@ -494,7 +508,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
           >
             ⏮
           </button>
-          
+
           <button
             className="control-button"
             onClick={() => controls.skipBackward(10)}
@@ -503,7 +517,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
           >
             ⏪
           </button>
-          
+
           <button
             className="control-button play-pause"
             onClick={handlePlayPause}
@@ -512,7 +526,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
           >
             {state.isPlaying ? '⏸' : '▶'}
           </button>
-          
+
           <button
             className="control-button"
             onClick={() => controls.skipForward(10)}
@@ -521,7 +535,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
           >
             ⏩
           </button>
-          
+
           <button
             className="control-button"
             onClick={handleNextTrack}
@@ -585,9 +599,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
                 </div>
               </div>
               {index === currentIndex && (
-                <span style={{ fontSize: '12px' }}>
-                  {state.isPlaying ? '▶' : '⏸'}
-                </span>
+                <span style={{ fontSize: '12px' }}>{state.isPlaying ? '▶' : '⏸'}</span>
               )}
             </div>
           ))}

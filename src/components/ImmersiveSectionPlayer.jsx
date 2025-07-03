@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Suspense, useMemo, useState } from 'react';
@@ -15,12 +14,12 @@ import UnifiedAudioPlayer from '@/components/UnifiedAudioPlayer';
 const ReactMarkdown = dynamic(() => import('react-markdown'), {
   loading: () => (
     <div className="animate-pulse space-y-4">
-      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-      <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+      <div className="h-4 w-3/4 rounded bg-gray-200"></div>
+      <div className="h-4 w-1/2 rounded bg-gray-200"></div>
+      <div className="h-4 w-5/6 rounded bg-gray-200"></div>
     </div>
   ),
-  ssr: false
+  ssr: false,
 });
 
 const remarkGfm = dynamic(() => import('remark-gfm'), { ssr: false });
@@ -29,22 +28,22 @@ const remarkGfm = dynamic(() => import('remark-gfm'), { ssr: false });
 function OptimizedImage({ visual, alt, className }) {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
-  
+
   if (imageError) {
     return (
       <SacredCard variant="glass" className="p-8 text-center">
-        <div className="text-sacred-blue-500 text-4xl mb-3">📷</div>
+        <div className="mb-3 text-4xl text-sacred-blue-500">📷</div>
         <p className="text-sm text-sacred-blue-600">
           Image temporarily unavailable: {alt || visual.caption}
         </p>
       </SacredCard>
     );
   }
-  
+
   return (
     <div className="relative">
       {imageLoading && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-xl flex items-center justify-center">
+        <div className="absolute inset-0 flex animate-pulse items-center justify-center rounded-xl bg-gray-200">
           <div className="text-gray-400">Loading...</div>
         </div>
       )}
@@ -54,7 +53,7 @@ function OptimizedImage({ visual, alt, className }) {
         width={700}
         height={394}
         style={{ objectFit: 'contain', maxWidth: '100%', height: 'auto', display: 'block' }}
-        className={`rounded-xl shadow-lg mx-auto ${className || ''}`}
+        className={`mx-auto rounded-xl shadow-lg ${className || ''}`}
         loading="lazy"
         onLoad={() => setImageLoading(false)}
         onError={() => {
@@ -80,15 +79,15 @@ function ImmersiveMarkdownContent({ content, components }) {
 export default function ImmersiveSectionPlayer({ section, visuals, visualsMap, params }) {
   // Destructure sectionSlug from params in client component
   const { sectionSlug } = params;
-  
+
   // Ensure we have valid section data
   if (!section) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <SacredCard variant="heavy" className="p-12 text-center max-w-md">
-          <div className="text-sacred-blue-500 text-6xl mb-6">📖</div>
-          <h1 className="text-2xl font-serif text-sacred-blue-900 mb-4">Section Not Found</h1>
-          <p className="text-sacred-blue-600 mb-6">
+      <div className="flex min-h-screen items-center justify-center p-6">
+        <SacredCard variant="heavy" className="max-w-md p-12 text-center">
+          <div className="mb-6 text-6xl text-sacred-blue-500">📖</div>
+          <h1 className="mb-4 font-serif text-2xl text-sacred-blue-900">Section Not Found</h1>
+          <p className="mb-6 text-sacred-blue-600">
             The requested section "{sectionSlug}" could not be loaded.
           </p>
           <SacredButton variant="primary" onClick={() => window.history.back()}>
@@ -100,162 +99,153 @@ export default function ImmersiveSectionPlayer({ section, visuals, visualsMap, p
   }
 
   // Enhanced markdown components with immersive styling
-  const markdownComponents = useMemo(() => ({
-    // Enhanced paragraph styling - Fix hydration issue by ensuring valid HTML structure
-    p: ({ node, children }) => {
-      // Check if this paragraph contains any block-level elements
-      const hasBlockElements = node?.children?.some(child => 
-        child.tagName === 'img' || 
-        child.tagName === 'div' || 
-        child.tagName === 'blockquote' ||
-        child.tagName === 'h1' || 
-        child.tagName === 'h2' || 
-        child.tagName === 'h3' ||
-        child.tagName === 'ul' ||
-        child.tagName === 'ol'
-      );
-      
-      // If it contains block elements, render as div to avoid invalid HTML nesting
-      if (hasBlockElements) {
-        return <div className="my-6">{children}</div>;
-      }
-      
-      // Otherwise render as normal paragraph
-      return (
-        <p className="text-lg leading-relaxed text-gray-700 mb-6 font-light tracking-wide">
-          {children}
-        </p>
-      );
-    },
-    
-    // Enhanced heading styles
-    h1: ({ children }) => (
-      <h1 className="text-3xl font-serif text-sacred-blue-900 mb-8 mt-12">
-        {children}
-      </h1>
-    ),
-    h2: ({ children }) => (
-      <h2 className="text-2xl font-serif text-sacred-blue-900 mb-6 mt-10">
-        {children}
-      </h2>
-    ),
-    h3: ({ children }) => (
-      <h3 className="text-xl font-serif text-sacred-blue-900 mb-4 mt-8">
-        {children}
-      </h3>
-    ),
-    
-    // Enhanced image handling - Fix hydration by ensuring proper block-level rendering
-    img: ({ node, ...props }) => {
-      const imageIdentifier = props.src;
-      const normalizedIdentifier = imageIdentifier?.toString().toUpperCase().trim() || '';
-      
-      const visual = visualsMap?.[normalizedIdentifier];
+  const markdownComponents = useMemo(
+    () => ({
+      // Enhanced paragraph styling - Fix hydration issue by ensuring valid HTML structure
+      p: ({ node, children }) => {
+        // Check if this paragraph contains any block-level elements
+        const hasBlockElements = node?.children?.some(
+          (child) =>
+            child.tagName === 'img' ||
+            child.tagName === 'div' ||
+            child.tagName === 'blockquote' ||
+            child.tagName === 'h1' ||
+            child.tagName === 'h2' ||
+            child.tagName === 'h3' ||
+            child.tagName === 'ul' ||
+            child.tagName === 'ol'
+        );
 
-      if (visual && visual.displayUrl) {
+        // If it contains block elements, render as div to avoid invalid HTML nesting
+        if (hasBlockElements) {
+          return <div className="my-6">{children}</div>;
+        }
+
+        // Otherwise render as normal paragraph
+        return (
+          <p className="mb-6 text-lg font-light leading-relaxed tracking-wide text-gray-700">
+            {children}
+          </p>
+        );
+      },
+
+      // Enhanced heading styles
+      h1: ({ children }) => (
+        <h1 className="mb-8 mt-12 font-serif text-3xl text-sacred-blue-900">{children}</h1>
+      ),
+      h2: ({ children }) => (
+        <h2 className="mb-6 mt-10 font-serif text-2xl text-sacred-blue-900">{children}</h2>
+      ),
+      h3: ({ children }) => (
+        <h3 className="mb-4 mt-8 font-serif text-xl text-sacred-blue-900">{children}</h3>
+      ),
+
+      // Enhanced image handling - Fix hydration by ensuring proper block-level rendering
+      img: ({ node, ...props }) => {
+        const imageIdentifier = props.src;
+        const normalizedIdentifier = imageIdentifier?.toString().toUpperCase().trim() || '';
+
+        const visual = visualsMap?.[normalizedIdentifier];
+
+        if (visual && visual.displayUrl) {
+          return (
+            <div className="my-8">
+              <SacredCard variant="glass" className="p-4">
+                <a
+                  href={visual.displayUrl}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={`Download ${props.alt || visual.caption}`}
+                  className="group block"
+                >
+                  <OptimizedImage
+                    visual={visual}
+                    alt={props.alt}
+                    className="transition-opacity group-hover:opacity-90"
+                  />
+                </a>
+                {visual.caption && (
+                  <div className="mt-4 text-center italic text-sacred-blue-600">
+                    {visual.caption}
+                  </div>
+                )}
+              </SacredCard>
+            </div>
+          );
+        }
         return (
           <div className="my-8">
-            <SacredCard variant="glass" className="p-4">
-              <a
-                href={visual.displayUrl}
-                download
-                target="_blank"
-                rel="noopener noreferrer"
-                title={`Download ${props.alt || visual.caption}`}
-                className="block group"
-              >
-                <OptimizedImage 
-                  visual={visual}
-                  alt={props.alt}
-                  className="group-hover:opacity-90 transition-opacity"
-                />
-              </a>
-              {visual.caption && (
-                <div className="text-center mt-4 text-sacred-blue-600 italic">
-                  {visual.caption}
-                </div>
-              )}
+            <SacredCard variant="glass" className="p-6 text-center">
+              <div className="mb-2 text-2xl text-amber-500">⚠️</div>
+              <p className="text-sacred-blue-600">
+                <em>Image: {props.alt || imageIdentifier} not found</em>
+              </p>
             </SacredCard>
           </div>
         );
-      }
-      return (
+      },
+
+      // Enhanced blockquote - Fix hydration by ensuring proper block-level rendering
+      blockquote: ({ children }) => (
         <div className="my-8">
-          <SacredCard variant="glass" className="p-6 text-center">
-            <div className="text-amber-500 text-2xl mb-2">⚠️</div>
-            <p className="text-sacred-blue-600">
-              <em>Image: {props.alt || imageIdentifier} not found</em>
-            </p>
+          <SacredCard variant="glass" className="border-l-4 border-sacred-gold-500 p-6">
+            <div className="text-lg font-light italic text-sacred-blue-800">{children}</div>
           </SacredCard>
         </div>
-      );
-    },
-    
-    // Enhanced blockquote - Fix hydration by ensuring proper block-level rendering
-    blockquote: ({ children }) => (
-      <div className="my-8">
-        <SacredCard variant="glass" className="p-6 border-l-4 border-sacred-gold-500">
-          <div className="text-sacred-blue-800 italic text-lg font-light">
-            {children}
-          </div>
-        </SacredCard>
-      </div>
-    ),
-    
-    // Enhanced lists
-    ul: ({ children }) => (
-      <ul className="space-y-3 my-6 text-gray-700">
-        {children}
-      </ul>
-    ),
-    li: ({ children }) => (
-      <li className="flex items-start space-x-3">
-        <Star className="w-4 h-4 text-sacred-gold-500 mt-1 flex-shrink-0" />
-        <span className="text-lg leading-relaxed">{children}</span>
-      </li>
-    ),
-  }), [visualsMap]);
+      ),
+
+      // Enhanced lists
+      ul: ({ children }) => <ul className="my-6 space-y-3 text-gray-700">{children}</ul>,
+      li: ({ children }) => (
+        <li className="flex items-start space-x-3">
+          <Star className="mt-1 h-4 w-4 flex-shrink-0 text-sacred-gold-500" />
+          <span className="text-lg leading-relaxed">{children}</span>
+        </li>
+      ),
+    }),
+    [visualsMap]
+  );
 
   return (
-    <ErrorBoundary fallback={
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <SacredCard variant="heavy" className="p-12 text-center">
-          <div className="text-red-500 text-4xl mb-4">⚠️</div>
-          <p className="text-red-600">Something went wrong loading this section.</p>
-        </SacredCard>
-      </div>
-    }>
+    <ErrorBoundary
+      fallback={
+        <div className="flex min-h-screen items-center justify-center p-6">
+          <SacredCard variant="heavy" className="p-12 text-center">
+            <div className="mb-4 text-4xl text-red-500">⚠️</div>
+            <p className="text-red-600">Something went wrong loading this section.</p>
+          </SacredCard>
+        </div>
+      }
+    >
       <div className="min-h-screen p-4 lg:p-8">
-        <div className="max-w-5xl mx-auto space-y-8">
-          
+        <div className="mx-auto max-w-5xl space-y-8">
           {/* Section Header */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <SacredCard variant="heavy" className="p-8 lg:p-12 text-center">
-              <div className="flex items-center justify-center mb-6">
-                <div className="w-16 h-16 sacred-icon-bg mr-4">
-                  <BookOpen className="w-8 h-8" />
+            <SacredCard variant="heavy" className="p-8 text-center lg:p-12">
+              <div className="mb-6 flex items-center justify-center">
+                <div className="sacred-icon-bg mr-4 h-16 w-16">
+                  <BookOpen className="h-8 w-8" />
                 </div>
                 <div className="text-left">
-                  <div className="text-sm font-semibold text-sacred-blue-600 uppercase tracking-wider mb-1">
+                  <div className="mb-1 text-sm font-semibold uppercase tracking-wider text-sacred-blue-600">
                     Sacred Journey
                   </div>
-                  <div className="text-lg text-sacred-blue-800">
-                    Immersive Experience
-                  </div>
+                  <div className="text-lg text-sacred-blue-800">Immersive Experience</div>
                 </div>
               </div>
-              
-              <h1 className="text-4xl lg:text-5xl font-serif text-sacred-blue-900 mb-6 leading-tight">
+
+              <h1 className="mb-6 font-serif text-4xl leading-tight text-sacred-blue-900 lg:text-5xl">
                 {section.title || 'Untitled Section'}
               </h1>
-              
-              <p className="text-xl text-sacred-blue-600 max-w-3xl mx-auto leading-relaxed">
-                Embark on this transformative journey through guided audio and immersive text. 
-                Let the words guide your spiritual awakening.
+
+              <p className="mx-auto max-w-3xl text-xl leading-relaxed text-sacred-blue-600">
+                Embark on this transformative journey through guided audio and immersive text. Let
+                the words guide your spiritual awakening.
               </p>
             </SacredCard>
           </motion.div>
@@ -267,14 +257,16 @@ export default function ImmersiveSectionPlayer({ section, visuals, visualsMap, p
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
             >
-              <ErrorBoundary fallback={
-                <SacredCard variant="glass" className="p-6 text-center">
-                  <Headphones className="w-12 h-12 text-red-500 mx-auto mb-3" />
-                  <p className="text-red-600">Audio player unavailable</p>
-                </SacredCard>
-              }>
-                <UnifiedAudioPlayer 
-                  mode="single" 
+              <ErrorBoundary
+                fallback={
+                  <SacredCard variant="glass" className="p-6 text-center">
+                    <Headphones className="mx-auto mb-3 h-12 w-12 text-red-500" />
+                    <p className="text-red-600">Audio player unavailable</p>
+                  </SacredCard>
+                }
+              >
+                <UnifiedAudioPlayer
+                  mode="single"
                   singleTrackSlug={params?.sectionSlug || section.slug}
                 />
               </ErrorBoundary>
@@ -288,46 +280,46 @@ export default function ImmersiveSectionPlayer({ section, visuals, visualsMap, p
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             <SacredCard variant="heavy" className="p-8 lg:p-12">
-              <div className="flex items-center justify-between mb-8">
+              <div className="mb-8 flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 sacred-icon-bg">
-                    <BookOpen className="w-6 h-6" />
+                  <div className="sacred-icon-bg h-12 w-12">
+                    <BookOpen className="h-6 w-6" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-serif text-sacred-blue-900">
-                      Read-Along Text
-                    </h2>
-                    <p className="text-sacred-blue-600 text-sm">
+                    <h2 className="font-serif text-2xl text-sacred-blue-900">Read-Along Text</h2>
+                    <p className="text-sm text-sacred-blue-600">
                       Follow along as you listen, or read at your own pace
                     </p>
                   </div>
                 </div>
-                
-
               </div>
 
-              <div className="max-w-4xl mx-auto">
-                <ErrorBoundary fallback={
-                  <SacredCard variant="glass" className="p-8 text-center">
-                    <div className="text-red-500 text-2xl mb-3">📄</div>
-                    <p className="text-red-600">Content temporarily unavailable</p>
-                  </SacredCard>
-                }>
-                  <Suspense fallback={
-                    <div className="space-y-6">
-                      {[...Array(5)].map((_, i) => (
-                        <div key={i} className="animate-pulse">
-                          <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                          <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+              <div className="mx-auto max-w-4xl">
+                <ErrorBoundary
+                  fallback={
+                    <SacredCard variant="glass" className="p-8 text-center">
+                      <div className="mb-3 text-2xl text-red-500">📄</div>
+                      <p className="text-red-600">Content temporarily unavailable</p>
+                    </SacredCard>
+                  }
+                >
+                  <Suspense
+                    fallback={
+                      <div className="space-y-6">
+                        {[...Array(5)].map((_, i) => (
+                          <div key={i} className="animate-pulse">
+                            <div className="mb-2 h-4 w-full rounded bg-gray-200"></div>
+                            <div className="mb-2 h-4 w-3/4 rounded bg-gray-200"></div>
+                            <div className="h-4 w-5/6 rounded bg-gray-200"></div>
+                          </div>
+                        ))}
+                        <div className="mt-8 text-center text-sacred-blue-600">
+                          Loading content...
                         </div>
-                      ))}
-                      <div className="text-center text-sacred-blue-600 mt-8">
-                        Loading content...
                       </div>
-                    </div>
-                  }>
-                    <ImmersiveMarkdownContent 
+                    }
+                  >
+                    <ImmersiveMarkdownContent
                       content={section.markdownContent}
                       components={markdownComponents}
                     />
@@ -344,32 +336,29 @@ export default function ImmersiveSectionPlayer({ section, visuals, visualsMap, p
             transition={{ duration: 0.6, delay: 0.6 }}
           >
             <SacredCard variant="glass" className="p-8 text-center">
-              <div className="w-16 h-16 sacred-icon-bg-gold mx-auto mb-6">
-                <Star className="w-8 h-8" />
+              <div className="sacred-icon-bg-gold mx-auto mb-6 h-16 w-16">
+                <Star className="h-8 w-8" />
               </div>
-              
-              <h3 className="text-2xl font-serif text-sacred-blue-900 mb-4">
-                Deepen Your Journey
-              </h3>
-              
-              <p className="text-sacred-blue-600 mb-6 max-w-2xl mx-auto">
-                Complete the guided exercises and reflections to fully integrate 
-                the wisdom from this section into your spiritual practice.
+
+              <h3 className="mb-4 font-serif text-2xl text-sacred-blue-900">Deepen Your Journey</h3>
+
+              <p className="mx-auto mb-6 max-w-2xl text-sacred-blue-600">
+                Complete the guided exercises and reflections to fully integrate the wisdom from
+                this section into your spiritual practice.
               </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+              <div className="flex flex-col justify-center gap-4 sm:flex-row">
                 <SacredButton variant="gold" size="lg">
-                  <Star className="w-5 h-5 mr-2" />
+                  <Star className="mr-2 h-5 w-5" />
                   View Exercises
                 </SacredButton>
                 <SacredButton variant="ghost" size="lg">
-                  <ExternalLink className="w-5 h-5 mr-2" />
+                  <ExternalLink className="mr-2 h-5 w-5" />
                   Share Insights
                 </SacredButton>
               </div>
             </SacredCard>
           </motion.div>
-
         </div>
       </div>
     </ErrorBoundary>

@@ -1,4 +1,3 @@
-
 /**
  * Application constants
  */
@@ -63,10 +62,26 @@ export const JOURNAL_CONSTANTS = {
     { id: 'life_transformation', name: 'Life Transformation', color: 'rose' },
   ],
   SACRED_TAGS: [
-    'wisdom', 'peace', 'love', 'growth', 'healing', 'forgiveness',
-    'gratitude', 'faith', 'hope', 'joy', 'strength', 'guidance',
-    'purpose', 'clarity', 'transformation', 'surrender', 'blessing',
-    'prayer', 'meditation', 'scripture'
+    'wisdom',
+    'peace',
+    'love',
+    'growth',
+    'healing',
+    'forgiveness',
+    'gratitude',
+    'faith',
+    'hope',
+    'joy',
+    'strength',
+    'guidance',
+    'purpose',
+    'clarity',
+    'transformation',
+    'surrender',
+    'blessing',
+    'prayer',
+    'meditation',
+    'scripture',
   ],
   MINDSET_TYPES: {
     NATURAL: 'natural' as const,
@@ -83,8 +98,9 @@ export const AUDIO_CONSTANTS = {
 } as const;
 
 // Type exports for constants
-export type ApiEndpoint = typeof API_ENDPOINTS[keyof typeof API_ENDPOINTS];
-export type Route = typeof ROUTES[keyof typeof ROUTES];
+export type ApiEndpoint = (typeof API_ENDPOINTS)[keyof typeof API_ENDPOINTS];
+export type Route = (typeof ROUTES)[keyof typeof ROUTES];
 export type ValidationKey = keyof typeof VALIDATION;
 export type ErrorMessageKey = keyof typeof ERROR_MESSAGES;
-export type MindsetType = typeof JOURNAL_CONSTANTS.MINDSET_TYPES[keyof typeof JOURNAL_CONSTANTS.MINDSET_TYPES];
+export type MindsetType =
+  (typeof JOURNAL_CONSTANTS.MINDSET_TYPES)[keyof typeof JOURNAL_CONSTANTS.MINDSET_TYPES];
