@@ -3,7 +3,7 @@
 
 /**
  * Core Audio Engine - Phase 2 Enhancement
- * 
+ *
  * Advanced audio processing and management system that extends the existing
  * useAudioPlayer hook with intelligent buffering, performance optimization,
  * and enhanced error handling capabilities.
@@ -14,16 +14,16 @@ export interface AudioEngineConfig {
   bufferAhead: number; // seconds to buffer ahead
   preloadNextTrack: boolean;
   adaptiveBuffering: boolean;
-  
+
   // Performance settings
   memoryManagement: boolean;
   performanceMonitoring: boolean;
   errorRetryAttempts: number;
-  
+
   // Analytics settings
   trackListening: boolean;
   trackPerformance: boolean;
-  
+
   // Audio settings
   crossfadeDuration: number; // ms
   gaplessPlayback: boolean;
@@ -85,7 +85,7 @@ export class CoreAudioEngine {
       crossfadeDuration: 1000,
       gaplessPlayback: true,
       audioQualityOptimization: true,
-      ...config
+      ...config,
     };
 
     this.stats = {
@@ -94,7 +94,7 @@ export class CoreAudioEngine {
       errorCount: 0,
       totalPlayTime: 0,
       averageLoadTime: 0,
-      memoryUsage: 0
+      memoryUsage: 0,
     };
 
     this.initializePerformanceMonitoring();
@@ -129,7 +129,7 @@ export class CoreAudioEngine {
     if (!sources.length) return null;
 
     const audio = new Audio();
-    const supportedFormats = sources.filter(source => {
+    const supportedFormats = sources.filter((source) => {
       const canPlay = audio.canPlayType(this.getMimeType(source.format));
       return canPlay === 'probably' || canPlay === 'maybe';
     });
@@ -149,12 +149,12 @@ export class CoreAudioEngine {
    */
   private getMimeType(format: string): string {
     const mimeTypes: Record<string, string> = {
-      'mp3': 'audio/mpeg',
-      'wav': 'audio/wav',
-      'ogg': 'audio/ogg',
-      'aac': 'audio/aac',
-      'flac': 'audio/flac',
-      'm4a': 'audio/mp4'
+      mp3: 'audio/mpeg',
+      wav: 'audio/wav',
+      ogg: 'audio/ogg',
+      aac: 'audio/aac',
+      flac: 'audio/flac',
+      m4a: 'audio/mp4',
     };
     return mimeTypes[format.toLowerCase()] || 'audio/*';
   }
@@ -246,11 +246,14 @@ export class CoreAudioEngine {
       // Performance tracking
       const endTime = performance.now();
       performance.mark(`audio-load-end-${track.id}`);
-      performance.measure(`audio-load-${track.id}`, `audio-load-start-${track.id}`, `audio-load-end-${track.id}`);
+      performance.measure(
+        `audio-load-${track.id}`,
+        `audio-load-start-${track.id}`,
+        `audio-load-end-${track.id}`
+      );
 
       this.updateLoadTimeStats(endTime - startTime);
       this.emit('preloadComplete', { trackId: track.id, loadTime: endTime - startTime });
-
     } catch (error) {
       track.loadError = error instanceof Error ? error.message : 'Unknown preload error';
       this.stats.errorCount++;
@@ -271,7 +274,7 @@ export class CoreAudioEngine {
     // Preload next track if enabled and available
     if (this.config.preloadNextTrack && nextTrack && !nextTrack.preloaded) {
       // Non-blocking preload
-      this.preloadAudio(nextTrack).catch(error => {
+      this.preloadAudio(nextTrack).catch((error) => {
         console.warn('Next track preload failed:', error);
       });
     }
@@ -354,7 +357,7 @@ export class CoreAudioEngine {
   private emit(event: string, data?: any): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
-      listeners.forEach(listener => listener(data));
+      listeners.forEach((listener) => listener(data));
     }
   }
 

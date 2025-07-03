@@ -12,7 +12,7 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
     const pathMap = {
       gentle: { name: 'The Gentle Path', icon: '🌱', color: 'sacred-gold' },
       balanced: { name: 'The Balanced Path', icon: '⚖️', color: 'sacred-blue' },
-      intensive: { name: 'The Intensive Path', icon: '🔥', color: 'sacred-purple' }
+      intensive: { name: 'The Intensive Path', icon: '🔥', color: 'sacred-purple' },
     };
     return pathMap[safeData.selectedPath] || pathMap.balanced;
   };
@@ -22,7 +22,7 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
 
   return (
     <div className="min-h-screen p-6 lg:p-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="mx-auto max-w-6xl">
         {/* Welcome Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -32,18 +32,19 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
         >
           <SacredCard variant="heavy" className="p-8 md:p-12">
             <div className="flex items-center justify-between">
-              <div className="text-center w-full">
-                <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-sacred-gradient flex items-center justify-center shadow-lg">
-                  <span className="text-white text-3xl">{pathInfo.icon}</span>
+              <div className="w-full text-center">
+                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-sacred-gradient shadow-lg">
+                  <span className="text-3xl text-white">{pathInfo.icon}</span>
                 </div>
-                <h1 className="text-3xl md:text-4xl font-serif text-sacred-blue-900 mb-4">
+                <h1 className="mb-4 font-serif text-3xl text-sacred-blue-900 md:text-4xl">
                   Welcome to Your{' '}
                   <span className="bg-sacred-gradient bg-clip-text text-transparent">
                     Sacred Journey
                   </span>
                 </h1>
-                <p className="text-sacred-blue-600 text-lg">
-                  Your transformation begins now. You're ready to embark on this sacred path of renewal.
+                <p className="text-lg text-sacred-blue-600">
+                  Your transformation begins now. You're ready to embark on this sacred path of
+                  renewal.
                 </p>
               </div>
             </div>
@@ -57,24 +58,24 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="mb-8"
         >
-          <h2 className="text-2xl font-serif text-sacred-blue-900 mb-6">Your Sacred Path Summary</h2>
+          <h2 className="mb-6 font-serif text-2xl text-sacred-blue-900">
+            Your Sacred Path Summary
+          </h2>
           <SacredCard variant="heavy" className="p-6">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid gap-6 md:grid-cols-2">
               {/* Selected Path */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
-                className="p-4 rounded-lg bg-sacred-gold-50 border border-sacred-gold-200"
+                className="rounded-lg border border-sacred-gold-200 bg-sacred-gold-50 p-4"
               >
-                <h3 className="text-lg font-serif text-sacred-blue-900 mb-3">
-                  Chosen Path
-                </h3>
+                <h3 className="mb-3 font-serif text-lg text-sacred-blue-900">Chosen Path</h3>
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-sacred-gradient flex items-center justify-center shadow-lg">
-                    <span className="text-white text-xl">{pathInfo.icon}</span>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sacred-gradient shadow-lg">
+                    <span className="text-xl text-white">{pathInfo.icon}</span>
                   </div>
-                  <span className="text-sacred-blue-900 font-medium">{pathInfo.name}</span>
+                  <span className="font-medium text-sacred-blue-900">{pathInfo.name}</span>
                 </div>
               </motion.div>
 
@@ -83,16 +84,14 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4, delay: 0.2 }}
-                className="p-4 rounded-lg bg-sacred-purple-50 border border-sacred-purple-200"
+                className="rounded-lg border border-sacred-purple-200 bg-sacred-purple-50 p-4"
               >
-                <h3 className="text-lg font-serif text-sacred-blue-900 mb-3">
-                  Sacred Intentions
-                </h3>
+                <h3 className="mb-3 font-serif text-lg text-sacred-blue-900">Sacred Intentions</h3>
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-sacred-purple-gradient flex items-center justify-center shadow-lg">
-                    <span className="text-white text-xl">🎯</span>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sacred-purple-gradient shadow-lg">
+                    <span className="text-xl text-white">🎯</span>
                   </div>
-                  <span className="text-sacred-blue-900 font-medium">
+                  <span className="font-medium text-sacred-blue-900">
                     {intentionCount} {intentionCount === 1 ? 'Intention' : 'Intentions'} Set
                   </span>
                 </div>
@@ -104,16 +103,14 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.4, delay: 0.3 }}
-                  className="p-4 rounded-lg bg-sacred-teal-50 border border-sacred-teal-200"
+                  className="bg-sacred-teal-50 border-sacred-teal-200 rounded-lg border p-4"
                 >
-                  <h3 className="text-lg font-serif text-sacred-blue-900 mb-3">
-                    Sacred Name
-                  </h3>
+                  <h3 className="mb-3 font-serif text-lg text-sacred-blue-900">Sacred Name</h3>
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-sacred-teal-gradient flex items-center justify-center shadow-lg">
-                      <span className="text-white text-xl">✨</span>
+                    <div className="bg-sacred-teal-gradient flex h-12 w-12 items-center justify-center rounded-full shadow-lg">
+                      <span className="text-xl text-white">✨</span>
                     </div>
-                    <span className="text-sacred-blue-900 font-medium">{safeData.name}</span>
+                    <span className="font-medium text-sacred-blue-900">{safeData.name}</span>
                   </div>
                 </motion.div>
               )}
@@ -124,16 +121,16 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.4, delay: 0.4 }}
-                  className="p-4 rounded-lg bg-sacred-rose-50 border border-sacred-rose-200"
+                  className="bg-sacred-rose-50 border-sacred-rose-200 rounded-lg border p-4"
                 >
-                  <h3 className="text-lg font-serif text-sacred-blue-900 mb-3">
-                    Experience Level
-                  </h3>
+                  <h3 className="mb-3 font-serif text-lg text-sacred-blue-900">Experience Level</h3>
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-sacred-rose-gradient flex items-center justify-center shadow-lg">
-                      <span className="text-white text-xl">🌟</span>
+                    <div className="bg-sacred-rose-gradient flex h-12 w-12 items-center justify-center rounded-full shadow-lg">
+                      <span className="text-xl text-white">🌟</span>
                     </div>
-                    <span className="text-sacred-blue-900 font-medium capitalize">{safeData.experience}</span>
+                    <span className="font-medium capitalize text-sacred-blue-900">
+                      {safeData.experience}
+                    </span>
                   </div>
                 </motion.div>
               )}
@@ -148,20 +145,23 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mb-8"
         >
-          <h2 className="text-2xl font-serif text-sacred-blue-900 mb-6">What Happens Next?</h2>
-          <div className="grid md:grid-cols-3 gap-6">
+          <h2 className="mb-6 font-serif text-2xl text-sacred-blue-900">What Happens Next?</h2>
+          <div className="grid gap-6 md:grid-cols-3">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
             >
-              <SacredCard variant="glass" className="p-6 h-full text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-gradient flex items-center justify-center shadow-lg">
-                  <span className="text-white text-2xl">📚</span>
+              <SacredCard variant="glass" className="h-full p-6 text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-gradient shadow-lg">
+                  <span className="text-2xl text-white">📚</span>
                 </div>
-                <h3 className="text-xl font-serif text-sacred-blue-900 mb-3">Personalized Content</h3>
-                <p className="text-sacred-blue-600 text-sm leading-relaxed">
-                  Receive teachings and content tailored specifically to your chosen path and spiritual journey
+                <h3 className="mb-3 font-serif text-xl text-sacred-blue-900">
+                  Personalized Content
+                </h3>
+                <p className="text-sm leading-relaxed text-sacred-blue-600">
+                  Receive teachings and content tailored specifically to your chosen path and
+                  spiritual journey
                 </p>
               </SacredCard>
             </motion.div>
@@ -171,13 +171,14 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
             >
-              <SacredCard variant="glass" className="p-6 h-full text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-gold-gradient flex items-center justify-center shadow-lg">
-                  <span className="text-white text-2xl">📝</span>
+              <SacredCard variant="glass" className="h-full p-6 text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-gold-gradient shadow-lg">
+                  <span className="text-2xl text-white">📝</span>
                 </div>
-                <h3 className="text-xl font-serif text-sacred-blue-900 mb-3">Sacred Journal</h3>
-                <p className="text-sacred-blue-600 text-sm leading-relaxed">
-                  Track your spiritual growth and transformation through guided journaling and reflection
+                <h3 className="mb-3 font-serif text-xl text-sacred-blue-900">Sacred Journal</h3>
+                <p className="text-sm leading-relaxed text-sacred-blue-600">
+                  Track your spiritual growth and transformation through guided journaling and
+                  reflection
                 </p>
               </SacredCard>
             </motion.div>
@@ -187,13 +188,14 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.3 }}
             >
-              <SacredCard variant="glass" className="p-6 h-full text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-sacred-purple-gradient flex items-center justify-center shadow-lg">
-                  <span className="text-white text-2xl">🎯</span>
+              <SacredCard variant="glass" className="h-full p-6 text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-purple-gradient shadow-lg">
+                  <span className="text-2xl text-white">🎯</span>
                 </div>
-                <h3 className="text-xl font-serif text-sacred-blue-900 mb-3">Guided Practice</h3>
-                <p className="text-sacred-blue-600 text-sm leading-relaxed">
-                  Daily exercises and practices designed to support your spiritual transformation goals
+                <h3 className="mb-3 font-serif text-xl text-sacred-blue-900">Guided Practice</h3>
+                <p className="text-sm leading-relaxed text-sacred-blue-600">
+                  Daily exercises and practices designed to support your spiritual transformation
+                  goals
                 </p>
               </SacredCard>
             </motion.div>
@@ -224,7 +226,7 @@ const CompletionStep = ({ onboardingData = {}, data = {} }) => {
             >
               Begin Your Sacred Journey ✨
             </SacredButton>
-            <p className="text-sacred-blue-600 text-sm mt-4">
+            <p className="mt-4 text-sm text-sacred-blue-600">
               Your personalized dashboard and spiritual toolkit await you.
             </p>
           </SacredCard>

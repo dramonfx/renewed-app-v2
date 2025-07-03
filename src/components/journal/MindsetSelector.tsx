@@ -1,4 +1,3 @@
-
 // src/components/journal/MindsetSelector.tsx
 // Sacred Mindset Selector - Help users discern between Natural vs Spiritual Mind
 
@@ -29,10 +28,10 @@ interface MindsetTypeConfig {
   characteristics: string[];
 }
 
-export default function MindsetSelector({ 
-  value, 
-  onChange, 
-  required = false 
+export default function MindsetSelector({
+  value,
+  onChange,
+  required = false,
 }: MindsetSelectorProps): React.ReactElement {
   const [selectedMindset, setSelectedMindset] = useState<MindsetType | null>(value || null);
 
@@ -48,7 +47,12 @@ export default function MindsetSelector({
       textColor: 'text-red-700',
       iconColor: 'text-red-600',
       selectedBg: 'bg-red-100',
-      characteristics: ['Fear-based thinking', 'Anxiety and worry', 'Self-condemnation', 'Doubt and insecurity']
+      characteristics: [
+        'Fear-based thinking',
+        'Anxiety and worry',
+        'Self-condemnation',
+        'Doubt and insecurity',
+      ],
     },
     {
       value: 'transition',
@@ -60,7 +64,12 @@ export default function MindsetSelector({
       textColor: 'text-amber-700',
       iconColor: 'text-amber-600',
       selectedBg: 'bg-amber-100',
-      characteristics: ['Recognizing old patterns', 'Seeking truth', 'Growing awareness', 'Choosing transformation']
+      characteristics: [
+        'Recognizing old patterns',
+        'Seeking truth',
+        'Growing awareness',
+        'Choosing transformation',
+      ],
     },
     {
       value: 'spiritual',
@@ -72,8 +81,13 @@ export default function MindsetSelector({
       textColor: 'text-emerald-700',
       iconColor: 'text-emerald-600',
       selectedBg: 'bg-emerald-100',
-      characteristics: ['Love-centered thinking', 'Joy and peace', 'Divine wisdom', 'Spiritual discernment']
-    }
+      characteristics: [
+        'Love-centered thinking',
+        'Joy and peace',
+        'Divine wisdom',
+        'Spiritual discernment',
+      ],
+    },
   ];
 
   const handleMindsetSelect = (mindset: MindsetType): void => {
@@ -84,13 +98,13 @@ export default function MindsetSelector({
   return (
     <div className="space-y-4">
       {/* Sacred Header */}
-      <div className="text-center mb-6">
-        <h3 className="font-sacred-serif text-lg font-bold text-sacred-blue-800 mb-2">
+      <div className="mb-6 text-center">
+        <h3 className="mb-2 font-sacred-serif text-lg font-bold text-sacred-blue-800">
           Sacred Mind Discernment
         </h3>
-        <p className="text-sm text-sacred-blue-600 leading-relaxed">
-          Which mindset guided your thoughts during this reflection? 
-          {required && <span className="text-red-500 ml-1">*</span>}
+        <p className="text-sm leading-relaxed text-sacred-blue-600">
+          Which mindset guided your thoughts during this reflection?
+          {required && <span className="ml-1 text-red-500">*</span>}
         </p>
       </div>
 
@@ -105,37 +119,46 @@ export default function MindsetSelector({
               key={mindset.value}
               onClick={() => handleMindsetSelect(mindset.value)}
               className={`
-                relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 hover:shadow-md hover:scale-[1.02]
-                ${isSelected 
-                  ? `${mindset.borderColor} ${mindset.selectedBg} shadow-lg scale-[1.02]` 
-                  : 'border-sacred-blue-200 bg-white hover:border-sacred-blue-300'
+                relative cursor-pointer rounded-xl border-2 p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-md
+                ${
+                  isSelected
+                    ? `${mindset.borderColor} ${mindset.selectedBg} scale-[1.02] shadow-lg`
+                    : 'border-sacred-blue-200 bg-white hover:border-sacred-blue-300'
                 }
               `}
             >
               {/* Selection Indicator */}
               {isSelected && (
-                <div className="absolute top-3 right-3">
-                  <div className={`w-6 h-6 rounded-full ${mindset.selectedBg} border-2 ${mindset.borderColor} flex items-center justify-center`}>
-                    <Check className={`w-3 h-3 ${mindset.iconColor}`} />
+                <div className="absolute right-3 top-3">
+                  <div
+                    className={`h-6 w-6 rounded-full ${mindset.selectedBg} border-2 ${mindset.borderColor} flex items-center justify-center`}
+                  >
+                    <Check className={`h-3 w-3 ${mindset.iconColor}`} />
                   </div>
                 </div>
               )}
 
               <div className="flex items-start gap-4">
                 {/* Sacred Icon */}
-                <div className={`
-                  flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br ${mindset.color} 
+                <div
+                  className={`
+                  h-12 w-12 flex-shrink-0 rounded-xl bg-gradient-to-br ${mindset.color} 
                   flex items-center justify-center shadow-sm
-                `}>
-                  <Icon className={`w-6 h-6 ${mindset.iconColor}`} />
+                `}
+                >
+                  <Icon className={`h-6 w-6 ${mindset.iconColor}`} />
                 </div>
 
                 {/* Content */}
                 <div className="flex-1">
-                  <h4 className={`font-semibold text-base mb-1 ${isSelected ? mindset.textColor : 'text-sacred-blue-800'}`}>
+                  <h4
+                    className={`mb-1 text-base font-semibold ${isSelected ? mindset.textColor : 'text-sacred-blue-800'}`}
+                  >
                     {mindset.title}
                   </h4>
-                  <p className={`text-sm mb-3 ${isSelected ? mindset.textColor : 'text-sacred-blue-600'}`}>
+                  <p
+                    className={`mb-3 text-sm ${isSelected ? mindset.textColor : 'text-sacred-blue-600'}`}
+                  >
                     {mindset.description}
                   </p>
 
@@ -143,8 +166,12 @@ export default function MindsetSelector({
                   <div className="grid grid-cols-2 gap-1">
                     {mindset.characteristics.map((characteristic, index) => (
                       <div key={index} className="flex items-center gap-1.5">
-                        <div className={`w-1.5 h-1.5 rounded-full ${isSelected ? mindset.iconColor.replace('text-', 'bg-') : 'bg-sacred-blue-300'}`} />
-                        <span className={`text-xs ${isSelected ? mindset.textColor : 'text-sacred-blue-600'}`}>
+                        <div
+                          className={`h-1.5 w-1.5 rounded-full ${isSelected ? mindset.iconColor.replace('text-', 'bg-') : 'bg-sacred-blue-300'}`}
+                        />
+                        <span
+                          className={`text-xs ${isSelected ? mindset.textColor : 'text-sacred-blue-600'}`}
+                        >
                           {characteristic}
                         </span>
                       </div>
@@ -155,7 +182,9 @@ export default function MindsetSelector({
 
               {/* Sacred Selection Glow Effect */}
               {isSelected && (
-                <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${mindset.color} opacity-20 pointer-events-none`} />
+                <div
+                  className={`absolute inset-0 rounded-xl bg-gradient-to-br ${mindset.color} pointer-events-none opacity-20`}
+                />
               )}
             </div>
           );
@@ -163,18 +192,19 @@ export default function MindsetSelector({
       </div>
 
       {/* Sacred Guidance Message */}
-      <div className="mt-6 p-4 bg-gradient-to-r from-sacred-blue-50 to-purple-50 border border-sacred-blue-200 rounded-xl">
+      <div className="mt-6 rounded-xl border border-sacred-blue-200 bg-gradient-to-r from-sacred-blue-50 to-purple-50 p-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-r from-sacred-blue-400 to-purple-400 rounded-full flex items-center justify-center flex-shrink-0">
-            <Heart className="w-4 h-4 text-white" />
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-sacred-blue-400 to-purple-400">
+            <Heart className="h-4 w-4 text-white" />
           </div>
           <div>
-            <h5 className="text-sm font-semibold text-sacred-blue-800 mb-1">
+            <h5 className="mb-1 text-sm font-semibold text-sacred-blue-800">
               Sacred Discernment Guidance
             </h5>
-            <p className="text-xs text-sacred-blue-600 leading-relaxed">
-              This reflection on your mindset helps track your spiritual journey from natural thinking patterns 
-              toward the renewed mind of Christ. Be honest and gentle with yourself—growth is a process.
+            <p className="text-xs leading-relaxed text-sacred-blue-600">
+              This reflection on your mindset helps track your spiritual journey from natural
+              thinking patterns toward the renewed mind of Christ. Be honest and gentle with
+              yourself—growth is a process.
             </p>
           </div>
         </div>
@@ -182,8 +212,8 @@ export default function MindsetSelector({
 
       {/* Validation Message */}
       {required && !selectedMindset && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700 text-sm font-medium">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+          <p className="text-sm font-medium text-red-700">
             Please select a mindset to continue with your sacred reflection.
           </p>
         </div>

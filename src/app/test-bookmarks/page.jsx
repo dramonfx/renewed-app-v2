@@ -1,4 +1,3 @@
-
 // src/app/test-bookmarks/page.jsx
 'use client';
 
@@ -9,27 +8,30 @@ import { BookmarkManager } from '../../lib/bookmarks/BookmarkManager';
 
 /**
  * Bookmark System Test Page - Phase 3
- * 
+ *
  * Comprehensive testing page for the Bookmark Renaissance system
  * with advanced management, search, and synchronization features.
  */
 
 const TestBookmarksPage = () => {
-  const [bookmarkManager] = useState(() => new BookmarkManager({
-    enableSync: true,
-    enableCollaboration: false,
-    enableAnalytics: true,
-    autoSave: true,
-    syncInterval: 30000,
-    maxBookmarks: 1000,
-    enableOfflineMode: true,
-    enableExport: true
-  }));
+  const [bookmarkManager] = useState(
+    () =>
+      new BookmarkManager({
+        enableSync: true,
+        enableCollaboration: false,
+        enableAnalytics: true,
+        autoSave: true,
+        syncInterval: 30000,
+        maxBookmarks: 1000,
+        enableOfflineMode: true,
+        enableExport: true,
+      })
+  );
 
   const [state, actions] = useBookmarkManager({
     trackId: 'test-track-1',
     enableRealTimeSync: true,
-    enableLocalStorage: true
+    enableLocalStorage: true,
   });
 
   const [currentTime, setCurrentTime] = useState(0);
@@ -44,7 +46,7 @@ const TestBookmarksPage = () => {
     title: 'Sacred Blue Meditation - Extended',
     artist: 'At His Feet Productions',
     duration: 300, // 5 minutes
-    url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3'
+    url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3',
   };
 
   // Simulate audio playback
@@ -52,7 +54,7 @@ const TestBookmarksPage = () => {
     let interval;
     if (isPlaying) {
       interval = setInterval(() => {
-        setCurrentTime(prev => {
+        setCurrentTime((prev) => {
           const newTime = prev + 1;
           if (newTime >= sampleTrack.duration) {
             setIsPlaying(false);
@@ -67,41 +69,67 @@ const TestBookmarksPage = () => {
 
   // Test functions
   const addTestResult = (test, result, details = '') => {
-    setTestResults(prev => [...prev, {
-      id: Date.now(),
-      timestamp: new Date().toLocaleTimeString(),
-      test,
-      result,
-      details
-    }]);
+    setTestResults((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        timestamp: new Date().toLocaleTimeString(),
+        test,
+        result,
+        details,
+      },
+    ]);
   };
 
   const runBookmarkCreationTest = async () => {
     addTestResult('Bookmark Creation Test', 'RUNNING', 'Testing bookmark creation...');
-    
+
     try {
       const testBookmarks = [
-        { timestamp: 30, title: 'Beautiful Opening', description: 'The meditation begins with peaceful sounds', tags: ['peaceful', 'opening'], category: 'favorites' },
-        { timestamp: 90, title: 'Deep Breathing Section', description: 'Focus on breath awareness', tags: ['breathing', 'mindfulness'], category: 'important' },
-        { timestamp: 180, title: 'Visualization Moment', description: 'Sacred blue light visualization', tags: ['visualization', 'sacred'], category: 'notes' },
-        { timestamp: 240, title: 'Closing Gratitude', description: 'Ending with gratitude practice', tags: ['gratitude', 'closing'], category: 'share' }
+        {
+          timestamp: 30,
+          title: 'Beautiful Opening',
+          description: 'The meditation begins with peaceful sounds',
+          tags: ['peaceful', 'opening'],
+          category: 'favorites',
+        },
+        {
+          timestamp: 90,
+          title: 'Deep Breathing Section',
+          description: 'Focus on breath awareness',
+          tags: ['breathing', 'mindfulness'],
+          category: 'important',
+        },
+        {
+          timestamp: 180,
+          title: 'Visualization Moment',
+          description: 'Sacred blue light visualization',
+          tags: ['visualization', 'sacred'],
+          category: 'notes',
+        },
+        {
+          timestamp: 240,
+          title: 'Closing Gratitude',
+          description: 'Ending with gratitude practice',
+          tags: ['gratitude', 'closing'],
+          category: 'share',
+        },
       ];
 
       for (const bookmark of testBookmarks) {
-        await actions.createBookmark(
-          sampleTrack.id,
-          bookmark.timestamp,
-          bookmark.title,
-          {
-            description: bookmark.description,
-            tags: bookmark.tags,
-            category: bookmark.category,
-            isPublic: false
-          }
-        );
+        await actions.createBookmark(sampleTrack.id, bookmark.timestamp, bookmark.title, {
+          description: bookmark.description,
+          tags: bookmark.tags,
+          category: bookmark.category,
+          isPublic: false,
+        });
       }
 
-      addTestResult('Bookmark Creation Test', 'PASS', `Created ${testBookmarks.length} test bookmarks`);
+      addTestResult(
+        'Bookmark Creation Test',
+        'PASS',
+        `Created ${testBookmarks.length} test bookmarks`
+      );
     } catch (error) {
       addTestResult('Bookmark Creation Test', 'FAIL', error.message);
     }
@@ -109,22 +137,31 @@ const TestBookmarksPage = () => {
 
   const runSearchTest = async () => {
     addTestResult('Search Test', 'RUNNING', 'Testing search functionality...');
-    
+
     try {
       // Test text search
       const searchResults = actions.searchBookmarks('breathing');
-      addTestResult('Text Search', searchResults.length > 0 ? 'PASS' : 'FAIL', 
-        `Found ${searchResults.length} bookmarks for "breathing"`);
+      addTestResult(
+        'Text Search',
+        searchResults.length > 0 ? 'PASS' : 'FAIL',
+        `Found ${searchResults.length} bookmarks for "breathing"`
+      );
 
       // Test tag search
       const tagResults = actions.searchBookmarks('', { tags: ['peaceful'] });
-      addTestResult('Tag Search', tagResults.length > 0 ? 'PASS' : 'FAIL', 
-        `Found ${tagResults.length} bookmarks with "peaceful" tag`);
+      addTestResult(
+        'Tag Search',
+        tagResults.length > 0 ? 'PASS' : 'FAIL',
+        `Found ${tagResults.length} bookmarks with "peaceful" tag`
+      );
 
       // Test category filter
       const categoryResults = actions.searchBookmarks('', { categories: ['favorites'] });
-      addTestResult('Category Filter', categoryResults.length > 0 ? 'PASS' : 'FAIL', 
-        `Found ${categoryResults.length} bookmarks in "favorites" category`);
+      addTestResult(
+        'Category Filter',
+        categoryResults.length > 0 ? 'PASS' : 'FAIL',
+        `Found ${categoryResults.length} bookmarks in "favorites" category`
+      );
 
       addTestResult('Search Test', 'PASS', 'All search tests completed');
     } catch (error) {
@@ -134,22 +171,31 @@ const TestBookmarksPage = () => {
 
   const runExportImportTest = async () => {
     addTestResult('Export/Import Test', 'RUNNING', 'Testing export and import functionality...');
-    
+
     try {
       // Test JSON export
       const jsonData = actions.exportBookmarks('json');
-      addTestResult('JSON Export', jsonData.length > 0 ? 'PASS' : 'FAIL', 
-        `Exported ${jsonData.length} characters of JSON data`);
+      addTestResult(
+        'JSON Export',
+        jsonData.length > 0 ? 'PASS' : 'FAIL',
+        `Exported ${jsonData.length} characters of JSON data`
+      );
 
       // Test CSV export
       const csvData = actions.exportBookmarks('csv');
-      addTestResult('CSV Export', csvData.length > 0 ? 'PASS' : 'FAIL', 
-        `Exported ${csvData.length} characters of CSV data`);
+      addTestResult(
+        'CSV Export',
+        csvData.length > 0 ? 'PASS' : 'FAIL',
+        `Exported ${csvData.length} characters of CSV data`
+      );
 
       // Test XML export
       const xmlData = actions.exportBookmarks('xml');
-      addTestResult('XML Export', xmlData.length > 0 ? 'PASS' : 'FAIL', 
-        `Exported ${xmlData.length} characters of XML data`);
+      addTestResult(
+        'XML Export',
+        xmlData.length > 0 ? 'PASS' : 'FAIL',
+        `Exported ${xmlData.length} characters of XML data`
+      );
 
       addTestResult('Export/Import Test', 'PASS', 'Export tests completed successfully');
     } catch (error) {
@@ -159,7 +205,7 @@ const TestBookmarksPage = () => {
 
   const runCategoryTest = async () => {
     addTestResult('Category Test', 'RUNNING', 'Testing category management...');
-    
+
     try {
       // Create custom category
       const customCategory = await actions.createCategory(
@@ -169,24 +215,21 @@ const TestBookmarksPage = () => {
         'Test category for validation'
       );
 
-      addTestResult('Category Creation', 'PASS', 
-        `Created custom category: ${customCategory.name}`);
+      addTestResult('Category Creation', 'PASS', `Created custom category: ${customCategory.name}`);
 
       // Create bookmark with custom category
-      await actions.createBookmark(
-        sampleTrack.id,
-        150,
-        'Test Bookmark with Custom Category',
-        {
-          description: 'Testing custom category assignment',
-          tags: ['test', 'custom'],
-          category: customCategory.id,
-          isPublic: false
-        }
-      );
+      await actions.createBookmark(sampleTrack.id, 150, 'Test Bookmark with Custom Category', {
+        description: 'Testing custom category assignment',
+        tags: ['test', 'custom'],
+        category: customCategory.id,
+        isPublic: false,
+      });
 
-      addTestResult('Category Assignment', 'PASS', 
-        'Successfully assigned bookmark to custom category');
+      addTestResult(
+        'Category Assignment',
+        'PASS',
+        'Successfully assigned bookmark to custom category'
+      );
 
       addTestResult('Category Test', 'PASS', 'All category tests completed');
     } catch (error) {
@@ -196,10 +239,10 @@ const TestBookmarksPage = () => {
 
   const runPerformanceTest = async () => {
     addTestResult('Performance Test', 'RUNNING', 'Testing performance with bulk operations...');
-    
+
     try {
       const startTime = performance.now();
-      
+
       // Create multiple bookmarks quickly
       const promises = [];
       for (let i = 0; i < 20; i++) {
@@ -212,27 +255,29 @@ const TestBookmarksPage = () => {
               description: `Auto-generated bookmark for performance testing`,
               tags: ['performance', 'test', `batch-${Math.floor(i / 5)}`],
               category: ['favorites', 'important', 'notes', 'share'][i % 4],
-              isPublic: false
+              isPublic: false,
             }
           )
         );
       }
 
       await Promise.all(promises);
-      
+
       const endTime = performance.now();
       const duration = endTime - startTime;
 
-      addTestResult('Bulk Creation', 'PASS', 
-        `Created 20 bookmarks in ${duration.toFixed(2)}ms`);
+      addTestResult('Bulk Creation', 'PASS', `Created 20 bookmarks in ${duration.toFixed(2)}ms`);
 
       // Test search performance
       const searchStart = performance.now();
       const searchResults = actions.searchBookmarks('test');
       const searchEnd = performance.now();
 
-      addTestResult('Search Performance', 'PASS', 
-        `Searched ${searchResults.length} results in ${(searchEnd - searchStart).toFixed(2)}ms`);
+      addTestResult(
+        'Search Performance',
+        'PASS',
+        `Searched ${searchResults.length} results in ${(searchEnd - searchStart).toFixed(2)}ms`
+      );
 
       addTestResult('Performance Test', 'PASS', 'All performance tests completed');
     } catch (error) {
@@ -243,30 +288,30 @@ const TestBookmarksPage = () => {
   const runAllTests = async () => {
     setIsRunningTests(true);
     setTestResults([]);
-    
+
     addTestResult('Test Suite', 'RUNNING', 'Starting comprehensive bookmark tests...');
-    
+
     await runBookmarkCreationTest();
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     await runSearchTest();
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     await runCategoryTest();
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     await runExportImportTest();
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     await runPerformanceTest();
-    
+
     addTestResult('Test Suite', 'COMPLETE', 'All bookmark tests completed successfully');
     setIsRunningTests(false);
   };
 
   const clearAllBookmarks = async () => {
     if (!confirm('Are you sure you want to clear all test bookmarks?')) return;
-    
+
     try {
       const allBookmarks = state.bookmarks;
       for (const bookmark of allBookmarks) {
@@ -280,7 +325,11 @@ const TestBookmarksPage = () => {
 
   const handleSeek = (timestamp) => {
     setCurrentTime(timestamp);
-    addTestResult('Seek Action', 'PASS', `Seeked to ${Math.floor(timestamp / 60)}:${(timestamp % 60).toString().padStart(2, '0')}`);
+    addTestResult(
+      'Seek Action',
+      'PASS',
+      `Seeked to ${Math.floor(timestamp / 60)}:${(timestamp % 60).toString().padStart(2, '0')}`
+    );
   };
 
   const formatTime = (time) => {
@@ -290,24 +339,28 @@ const TestBookmarksPage = () => {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-      padding: '40px 20px',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      color: '#ffffff'
-    }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+        padding: '40px 20px',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        color: '#ffffff',
+      }}
+    >
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h1 style={{
-            fontSize: '32px',
-            fontWeight: '700',
-            marginBottom: '16px',
-            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}>
+          <h1
+            style={{
+              fontSize: '32px',
+              fontWeight: '700',
+              marginBottom: '16px',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
             📚 The Bookmark Renaissance - Phase 3 Testing
           </h1>
           <p style={{ color: '#cbd5e1', fontSize: '18px' }}>
@@ -319,51 +372,58 @@ const TestBookmarksPage = () => {
           {/* Main Content */}
           <div>
             {/* Mock Audio Player */}
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              borderRadius: '16px',
-              padding: '24px',
-              marginBottom: '32px',
-              border: '1px solid rgba(255, 255, 255, 0.1)'
-            }}>
+            <div
+              style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '16px',
+                padding: '24px',
+                marginBottom: '32px',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}
+            >
               <h2 style={{ fontSize: '20px', marginBottom: '16px' }}>🎵 Mock Audio Player</h2>
-              
+
               <div style={{ marginBottom: '16px' }}>
                 <div style={{ fontSize: '16px', fontWeight: '600', marginBottom: '4px' }}>
                   {sampleTrack.title}
                 </div>
-                <div style={{ fontSize: '14px', color: '#cbd5e1' }}>
-                  {sampleTrack.artist}
-                </div>
+                <div style={{ fontSize: '14px', color: '#cbd5e1' }}>{sampleTrack.artist}</div>
               </div>
 
               <div style={{ marginBottom: '16px' }}>
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  borderRadius: '4px',
-                  height: '6px',
-                  position: 'relative',
-                  cursor: 'pointer'
-                }} onClick={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const percent = (e.clientX - rect.left) / rect.width;
-                  setCurrentTime(percent * sampleTrack.duration);
-                }}>
-                  <div style={{
-                    background: '#3b82f6',
-                    height: '100%',
+                <div
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.2)',
                     borderRadius: '4px',
-                    width: `${(currentTime / sampleTrack.duration) * 100}%`,
-                    transition: 'width 0.1s ease'
-                  }}></div>
+                    height: '6px',
+                    position: 'relative',
+                    cursor: 'pointer',
+                  }}
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const percent = (e.clientX - rect.left) / rect.width;
+                    setCurrentTime(percent * sampleTrack.duration);
+                  }}
+                >
+                  <div
+                    style={{
+                      background: '#3b82f6',
+                      height: '100%',
+                      borderRadius: '4px',
+                      width: `${(currentTime / sampleTrack.duration) * 100}%`,
+                      transition: 'width 0.1s ease',
+                    }}
+                  ></div>
                 </div>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  fontSize: '12px',
-                  color: '#9ca3af',
-                  marginTop: '4px'
-                }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    fontSize: '12px',
+                    color: '#9ca3af',
+                    marginTop: '4px',
+                  }}
+                >
                   <span>{formatTime(currentTime)}</span>
                   <span>{formatTime(sampleTrack.duration)}</span>
                 </div>
@@ -383,12 +443,12 @@ const TestBookmarksPage = () => {
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
                   }}
                 >
                   {isPlaying ? '⏸' : '▶'}
                 </button>
-                
+
                 <button
                   onClick={() => setShowPanel(!showPanel)}
                   style={{
@@ -397,7 +457,7 @@ const TestBookmarksPage = () => {
                     borderRadius: '8px',
                     padding: '8px 16px',
                     color: '#a78bfa',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
                   }}
                 >
                   {showPanel ? 'Hide' : 'Show'} Bookmarks
@@ -406,15 +466,17 @@ const TestBookmarksPage = () => {
             </div>
 
             {/* Test Controls */}
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              borderRadius: '16px',
-              padding: '24px',
-              marginBottom: '32px',
-              border: '1px solid rgba(255, 255, 255, 0.1)'
-            }}>
+            <div
+              style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '16px',
+                padding: '24px',
+                marginBottom: '32px',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}
+            >
               <h2 style={{ fontSize: '20px', marginBottom: '20px' }}>🧪 Test Controls</h2>
-              
+
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '20px' }}>
                 <button
                   onClick={runAllTests}
@@ -427,12 +489,12 @@ const TestBookmarksPage = () => {
                     color: 'white',
                     fontWeight: '600',
                     cursor: isRunningTests ? 'not-allowed' : 'pointer',
-                    opacity: isRunningTests ? 0.6 : 1
+                    opacity: isRunningTests ? 0.6 : 1,
                   }}
                 >
                   {isRunningTests ? 'Running Tests...' : 'Run All Tests'}
                 </button>
-                
+
                 <button
                   onClick={runBookmarkCreationTest}
                   style={{
@@ -441,12 +503,12 @@ const TestBookmarksPage = () => {
                     borderRadius: '8px',
                     padding: '12px 24px',
                     color: '#34d399',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
                   }}
                 >
                   Test Creation
                 </button>
-                
+
                 <button
                   onClick={runSearchTest}
                   style={{
@@ -455,12 +517,12 @@ const TestBookmarksPage = () => {
                     borderRadius: '8px',
                     padding: '12px 24px',
                     color: '#a78bfa',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
                   }}
                 >
                   Test Search
                 </button>
-                
+
                 <button
                   onClick={runExportImportTest}
                   style={{
@@ -469,12 +531,12 @@ const TestBookmarksPage = () => {
                     borderRadius: '8px',
                     padding: '12px 24px',
                     color: '#fbbf24',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
                   }}
                 >
                   Test Export/Import
                 </button>
-                
+
                 <button
                   onClick={clearAllBookmarks}
                   style={{
@@ -483,7 +545,7 @@ const TestBookmarksPage = () => {
                     borderRadius: '8px',
                     padding: '12px 24px',
                     color: '#f87171',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
                   }}
                 >
                   Clear All
@@ -492,14 +554,16 @@ const TestBookmarksPage = () => {
 
               {/* Statistics */}
               {state.stats && (
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-                  gap: '16px',
-                  background: 'rgba(0, 0, 0, 0.2)',
-                  borderRadius: '8px',
-                  padding: '16px'
-                }}>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                    gap: '16px',
+                    background: 'rgba(0, 0, 0, 0.2)',
+                    borderRadius: '8px',
+                    padding: '16px',
+                  }}
+                >
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: '20px', fontWeight: '600', color: '#60a5fa' }}>
                       {state.stats.totalBookmarks}
@@ -529,14 +593,16 @@ const TestBookmarksPage = () => {
             </div>
 
             {/* Test Results */}
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              borderRadius: '16px',
-              padding: '24px',
-              border: '1px solid rgba(255, 255, 255, 0.1)'
-            }}>
+            <div
+              style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                borderRadius: '16px',
+                padding: '24px',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}
+            >
               <h2 style={{ fontSize: '20px', marginBottom: '20px' }}>📊 Test Results</h2>
-              
+
               {testResults.length === 0 ? (
                 <p style={{ color: '#9ca3af', textAlign: 'center', padding: '40px' }}>
                   No test results yet. Run some tests to see results here.
@@ -553,38 +619,55 @@ const TestBookmarksPage = () => {
                         padding: '12px 16px',
                         marginBottom: '8px',
                         borderRadius: '8px',
-                        background: result.result === 'PASS' ? 'rgba(16, 185, 129, 0.1)' :
-                                   result.result === 'FAIL' ? 'rgba(239, 68, 68, 0.1)' :
-                                   result.result === 'RUNNING' ? 'rgba(245, 158, 11, 0.1)' :
-                                   'rgba(107, 114, 128, 0.1)',
-                        border: `1px solid ${result.result === 'PASS' ? 'rgba(16, 185, 129, 0.2)' :
-                                             result.result === 'FAIL' ? 'rgba(239, 68, 68, 0.2)' :
-                                             result.result === 'RUNNING' ? 'rgba(245, 158, 11, 0.2)' :
-                                             'rgba(107, 114, 128, 0.2)'}`
+                        background:
+                          result.result === 'PASS'
+                            ? 'rgba(16, 185, 129, 0.1)'
+                            : result.result === 'FAIL'
+                              ? 'rgba(239, 68, 68, 0.1)'
+                              : result.result === 'RUNNING'
+                                ? 'rgba(245, 158, 11, 0.1)'
+                                : 'rgba(107, 114, 128, 0.1)',
+                        border: `1px solid ${
+                          result.result === 'PASS'
+                            ? 'rgba(16, 185, 129, 0.2)'
+                            : result.result === 'FAIL'
+                              ? 'rgba(239, 68, 68, 0.2)'
+                              : result.result === 'RUNNING'
+                                ? 'rgba(245, 158, 11, 0.2)'
+                                : 'rgba(107, 114, 128, 0.2)'
+                        }`,
                       }}
                     >
                       <div>
-                        <div style={{ fontWeight: '600', marginBottom: '4px' }}>
-                          {result.test}
-                        </div>
+                        <div style={{ fontWeight: '600', marginBottom: '4px' }}>{result.test}</div>
                         <div style={{ fontSize: '12px', color: '#9ca3af' }}>
                           {result.timestamp} - {result.details}
                         </div>
                       </div>
-                      <div style={{
-                        padding: '4px 12px',
-                        borderRadius: '20px',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        background: result.result === 'PASS' ? '#065f46' :
-                                   result.result === 'FAIL' ? '#7f1d1d' :
-                                   result.result === 'RUNNING' ? '#78350f' :
-                                   '#374151',
-                        color: result.result === 'PASS' ? '#34d399' :
-                               result.result === 'FAIL' ? '#f87171' :
-                               result.result === 'RUNNING' ? '#fbbf24' :
-                               '#9ca3af'
-                      }}>
+                      <div
+                        style={{
+                          padding: '4px 12px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          background:
+                            result.result === 'PASS'
+                              ? '#065f46'
+                              : result.result === 'FAIL'
+                                ? '#7f1d1d'
+                                : result.result === 'RUNNING'
+                                  ? '#78350f'
+                                  : '#374151',
+                          color:
+                            result.result === 'PASS'
+                              ? '#34d399'
+                              : result.result === 'FAIL'
+                                ? '#f87171'
+                                : result.result === 'RUNNING'
+                                  ? '#fbbf24'
+                                  : '#9ca3af',
+                        }}
+                      >
                         {result.result}
                       </div>
                     </div>
@@ -609,18 +692,22 @@ const TestBookmarksPage = () => {
         </div>
 
         {/* Feature Overview */}
-        <div style={{
-          marginTop: '40px',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '24px'
-        }}>
-          <div style={{
-            background: 'rgba(59, 130, 246, 0.1)',
-            border: '1px solid rgba(59, 130, 246, 0.2)',
-            borderRadius: '12px',
-            padding: '24px'
-          }}>
+        <div
+          style={{
+            marginTop: '40px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '24px',
+          }}
+        >
+          <div
+            style={{
+              background: 'rgba(59, 130, 246, 0.1)',
+              border: '1px solid rgba(59, 130, 246, 0.2)',
+              borderRadius: '12px',
+              padding: '24px',
+            }}
+          >
             <h3 style={{ color: '#60a5fa', fontSize: '18px', marginBottom: '16px' }}>
               📚 Advanced Management
             </h3>
@@ -633,12 +720,14 @@ const TestBookmarksPage = () => {
             </ul>
           </div>
 
-          <div style={{
-            background: 'rgba(16, 185, 129, 0.1)',
-            border: '1px solid rgba(16, 185, 129, 0.2)',
-            borderRadius: '12px',
-            padding: '24px'
-          }}>
+          <div
+            style={{
+              background: 'rgba(16, 185, 129, 0.1)',
+              border: '1px solid rgba(16, 185, 129, 0.2)',
+              borderRadius: '12px',
+              padding: '24px',
+            }}
+          >
             <h3 style={{ color: '#34d399', fontSize: '18px', marginBottom: '16px' }}>
               🔍 Smart Search & Filter
             </h3>
@@ -651,12 +740,14 @@ const TestBookmarksPage = () => {
             </ul>
           </div>
 
-          <div style={{
-            background: 'rgba(168, 85, 247, 0.1)',
-            border: '1px solid rgba(168, 85, 247, 0.2)',
-            borderRadius: '12px',
-            padding: '24px'
-          }}>
+          <div
+            style={{
+              background: 'rgba(168, 85, 247, 0.1)',
+              border: '1px solid rgba(168, 85, 247, 0.2)',
+              borderRadius: '12px',
+              padding: '24px',
+            }}
+          >
             <h3 style={{ color: '#a78bfa', fontSize: '18px', marginBottom: '16px' }}>
               🔄 Real-time Sync
             </h3>
@@ -669,12 +760,14 @@ const TestBookmarksPage = () => {
             </ul>
           </div>
 
-          <div style={{
-            background: 'rgba(245, 158, 11, 0.1)',
-            border: '1px solid rgba(245, 158, 11, 0.2)',
-            borderRadius: '12px',
-            padding: '24px'
-          }}>
+          <div
+            style={{
+              background: 'rgba(245, 158, 11, 0.1)',
+              border: '1px solid rgba(245, 158, 11, 0.2)',
+              borderRadius: '12px',
+              padding: '24px',
+            }}
+          >
             <h3 style={{ color: '#fbbf24', fontSize: '18px', marginBottom: '16px' }}>
               📤 Export & Share
             </h3>

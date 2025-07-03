@@ -42,10 +42,10 @@ const safeParse = (str, fallback = {}) => {
 // Validate onboarding data structure
 const validateOnboardingData = (data) => {
   if (!data || typeof data !== 'object') return false;
-  
+
   // Basic structure validation
   const requiredFields = ['selectedMind', 'assessment', 'intentions', 'selectedPath'];
-  return requiredFields.every(field => data.hasOwnProperty(field));
+  return requiredFields.every((field) => data.hasOwnProperty(field));
 };
 
 // Clean onboarding data for safe storage
@@ -55,7 +55,7 @@ const cleanDataForStorage = (data) => {
     assessment: {
       stress_level: data.assessment?.stress_level || '',
       life_satisfaction: data.assessment?.life_satisfaction || '',
-      growth_desire: data.assessment?.growth_desire || ''
+      growth_desire: data.assessment?.growth_desire || '',
     },
     intentions: Array.isArray(data.intentions) ? data.intentions : [],
     selectedPath: data.selectedPath || '',
@@ -63,7 +63,7 @@ const cleanDataForStorage = (data) => {
     startedAt: data.startedAt || new Date().toISOString(),
     completedAt: data.completedAt || null,
     journeyId: data.journeyId || `journey_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    lastUpdated: new Date().toISOString()
+    lastUpdated: new Date().toISOString(),
   };
 };
 
@@ -72,7 +72,7 @@ const STORAGE_KEYS = {
   ONBOARDING_DATA: 'renewed_sacred_journey_data',
   ONBOARDING_COMPLETE: 'renewed_sacred_journey_complete',
   JOURNEY_PROGRESS: 'renewed_sacred_journey_progress',
-  TEMPORARY_DATA: 'renewed_sacred_journey_temp'
+  TEMPORARY_DATA: 'renewed_sacred_journey_temp',
 };
 
 // Sacred Journey Storage API
@@ -81,17 +81,17 @@ export const SacredJourneyStorage = {
   saveJourneyData: (data) => {
     try {
       if (typeof window === 'undefined') return false;
-      
+
       const cleanedData = cleanDataForStorage(data);
       if (!validateOnboardingData(cleanedData)) {
         console.warn('Invalid onboarding data structure');
         return false;
       }
-      
+
       const serializedData = safeStringify(cleanedData);
       localStorage.setItem(STORAGE_KEYS.ONBOARDING_DATA, serializedData);
       localStorage.setItem(STORAGE_KEYS.JOURNEY_PROGRESS, cleanedData.completedSteps?.length || 0);
-      
+
       return true;
     } catch (error) {
       console.error('Failed to save journey data:', error);
@@ -103,14 +103,14 @@ export const SacredJourneyStorage = {
   loadJourneyData: () => {
     try {
       if (typeof window === 'undefined') return null;
-      
+
       const data = localStorage.getItem(STORAGE_KEYS.ONBOARDING_DATA);
       const parsed = safeParse(data);
-      
+
       if (validateOnboardingData(parsed)) {
         return parsed;
       }
-      
+
       return null;
     } catch (error) {
       console.error('Failed to load journey data:', error);
@@ -122,13 +122,13 @@ export const SacredJourneyStorage = {
   saveTempData: (stepData, stepIndex) => {
     try {
       if (typeof window === 'undefined') return false;
-      
+
       const tempData = {
         stepData: cleanDataForStorage(stepData),
         stepIndex,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      
+
       localStorage.setItem(STORAGE_KEYS.TEMPORARY_DATA, safeStringify(tempData));
       return true;
     } catch (error) {
@@ -141,7 +141,7 @@ export const SacredJourneyStorage = {
   loadTempData: () => {
     try {
       if (typeof window === 'undefined') return null;
-      
+
       const data = localStorage.getItem(STORAGE_KEYS.TEMPORARY_DATA);
       return safeParse(data);
     } catch (error) {
@@ -154,16 +154,16 @@ export const SacredJourneyStorage = {
   markJourneyComplete: (finalData) => {
     try {
       if (typeof window === 'undefined') return false;
-      
+
       const success = SacredJourneyStorage.saveJourneyData({
         ...finalData,
-        completedAt: new Date().toISOString()
+        completedAt: new Date().toISOString(),
       });
-      
+
       if (success) {
         localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETE, 'true');
       }
-      
+
       return success;
     } catch (error) {
       console.error('Failed to mark journey complete:', error);
@@ -185,11 +185,11 @@ export const SacredJourneyStorage = {
   clearJourneyData: () => {
     try {
       if (typeof window === 'undefined') return false;
-      
-      Object.values(STORAGE_KEYS).forEach(key => {
+
+      Object.values(STORAGE_KEYS).forEach((key) => {
         localStorage.removeItem(key);
       });
-      
+
       return true;
     } catch (error) {
       console.error('Failed to clear journey data:', error);
@@ -201,13 +201,13 @@ export const SacredJourneyStorage = {
   getJourneyProgress: () => {
     try {
       if (typeof window === 'undefined') return 0;
-      
+
       const progress = localStorage.getItem(STORAGE_KEYS.JOURNEY_PROGRESS);
       return parseInt(progress) || 0;
     } catch (error) {
       return 0;
     }
-  }
+  },
 };
 
 export default SacredJourneyStorage;

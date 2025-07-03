@@ -1,13 +1,12 @@
-
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 export async function GET() {
   const logs = [];
-  
+
   try {
     logs.push('🔍 Starting chart debug using golden snippet pattern...');
-    
+
     // Golden snippet Supabase client setup
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -22,16 +21,16 @@ export async function GET() {
 
     // Check what's in the visuals table
     logs.push('🔍 Querying visuals table...');
-    const { data: allVisuals, error: allVisualsError } = await supabase
-      .from('visuals')
-      .select('*');
+    const { data: allVisuals, error: allVisualsError } = await supabase.from('visuals').select('*');
 
     if (allVisualsError) {
       logs.push(`❌ Error querying visuals table: ${allVisualsError.message}`);
     } else {
       logs.push(`✅ Found ${allVisuals?.length || 0} visuals in table:`);
       allVisuals?.forEach((visual, index) => {
-        logs.push(`  ${index + 1}. ID: ${visual.id}, Tag: "${visual.markdown_tag}", Path: "${visual.file_path}"`);
+        logs.push(
+          `  ${index + 1}. ID: ${visual.id}, Tag: "${visual.markdown_tag}", Path: "${visual.file_path}"`
+        );
       });
     }
 
@@ -46,10 +45,10 @@ export async function GET() {
     if (chartError) {
       if (chartError.code === 'PGRST116') {
         logs.push('ℹ️ No NEXT_STEPS_CHART found, trying alternatives...');
-        
+
         const alternativeTags = ['![MTC]', 'MTC', 'CHART', 'TRANSFORMATION_CHART'];
         let foundChart = null;
-        
+
         for (const tag of alternativeTags) {
           logs.push(`🔍 Trying tag: "${tag}"`);
           const { data: altData, error: altError } = await supabase
@@ -57,18 +56,18 @@ export async function GET() {
             .select('*')
             .eq('markdown_tag', tag)
             .single();
-            
+
           if (!altError && altData) {
             logs.push(`✅ Found chart with tag: ${tag}`);
             logs.push(`   File path: ${altData.file_path}`);
             foundChart = altData;
-            
+
             // Try creating signed URL
             logs.push('🔍 Creating signed URL...');
             const { data: signedUrlData, error: urlError } = await supabase.storage
               .from('book-assets')
               .createSignedUrl(altData.file_path, 3600);
-            
+
             if (urlError) {
               logs.push(`❌ Signed URL error: ${urlError.message}`);
             } else {
@@ -79,7 +78,7 @@ export async function GET() {
             logs.push(`❌ Tag "${tag}" not found or error: ${altError?.message || 'unknown'}`);
           }
         }
-        
+
         if (!foundChart) {
           logs.push('❌ No chart found with any alternative tags');
         }
@@ -88,13 +87,13 @@ export async function GET() {
       }
     } else {
       logs.push(`✅ Found NEXT_STEPS_CHART with path: ${chartData.file_path}`);
-      
+
       // Test signed URL creation for the found chart
       logs.push('🔍 Testing signed URL creation for NEXT_STEPS_CHART...');
       const { data: signedUrlData, error: urlError } = await supabase.storage
         .from('book-assets')
         .createSignedUrl(chartData.file_path, 3600);
-      
+
       if (urlError) {
         logs.push(`❌ Signed URL error for NEXT_STEPS_CHART: ${urlError.message}`);
         logs.push(`   Error code: ${urlError.error || 'unknown'}`);
@@ -131,21 +130,22 @@ export async function GET() {
     } else {
       logs.push(`✅ Found ${visualsList?.length || 0} items in visuals directory:`);
       visualsList?.forEach((item, index) => {
-        logs.push(`  ${index + 1}. visuals/${item.name} (${item.metadata?.size || 'unknown size'})`);
+        logs.push(
+          `  ${index + 1}. visuals/${item.name} (${item.metadata?.size || 'unknown size'})`
+        );
       });
     }
 
     return NextResponse.json({
       success: true,
-      debug: logs.join('\n')
+      debug: logs.join('\n'),
     });
-
   } catch (e) {
     logs.push(`❌ Unexpected error: ${e.message}`);
     return NextResponse.json({
       success: false,
       error: e.message,
-      debug: logs.join('\n')
+      debug: logs.join('\n'),
     });
   }
 }

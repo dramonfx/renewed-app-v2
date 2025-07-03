@@ -3,7 +3,7 @@
 
 /**
  * Audio Analytics System - Performance Monitoring & Usage Tracking
- * 
+ *
  * Comprehensive analytics system for tracking audio player performance,
  * user behavior, and system health with privacy-focused data collection.
  */
@@ -79,11 +79,11 @@ export class AudioAnalytics {
       batchSize: 50,
       flushInterval: 30000, // 30 seconds
       maxRetries: 3,
-      ...config
+      ...config,
     };
 
     this.session = this.initializeSession();
-    
+
     if (this.config.enabled) {
       this.startFlushTimer();
       this.setupUnloadHandler();
@@ -102,7 +102,7 @@ export class AudioAnalytics {
       averageLoadTime: 0,
       errorCount: 0,
       userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Unknown',
-      networkType: this.getNetworkType()
+      networkType: this.getNetworkType(),
     };
   }
 
@@ -118,10 +118,11 @@ export class AudioAnalytics {
    */
   private getNetworkType(): string | undefined {
     if (typeof navigator === 'undefined') return undefined;
-    
+
     try {
       // @ts-ignore - Navigator connection API
-      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      const connection =
+        navigator.connection || navigator.mozConnection || navigator.webkitConnection;
       return connection?.effectiveType || 'unknown';
     } catch {
       return 'unknown';
@@ -143,7 +144,7 @@ export class AudioAnalytics {
       timestamp: Date.now(),
       type,
       value,
-      metadata
+      metadata,
     };
 
     this.performanceMetrics.push(metric);
@@ -169,11 +170,11 @@ export class AudioAnalytics {
       trackId,
       duration,
       position,
-      metadata
+      metadata,
     };
 
     this.userBehaviorEvents.push(event);
-    
+
     // Update session stats
     if (type === 'play') {
       this.session.totalTracks++;
@@ -205,12 +206,12 @@ export class AudioAnalytics {
       stack,
       trackId,
       userAgent: this.session.userAgent,
-      metadata
+      metadata,
     };
 
     this.errorEvents.push(error);
     this.session.errorCount++;
-    
+
     this.checkFlushConditions();
   }
 
@@ -219,17 +220,22 @@ export class AudioAnalytics {
    */
   public trackLoadTime(trackId: string, loadTime: number, metadata?: Record<string, any>): void {
     this.trackPerformance('load_time', loadTime, { trackId, ...metadata });
-    
+
     // Update session average
     const currentAvg = this.session.averageLoadTime;
     const count = this.session.totalTracks;
-    this.session.averageLoadTime = count > 0 ? (currentAvg * (count - 1) + loadTime) / count : loadTime;
+    this.session.averageLoadTime =
+      count > 0 ? (currentAvg * (count - 1) + loadTime) / count : loadTime;
   }
 
   /**
    * Track buffer health
    */
-  public trackBufferHealth(trackId: string, bufferHealth: number, metadata?: Record<string, any>): void {
+  public trackBufferHealth(
+    trackId: string,
+    bufferHealth: number,
+    metadata?: Record<string, any>
+  ): void {
     this.trackPerformance('buffer_health', bufferHealth, { trackId, ...metadata });
   }
 
@@ -258,10 +264,9 @@ export class AudioAnalytics {
    * Check if data should be flushed
    */
   private checkFlushConditions(): void {
-    const totalEvents = this.performanceMetrics.length + 
-                       this.userBehaviorEvents.length + 
-                       this.errorEvents.length;
-    
+    const totalEvents =
+      this.performanceMetrics.length + this.userBehaviorEvents.length + this.errorEvents.length;
+
     if (totalEvents >= this.config.batchSize) {
       this.flush();
     }
@@ -274,7 +279,7 @@ export class AudioAnalytics {
     if (this.flushTimer) {
       clearInterval(this.flushTimer);
     }
-    
+
     this.flushTimer = setInterval(() => {
       this.flush();
     }, this.config.flushInterval);
@@ -285,12 +290,12 @@ export class AudioAnalytics {
    */
   private setupUnloadHandler(): void {
     if (typeof window === 'undefined') return;
-    
+
     const handleUnload = () => {
       this.endSession();
       this.flush(true); // Force synchronous flush
     };
-    
+
     window.addEventListener('beforeunload', handleUnload);
     window.addEventListener('pagehide', handleUnload);
   }
@@ -311,11 +316,8 @@ export class AudioAnalytics {
     try {
       if (synchronous && typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
         // Use sendBeacon for synchronous sending during page unload
-        const success = navigator.sendBeacon(
-          this.config.endpoint,
-          JSON.stringify(payload)
-        );
-        
+        const success = navigator.sendBeacon(this.config.endpoint, JSON.stringify(payload));
+
         if (success) {
           this.clearLocalData();
         } else {
@@ -341,7 +343,7 @@ export class AudioAnalytics {
       timestamp: Date.now(),
       performance: [...this.performanceMetrics],
       userBehavior: [...this.userBehaviorEvents],
-      errors: [...this.errorEvents]
+      errors: [...this.errorEvents],
     };
   }
 
@@ -349,9 +351,11 @@ export class AudioAnalytics {
    * Check if payload is empty
    */
   private isEmpty(payload: any): boolean {
-    return payload.performance.length === 0 && 
-           payload.userBehavior.length === 0 && 
-           payload.errors.length === 0;
+    return (
+      payload.performance.length === 0 &&
+      payload.userBehavior.length === 0 &&
+      payload.errors.length === 0
+    );
   }
 
   /**
@@ -359,19 +363,19 @@ export class AudioAnalytics {
    */
   private async sendData(payload: any): Promise<void> {
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     };
-    
+
     if (this.config.apiKey) {
       headers['Authorization'] = `Bearer ${this.config.apiKey}`;
     }
-    
+
     const response = await fetch(this.config.endpoint!, {
       method: 'POST',
       headers,
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
-    
+
     if (!response.ok) {
       throw new Error(`Analytics request failed: ${response.status}`);
     }
@@ -384,9 +388,9 @@ export class AudioAnalytics {
     this.retryQueue.push({
       payload,
       attempts: 0,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
-    
+
     // Process retry queue
     this.processRetryQueue();
   }
@@ -397,15 +401,15 @@ export class AudioAnalytics {
   private async processRetryQueue(): Promise<void> {
     const now = Date.now();
     const retryDelay = 5000; // 5 seconds
-    
+
     for (let i = this.retryQueue.length - 1; i >= 0; i--) {
       const item = this.retryQueue[i];
-      
+
       if (item.attempts >= this.config.maxRetries) {
         this.retryQueue.splice(i, 1);
         continue;
       }
-      
+
       if (now - item.timestamp >= retryDelay) {
         try {
           await this.sendData(item.payload);
@@ -451,10 +455,9 @@ export class AudioAnalytics {
   } {
     return {
       session: this.getSession(),
-      pendingEvents: this.performanceMetrics.length + 
-                    this.userBehaviorEvents.length + 
-                    this.errorEvents.length,
-      retryQueueSize: this.retryQueue.length
+      pendingEvents:
+        this.performanceMetrics.length + this.userBehaviorEvents.length + this.errorEvents.length,
+      retryQueueSize: this.retryQueue.length,
     };
   }
 
@@ -463,7 +466,7 @@ export class AudioAnalytics {
    */
   public updateConfig(newConfig: Partial<AnalyticsConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    
+
     if (this.config.enabled) {
       this.startFlushTimer();
     } else if (this.flushTimer) {
@@ -479,7 +482,7 @@ export class AudioAnalytics {
     if (this.flushTimer) {
       clearInterval(this.flushTimer);
     }
-    
+
     this.endSession();
     this.flush(true);
     this.clearLocalData();

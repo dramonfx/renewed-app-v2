@@ -1,4 +1,3 @@
-
 // src/hooks/useVisuals.ts
 'use client';
 
@@ -40,34 +39,39 @@ export function useVisuals(sectionId: number | null): UseVisualsReturn {
           const visualsWithUrls: Visual[] = await Promise.all(
             visualsData.map(async (visual: any): Promise<Visual> => {
               if (visual.file_path) {
-                const { data: signedUrlData, error: signedUrlError } = await (supabase as any).storage
+                const { data: signedUrlData, error: signedUrlError } = await (
+                  supabase as any
+                ).storage
                   .from('book-assets')
                   .createSignedUrl(visual.file_path, 60 * 60);
 
                 if (signedUrlError) {
-                  console.error(`Error creating signed URL for visual ${visual.file_path}:`, signedUrlError.message);
-                  return { 
-                    ...visual, 
-                    displayUrl: null, 
-                    error: signedUrlError.message 
+                  console.error(
+                    `Error creating signed URL for visual ${visual.file_path}:`,
+                    signedUrlError.message
+                  );
+                  return {
+                    ...visual,
+                    displayUrl: null,
+                    error: signedUrlError.message,
                   };
                 }
-                return { 
-                  ...visual, 
-                  displayUrl: signedUrlData?.signedUrl || null 
+                return {
+                  ...visual,
+                  displayUrl: signedUrlData?.signedUrl || null,
                 };
               }
-              return { 
-                ...visual, 
-                displayUrl: null, 
-                error: 'No file path for visual' 
+              return {
+                ...visual,
+                displayUrl: null,
+                error: 'No file path for visual',
               };
             })
           );
 
           // Create visuals map for markdown rendering
           const newVisualsMap = new Map<string, Visual>();
-          visualsWithUrls.forEach(vis => {
+          visualsWithUrls.forEach((vis) => {
             if (vis.markdown_tag && vis.displayUrl) {
               newVisualsMap.set(vis.markdown_tag, vis);
             }

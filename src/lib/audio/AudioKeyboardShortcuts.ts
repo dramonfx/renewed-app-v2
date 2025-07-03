@@ -3,7 +3,7 @@
 
 /**
  * Audio Keyboard Shortcuts System
- * 
+ *
  * Provides comprehensive keyboard control for audio players with
  * customizable shortcuts and accessibility features.
  */
@@ -55,12 +55,12 @@ export class AudioKeyboardShortcuts {
       preventDefaultOnInputs: true,
       showNotifications: false,
       customShortcuts: [],
-      ...config
+      ...config,
     };
 
     this.initializeDefaultShortcuts();
     this.initializeCustomShortcuts();
-    
+
     if (this.config.enabled) {
       this.enable();
     }
@@ -77,7 +77,7 @@ export class AudioKeyboardShortcuts {
         modifiers: {},
         action: 'playPause',
         description: 'Play/Pause',
-        enabled: true
+        enabled: true,
       },
       {
         key: 'ArrowLeft',
@@ -85,7 +85,7 @@ export class AudioKeyboardShortcuts {
         modifiers: {},
         action: 'skipBackward',
         description: 'Skip backward 10 seconds',
-        enabled: true
+        enabled: true,
       },
       {
         key: 'ArrowRight',
@@ -93,7 +93,7 @@ export class AudioKeyboardShortcuts {
         modifiers: {},
         action: 'skipForward',
         description: 'Skip forward 10 seconds',
-        enabled: true
+        enabled: true,
       },
       {
         key: 'ArrowUp',
@@ -101,7 +101,7 @@ export class AudioKeyboardShortcuts {
         modifiers: {},
         action: 'volumeUp',
         description: 'Volume up',
-        enabled: true
+        enabled: true,
       },
       {
         key: 'ArrowDown',
@@ -109,7 +109,7 @@ export class AudioKeyboardShortcuts {
         modifiers: {},
         action: 'volumeDown',
         description: 'Volume down',
-        enabled: true
+        enabled: true,
       },
       {
         key: 'm',
@@ -117,7 +117,7 @@ export class AudioKeyboardShortcuts {
         modifiers: {},
         action: 'mute',
         description: 'Toggle mute',
-        enabled: true
+        enabled: true,
       },
       {
         key: 'r',
@@ -125,7 +125,7 @@ export class AudioKeyboardShortcuts {
         modifiers: {},
         action: 'restart',
         description: 'Restart track',
-        enabled: true
+        enabled: true,
       },
       {
         key: 'n',
@@ -133,7 +133,7 @@ export class AudioKeyboardShortcuts {
         modifiers: {},
         action: 'nextTrack',
         description: 'Next track',
-        enabled: true
+        enabled: true,
       },
       {
         key: 'p',
@@ -141,11 +141,11 @@ export class AudioKeyboardShortcuts {
         modifiers: {},
         action: 'previousTrack',
         description: 'Previous track',
-        enabled: true
-      }
+        enabled: true,
+      },
     ];
 
-    defaultShortcuts.forEach(shortcut => {
+    defaultShortcuts.forEach((shortcut) => {
       const key = this.generateShortcutKey(shortcut);
       this.shortcuts.set(key, shortcut);
     });
@@ -155,7 +155,7 @@ export class AudioKeyboardShortcuts {
    * Initialize custom shortcuts from config
    */
   private initializeCustomShortcuts(): void {
-    this.config.customShortcuts.forEach(shortcut => {
+    this.config.customShortcuts.forEach((shortcut) => {
       const key = this.generateShortcutKey(shortcut);
       this.shortcuts.set(key, shortcut);
     });
@@ -170,7 +170,7 @@ export class AudioKeyboardShortcuts {
     if (shortcut.modifiers.shift) modifiers.push('shift');
     if (shortcut.modifiers.alt) modifiers.push('alt');
     if (shortcut.modifiers.meta) modifiers.push('meta');
-    
+
     return `${modifiers.join('+')}_${shortcut.code}`;
   }
 
@@ -186,7 +186,7 @@ export class AudioKeyboardShortcuts {
    */
   public enable(): void {
     if (typeof window === 'undefined') return;
-    
+
     this.isEnabled = true;
     window.addEventListener('keydown', this.handleKeyDown);
     window.addEventListener('keyup', this.handleKeyUp);
@@ -197,7 +197,7 @@ export class AudioKeyboardShortcuts {
    */
   public disable(): void {
     if (typeof window === 'undefined') return;
-    
+
     this.isEnabled = false;
     window.removeEventListener('keydown', this.handleKeyDown);
     window.removeEventListener('keyup', this.handleKeyUp);
@@ -220,11 +220,11 @@ export class AudioKeyboardShortcuts {
     if (shortcut && shortcut.enabled) {
       event.preventDefault();
       this.executeShortcut(shortcut);
-      
+
       if (this.config.showNotifications) {
         this.showNotification(shortcut.description);
       }
-      
+
       this.emit('shortcutExecuted', { shortcut, event });
     }
   };
@@ -246,7 +246,7 @@ export class AudioKeyboardShortcuts {
     if (event.shiftKey) modifiers.push('shift');
     if (event.altKey) modifiers.push('alt');
     if (event.metaKey) modifiers.push('meta');
-    
+
     return `${modifiers.join('+')}_${event.code}`;
   }
 
@@ -255,13 +255,15 @@ export class AudioKeyboardShortcuts {
    */
   private isInputElement(target: EventTarget | null): boolean {
     if (!target) return false;
-    
+
     const element = target as HTMLElement;
     const tagName = element.tagName.toLowerCase();
-    
-    return ['input', 'textarea', 'select', 'button'].includes(tagName) ||
-           element.contentEditable === 'true' ||
-           element.getAttribute('role') === 'textbox';
+
+    return (
+      ['input', 'textarea', 'select', 'button'].includes(tagName) ||
+      element.contentEditable === 'true' ||
+      element.getAttribute('role') === 'textbox'
+    );
   }
 
   /**
@@ -322,7 +324,7 @@ export class AudioKeyboardShortcuts {
         new Notification('Audio Player', {
           body: message,
           icon: '/favicon.ico',
-          tag: 'audio-shortcut'
+          tag: 'audio-shortcut',
         });
       }
     }
@@ -365,7 +367,7 @@ export class AudioKeyboardShortcuts {
   public toggleShortcut(shortcut: KeyboardShortcut, enabled: boolean): void {
     const key = this.generateShortcutKey(shortcut);
     const existingShortcut = this.shortcuts.get(key);
-    
+
     if (existingShortcut) {
       existingShortcut.enabled = enabled;
     }
@@ -394,7 +396,7 @@ export class AudioKeyboardShortcuts {
   private emit(event: string, data?: any): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
-      listeners.forEach(listener => listener(data));
+      listeners.forEach((listener) => listener(data));
     }
   }
 
@@ -403,7 +405,7 @@ export class AudioKeyboardShortcuts {
    */
   public updateConfig(newConfig: Partial<KeyboardShortcutsConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    
+
     if (this.config.enabled && !this.isEnabled) {
       this.enable();
     } else if (!this.config.enabled && this.isEnabled) {
@@ -415,21 +417,21 @@ export class AudioKeyboardShortcuts {
    * Get help text for all shortcuts
    */
   public getHelpText(): string {
-    const enabledShortcuts = Array.from(this.shortcuts.values())
-      .filter(shortcut => shortcut.enabled);
-    
+    const enabledShortcuts = Array.from(this.shortcuts.values()).filter(
+      (shortcut) => shortcut.enabled
+    );
+
     return enabledShortcuts
-      .map(shortcut => {
+      .map((shortcut) => {
         const modifiers = [];
         if (shortcut.modifiers.ctrl) modifiers.push('Ctrl');
         if (shortcut.modifiers.shift) modifiers.push('Shift');
         if (shortcut.modifiers.alt) modifiers.push('Alt');
         if (shortcut.modifiers.meta) modifiers.push('Cmd');
-        
-        const keyCombo = modifiers.length > 0 
-          ? `${modifiers.join('+')}+${shortcut.key}`
-          : shortcut.key;
-          
+
+        const keyCombo =
+          modifiers.length > 0 ? `${modifiers.join('+')}+${shortcut.key}` : shortcut.key;
+
         return `${keyCombo}: ${shortcut.description}`;
       })
       .join('\n');

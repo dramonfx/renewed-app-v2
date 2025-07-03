@@ -1,6 +1,6 @@
 /**
  * Comprehensive Input Validation and Sanitization Utilities
- * 
+ *
  * Provides secure, reusable validation patterns for the Sacred Journey application.
  * Focuses on preventing XSS, injection attacks, and ensuring data integrity.
  */
@@ -8,14 +8,16 @@
 import { z } from 'zod';
 
 // Email validation regex (RFC 5322 compliant)
-const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+const EMAIL_REGEX =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
 // Password strength validation
 const PASSWORD_MIN_LENGTH = 8;
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
 
 // URL validation regex
-const URL_REGEX = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
+const URL_REGEX =
+  /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/;
 
 // HTML/XSS prevention patterns
 const HTML_TAGS_REGEX = /<[^>]*>/g;
@@ -58,25 +60,27 @@ export class Validator {
    */
   static email(email: string): ValidationResult<string> {
     const trimmed = email.trim().toLowerCase();
-    
+
     if (!trimmed) {
       return {
         isValid: false,
-        errors: [{ field: 'email', message: 'Email is required', code: 'REQUIRED' }]
+        errors: [{ field: 'email', message: 'Email is required', code: 'REQUIRED' }],
       };
     }
 
     if (!EMAIL_REGEX.test(trimmed)) {
       return {
         isValid: false,
-        errors: [{ field: 'email', message: 'Please enter a valid email address', code: 'INVALID_FORMAT' }]
+        errors: [
+          { field: 'email', message: 'Please enter a valid email address', code: 'INVALID_FORMAT' },
+        ],
       };
     }
 
     if (trimmed.length > 254) {
       return {
         isValid: false,
-        errors: [{ field: 'email', message: 'Email address is too long', code: 'TOO_LONG' }]
+        errors: [{ field: 'email', message: 'Email address is too long', code: 'TOO_LONG' }],
       };
     }
 
@@ -92,7 +96,7 @@ export class Validator {
     if (!password) {
       return {
         isValid: false,
-        errors: [{ field: 'password', message: 'Password is required', code: 'REQUIRED' }]
+        errors: [{ field: 'password', message: 'Password is required', code: 'REQUIRED' }],
       };
     }
 
@@ -100,7 +104,7 @@ export class Validator {
       errors.push({
         field: 'password',
         message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters long`,
-        code: 'TOO_SHORT'
+        code: 'TOO_SHORT',
       });
     }
 
@@ -108,7 +112,7 @@ export class Validator {
       errors.push({
         field: 'password',
         message: 'Password is too long (max 128 characters)',
-        code: 'TOO_LONG'
+        code: 'TOO_LONG',
       });
     }
 
@@ -116,7 +120,7 @@ export class Validator {
       errors.push({
         field: 'password',
         message: 'Password must contain at least one lowercase letter',
-        code: 'MISSING_LOWERCASE'
+        code: 'MISSING_LOWERCASE',
       });
     }
 
@@ -124,7 +128,7 @@ export class Validator {
       errors.push({
         field: 'password',
         message: 'Password must contain at least one uppercase letter',
-        code: 'MISSING_UPPERCASE'
+        code: 'MISSING_UPPERCASE',
       });
     }
 
@@ -132,7 +136,7 @@ export class Validator {
       errors.push({
         field: 'password',
         message: 'Password must contain at least one number',
-        code: 'MISSING_NUMBER'
+        code: 'MISSING_NUMBER',
       });
     }
 
@@ -140,7 +144,7 @@ export class Validator {
       errors.push({
         field: 'password',
         message: 'Password must contain at least one special character (@$!%*?&)',
-        code: 'MISSING_SPECIAL'
+        code: 'MISSING_SPECIAL',
       });
     }
 
@@ -150,14 +154,14 @@ export class Validator {
       errors.push({
         field: 'password',
         message: 'This password is too common. Please choose a stronger password.',
-        code: 'TOO_COMMON'
+        code: 'TOO_COMMON',
       });
     }
 
     return {
       isValid: errors.length === 0,
       data: errors.length === 0 ? password : undefined,
-      errors
+      errors,
     };
   }
 
@@ -170,14 +174,14 @@ export class Validator {
     if (!trimmed) {
       return {
         isValid: false,
-        errors: [{ field: 'url', message: 'URL is required', code: 'REQUIRED' }]
+        errors: [{ field: 'url', message: 'URL is required', code: 'REQUIRED' }],
       };
     }
 
     if (!URL_REGEX.test(trimmed)) {
       return {
         isValid: false,
-        errors: [{ field: 'url', message: 'Please enter a valid URL', code: 'INVALID_FORMAT' }]
+        errors: [{ field: 'url', message: 'Please enter a valid URL', code: 'INVALID_FORMAT' }],
       };
     }
 
@@ -188,10 +192,10 @@ export class Validator {
    * Validate text input with length constraints
    */
   static text(
-    text: string, 
-    options: { 
-      minLength?: number; 
-      maxLength?: number; 
+    text: string,
+    options: {
+      minLength?: number;
+      maxLength?: number;
       required?: boolean;
       fieldName?: string;
     } = {}
@@ -202,29 +206,33 @@ export class Validator {
     if (required && !trimmed) {
       return {
         isValid: false,
-        errors: [{ field: fieldName, message: `${fieldName} is required`, code: 'REQUIRED' }]
+        errors: [{ field: fieldName, message: `${fieldName} is required`, code: 'REQUIRED' }],
       };
     }
 
     if (trimmed.length < minLength) {
       return {
         isValid: false,
-        errors: [{
-          field: fieldName,
-          message: `${fieldName} must be at least ${minLength} characters long`,
-          code: 'TOO_SHORT'
-        }]
+        errors: [
+          {
+            field: fieldName,
+            message: `${fieldName} must be at least ${minLength} characters long`,
+            code: 'TOO_SHORT',
+          },
+        ],
       };
     }
 
     if (trimmed.length > maxLength) {
       return {
         isValid: false,
-        errors: [{
-          field: fieldName,
-          message: `${fieldName} must be no more than ${maxLength} characters long`,
-          code: 'TOO_LONG'
-        }]
+        errors: [
+          {
+            field: fieldName,
+            message: `${fieldName} must be no more than ${maxLength} characters long`,
+            code: 'TOO_LONG',
+          },
+        ],
       };
     }
 
@@ -249,7 +257,7 @@ export class Validator {
     if (required && (value === null || value === undefined || value === '')) {
       return {
         isValid: false,
-        errors: [{ field: fieldName, message: `${fieldName} is required`, code: 'REQUIRED' }]
+        errors: [{ field: fieldName, message: `${fieldName} is required`, code: 'REQUIRED' }],
       };
     }
 
@@ -258,36 +266,48 @@ export class Validator {
     if (isNaN(num)) {
       return {
         isValid: false,
-        errors: [{ field: fieldName, message: `${fieldName} must be a valid number`, code: 'INVALID_NUMBER' }]
+        errors: [
+          {
+            field: fieldName,
+            message: `${fieldName} must be a valid number`,
+            code: 'INVALID_NUMBER',
+          },
+        ],
       };
     }
 
     if (integer && !Number.isInteger(num)) {
       return {
         isValid: false,
-        errors: [{ field: fieldName, message: `${fieldName} must be a whole number`, code: 'NOT_INTEGER' }]
+        errors: [
+          { field: fieldName, message: `${fieldName} must be a whole number`, code: 'NOT_INTEGER' },
+        ],
       };
     }
 
     if (min !== undefined && num < min) {
       return {
         isValid: false,
-        errors: [{
-          field: fieldName,
-          message: `${fieldName} must be at least ${min}`,
-          code: 'TOO_SMALL'
-        }]
+        errors: [
+          {
+            field: fieldName,
+            message: `${fieldName} must be at least ${min}`,
+            code: 'TOO_SMALL',
+          },
+        ],
       };
     }
 
     if (max !== undefined && num > max) {
       return {
         isValid: false,
-        errors: [{
-          field: fieldName,
-          message: `${fieldName} must be no more than ${max}`,
-          code: 'TOO_LARGE'
-        }]
+        errors: [
+          {
+            field: fieldName,
+            message: `${fieldName} must be no more than ${max}`,
+            code: 'TOO_LARGE',
+          },
+        ],
       };
     }
 
@@ -318,7 +338,7 @@ export class Sanitizer {
       allowLinks = false,
       maxLength,
       trim = true,
-      removeExtraSpaces = true
+      removeExtraSpaces = true,
     } = options;
 
     let sanitized = input;
@@ -356,7 +376,23 @@ export class Sanitizer {
    */
   static html(input: string): string {
     // Allow only safe HTML tags
-    const allowedTags = ['p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+    const allowedTags = [
+      'p',
+      'br',
+      'strong',
+      'em',
+      'u',
+      'ol',
+      'ul',
+      'li',
+      'a',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+    ];
     const allowedAttributes = ['href', 'target', 'rel'];
 
     // This is a simplified sanitizer - in production, consider using DOMPurify
@@ -404,8 +440,9 @@ export class Sanitizer {
  */
 export const schemas = {
   email: z.string().email('Please enter a valid email address').max(254, 'Email is too long'),
-  
-  password: z.string()
+
+  password: z
+    .string()
     .min(PASSWORD_MIN_LENGTH, `Password must be at least ${PASSWORD_MIN_LENGTH} characters`)
     .max(128, 'Password is too long')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
@@ -415,35 +452,39 @@ export const schemas = {
 
   url: z.string().url('Please enter a valid URL'),
 
-  journalTitle: z.string()
+  journalTitle: z
+    .string()
     .min(1, 'Title is required')
     .max(200, 'Title is too long')
-    .transform(val => Sanitizer.text(val, { maxLength: 200 })),
+    .transform((val) => Sanitizer.text(val, { maxLength: 200 })),
 
-  journalContent: z.string()
+  journalContent: z
+    .string()
     .min(1, 'Content is required')
     .max(10000, 'Content is too long')
-    .transform(val => Sanitizer.text(val, { maxLength: 10000 })),
+    .transform((val) => Sanitizer.text(val, { maxLength: 10000 })),
 
   mindset: z.enum(['natural', 'transition', 'spiritual'], {
-    errorMap: () => ({ message: 'Please select a valid mindset' })
+    errorMap: () => ({ message: 'Please select a valid mindset' }),
   }),
 
   tags: z.array(z.string().max(50, 'Tag is too long')).max(10, 'Too many tags'),
 
   userProfile: z.object({
-    fullName: z.string()
+    fullName: z
+      .string()
       .min(1, 'Name is required')
       .max(100, 'Name is too long')
-      .transform(val => Sanitizer.text(val, { maxLength: 100 })),
+      .transform((val) => Sanitizer.text(val, { maxLength: 100 })),
     email: z.string().email('Please enter a valid email address'),
-    spiritualJourneyStage: z.enum(['seeker', 'learner', 'practitioner', 'teacher']).optional()
+    spiritualJourneyStage: z.enum(['seeker', 'learner', 'practitioner', 'teacher']).optional(),
   }),
 
-  apiKey: z.string()
+  apiKey: z
+    .string()
     .min(10, 'API key is too short')
     .max(200, 'API key is too long')
-    .regex(/^[a-zA-Z0-9_-]+$/, 'API key contains invalid characters')
+    .regex(/^[a-zA-Z0-9_-]+$/, 'API key contains invalid characters'),
 };
 
 /**
@@ -462,30 +503,32 @@ export class FormValidator {
       return {
         isValid: true,
         data: validatedData,
-        errors: []
+        errors: [],
       };
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errors: ValidationError[] = error.errors.map(err => ({
+        const errors: ValidationError[] = error.errors.map((err) => ({
           field: err.path.join('.'),
           message: err.message,
           code: err.code,
-          value: err.path.reduce((obj, key) => obj?.[key], data)
+          value: err.path.reduce((obj, key) => obj?.[key], data),
         }));
 
         return {
           isValid: false,
-          errors
+          errors,
         };
       }
 
       return {
         isValid: false,
-        errors: [{
-          field: 'form',
-          message: 'Validation failed',
-          code: 'VALIDATION_ERROR'
-        }]
+        errors: [
+          {
+            field: 'form',
+            message: 'Validation failed',
+            code: 'VALIDATION_ERROR',
+          },
+        ],
       };
     }
   }
@@ -503,30 +546,32 @@ export class FormValidator {
       return {
         isValid: true,
         data: validatedValue,
-        errors: []
+        errors: [],
       };
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errors: ValidationError[] = error.errors.map(err => ({
+        const errors: ValidationError[] = error.errors.map((err) => ({
           field: fieldName,
           message: err.message,
           code: err.code,
-          value
+          value,
         }));
 
         return {
           isValid: false,
-          errors
+          errors,
         };
       }
 
       return {
         isValid: false,
-        errors: [{
-          field: fieldName,
-          message: 'Validation failed',
-          code: 'VALIDATION_ERROR'
-        }]
+        errors: [
+          {
+            field: fieldName,
+            message: 'Validation failed',
+            code: 'VALIDATION_ERROR',
+          },
+        ],
       };
     }
   }
@@ -542,11 +587,11 @@ export class SecurityUtils {
   static generateToken(length: number = 32): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
-    
+
     for (let i = 0; i < length; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    
+
     return result;
   }
 
@@ -561,10 +606,10 @@ export class SecurityUtils {
       /<iframe/i,
       /<object/i,
       /<embed/i,
-      /expression\s*\(/i
+      /expression\s*\(/i,
     ];
 
-    return xssPatterns.some(pattern => pattern.test(input));
+    return xssPatterns.some((pattern) => pattern.test(input));
   }
 
   /**
@@ -574,10 +619,10 @@ export class SecurityUtils {
     const sqlPatterns = [
       /('|(\\'))|(;|\\;)|(--)|\(\*\)|(\/\*)|\(\*\/\)/i,
       /(union|select|insert|update|delete|drop|create|alter|exec|execute)\s/i,
-      /\b(or|and)\s+(1=1|true|false)\b/i
+      /\b(or|and)\s+(1=1|true|false)\b/i,
     ];
 
-    return sqlPatterns.some(pattern => pattern.test(input));
+    return sqlPatterns.some((pattern) => pattern.test(input));
   }
 
   /**
@@ -585,7 +630,11 @@ export class SecurityUtils {
    */
   private static rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
-  static checkRateLimit(identifier: string, maxRequests: number = 10, windowMs: number = 60000): boolean {
+  static checkRateLimit(
+    identifier: string,
+    maxRequests: number = 10,
+    windowMs: number = 60000
+  ): boolean {
     const now = Date.now();
     const record = this.rateLimitStore.get(identifier);
 
@@ -612,5 +661,5 @@ export const security = SecurityUtils;
 export type {
   ValidationError as ValidError,
   ValidationResult as ValidResult,
-  SanitizeOptions as SanitizeOpts
+  SanitizeOptions as SanitizeOpts,
 };

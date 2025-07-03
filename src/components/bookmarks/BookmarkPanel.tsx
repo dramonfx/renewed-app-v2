@@ -1,13 +1,17 @@
-
 // src/components/bookmarks/BookmarkPanel.tsx
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { BookmarkManager, Bookmark, BookmarkCategory, BookmarkSearchOptions } from '../../lib/bookmarks/BookmarkManager';
+import {
+  BookmarkManager,
+  Bookmark,
+  BookmarkCategory,
+  BookmarkSearchOptions,
+} from '../../lib/bookmarks/BookmarkManager';
 
 /**
  * Bookmark Panel Component - Phase 3 UI
- * 
+ *
  * Advanced bookmark management interface with search, filtering,
  * categorization, and real-time synchronization.
  */
@@ -27,7 +31,7 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
   currentTime = 0,
   onBookmarkSeek,
   onClose,
-  className = ''
+  className = '',
 }) => {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [categories, setCategories] = useState<BookmarkCategory[]>([]);
@@ -47,7 +51,7 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
     description: '',
     tags: '',
     category: 'notes',
-    isPublic: false
+    isPublic: false,
   });
 
   // Load initial data
@@ -91,12 +95,20 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
       tags: selectedTags.length > 0 ? selectedTags : undefined,
       trackId: currentTrackId,
       sortBy,
-      sortOrder
+      sortOrder,
     };
 
     const results = bookmarkManager.searchBookmarks(searchOptions);
     setBookmarks(results);
-  }, [bookmarkManager, searchQuery, selectedCategory, selectedTags, currentTrackId, sortBy, sortOrder]);
+  }, [
+    bookmarkManager,
+    searchQuery,
+    selectedCategory,
+    selectedTags,
+    currentTrackId,
+    sortBy,
+    sortOrder,
+  ]);
 
   // Load categories
   const loadCategories = useCallback(() => {
@@ -118,8 +130,8 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
   // Get all unique tags from bookmarks
   const availableTags = useMemo(() => {
     const allTags = new Set<string>();
-    bookmarks.forEach(bookmark => {
-      bookmark.tags.forEach(tag => allTags.add(tag));
+    bookmarks.forEach((bookmark) => {
+      bookmark.tags.forEach((tag) => allTags.add(tag));
     });
     return Array.from(allTags).sort();
   }, [bookmarks]);
@@ -130,17 +142,15 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
 
     setIsLoading(true);
     try {
-      await bookmarkManager.createBookmark(
-        currentTrackId,
-        currentTime,
-        formData.title.trim(),
-        {
-          description: formData.description.trim() || undefined,
-          tags: formData.tags.split(',').map(tag => tag.trim()).filter(Boolean),
-          category: formData.category,
-          isPublic: formData.isPublic
-        }
-      );
+      await bookmarkManager.createBookmark(currentTrackId, currentTime, formData.title.trim(), {
+        description: formData.description.trim() || undefined,
+        tags: formData.tags
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+        category: formData.category,
+        isPublic: formData.isPublic,
+      });
 
       // Reset form
       setFormData({
@@ -148,7 +158,7 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
         description: '',
         tags: '',
         category: 'notes',
-        isPublic: false
+        isPublic: false,
       });
       setShowCreateForm(false);
     } catch (error) {
@@ -167,9 +177,12 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
       await bookmarkManager.updateBookmark(editingBookmark.id, {
         title: formData.title.trim(),
         description: formData.description.trim() || undefined,
-        tags: formData.tags.split(',').map(tag => tag.trim()).filter(Boolean),
+        tags: formData.tags
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter(Boolean),
         category: formData.category,
-        isPublic: formData.isPublic
+        isPublic: formData.isPublic,
       });
 
       setEditingBookmark(null);
@@ -178,7 +191,7 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
         description: '',
         tags: '',
         category: 'notes',
-        isPublic: false
+        isPublic: false,
       });
     } catch (error) {
       console.error('Failed to update bookmark:', error);
@@ -209,7 +222,7 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
       description: bookmark.description || '',
       tags: bookmark.tags.join(', '),
       category: bookmark.category,
-      isPublic: bookmark.isPublic
+      isPublic: bookmark.isPublic,
     });
     setShowCreateForm(true);
   };
@@ -223,7 +236,7 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
       description: '',
       tags: '',
       category: 'notes',
-      isPublic: false
+      isPublic: false,
     });
   };
 
@@ -240,13 +253,13 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     }).format(date);
   };
 
   // Get category by ID
   const getCategoryById = (categoryId: string): BookmarkCategory | undefined => {
-    return categories.find(cat => cat.id === categoryId);
+    return categories.find((cat) => cat.id === categoryId);
   };
 
   return (
@@ -627,8 +640,12 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
         }
 
         @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
         }
       `}</style>
 
@@ -671,7 +688,7 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        
+
         <div className="filter-row">
           <select
             className="filter-select"
@@ -679,13 +696,13 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
             onChange={(e) => setSelectedCategory(e.target.value)}
           >
             <option value="all">All Categories</option>
-            {categories.map(category => (
+            {categories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.icon} {category.name}
               </option>
             ))}
           </select>
-          
+
           <select
             className="filter-select"
             value={sortBy}
@@ -695,7 +712,7 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
             <option value="createdAt">By Created</option>
             <option value="title">By Title</option>
           </select>
-          
+
           <select
             className="filter-select"
             value={sortOrder}
@@ -730,7 +747,7 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
               placeholder="Enter bookmark title..."
             />
           </div>
-          
+
           <div className="form-group">
             <label className="form-label">Description</label>
             <textarea
@@ -740,7 +757,7 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
               placeholder="Optional description..."
             />
           </div>
-          
+
           <div className="form-group">
             <label className="form-label">Tags (comma-separated)</label>
             <input
@@ -751,7 +768,7 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
               placeholder="tag1, tag2, tag3..."
             />
           </div>
-          
+
           <div className="form-group">
             <label className="form-label">Category</label>
             <select
@@ -759,14 +776,14 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
             >
-              {categories.map(category => (
+              {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.icon} {category.name}
                 </option>
               ))}
             </select>
           </div>
-          
+
           <div className="form-group">
             <label className="form-checkbox">
               <input
@@ -777,13 +794,9 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
               Make this bookmark public
             </label>
           </div>
-          
+
           <div className="form-actions">
-            <button
-              className="form-button secondary"
-              onClick={cancelEditing}
-              disabled={isLoading}
-            >
+            <button className="form-button secondary" onClick={cancelEditing} disabled={isLoading}>
               Cancel
             </button>
             <button
@@ -808,14 +821,13 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
             <div className="empty-icon">📖</div>
             <div className="empty-title">No bookmarks found</div>
             <div className="empty-description">
-              {currentTrackId 
-                ? "Create your first bookmark for this track!"
-                : "Select a track to view and create bookmarks."
-              }
+              {currentTrackId
+                ? 'Create your first bookmark for this track!'
+                : 'Select a track to view and create bookmarks.'}
             </div>
           </div>
         ) : (
-          bookmarks.map(bookmark => {
+          bookmarks.map((bookmark) => {
             const category = getCategoryById(bookmark.category);
             return (
               <div
@@ -825,26 +837,22 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
               >
                 <div className="bookmark-header">
                   <h4 className="bookmark-title">{bookmark.title}</h4>
-                  <div className="bookmark-timestamp">
-                    {formatTimestamp(bookmark.timestamp)}
-                  </div>
+                  <div className="bookmark-timestamp">{formatTimestamp(bookmark.timestamp)}</div>
                 </div>
-                
+
                 {bookmark.description && (
-                  <div className="bookmark-description">
-                    {bookmark.description}
-                  </div>
+                  <div className="bookmark-description">{bookmark.description}</div>
                 )}
-                
+
                 <div className="bookmark-meta">
                   <div className="bookmark-tags">
-                    {bookmark.tags.map(tag => (
+                    {bookmark.tags.map((tag) => (
                       <span key={tag} className="bookmark-tag">
                         {tag}
                       </span>
                     ))}
                   </div>
-                  
+
                   {category && (
                     <div className="bookmark-category">
                       <span>{category.icon}</span>
@@ -852,7 +860,7 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
                     </div>
                   )}
                 </div>
-                
+
                 <div className="bookmark-actions" onClick={(e) => e.stopPropagation()}>
                   <button
                     className="bookmark-action edit"
@@ -867,7 +875,7 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
                     Delete
                   </button>
                 </div>
-                
+
                 <div style={{ fontSize: '10px', color: '#9ca3af', marginTop: '4px' }}>
                   Created {formatDate(bookmark.createdAt)}
                 </div>

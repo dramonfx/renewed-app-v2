@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { supabase } from './supabaseClient'
-import type { BookSection, CreateSectionData, UpdateSectionData, ExerciseTemplate } from './types'
+import { supabase } from './supabaseClient';
+import type { BookSection, CreateSectionData, UpdateSectionData, ExerciseTemplate } from './types';
 
 // Mock data for development/testing when Supabase is not available
 // Updated to match the authentic RENEWED content structure
@@ -9,7 +9,8 @@ const mockSections: BookSection[] = [
     id: '1',
     slug: 'prologue',
     title: 'Prologue',
-    description: 'The foundational introduction to discovering your spiritual identity through The New Man Story.',
+    description:
+      'The foundational introduction to discovering your spiritual identity through The New Man Story.',
     content: `The straightforward yet insightful exercise template contained in this guidebook has been refined over many years with one clear objective: to help individuals navigate through spiritual principles that unlock the understanding of their spiritual identity.`,
     order: 1,
     category: 'prologue',
@@ -18,9 +19,9 @@ const mockSections: BookSection[] = [
     readingTime: 3,
     isPublished: true,
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-]
+    updatedAt: new Date().toISOString(),
+  },
+];
 
 export async function getAllSections(): Promise<BookSection[]> {
   try {
@@ -28,14 +29,14 @@ export async function getAllSections(): Promise<BookSection[]> {
       .from('book_sections')
       .select('*')
       .eq('is_published', true)
-      .order('order', { ascending: true })
+      .order('order', { ascending: true });
 
     if (error) {
-      console.error('Supabase error, falling back to mock data:', error)
-      return mockSections
+      console.error('Supabase error, falling back to mock data:', error);
+      return mockSections;
     }
 
-    return data.map(section => ({
+    return data.map((section) => ({
       id: section.id,
       slug: section.slug,
       title: section.title,
@@ -52,11 +53,11 @@ export async function getAllSections(): Promise<BookSection[]> {
       readingTime: section.reading_time,
       isPublished: section.is_published,
       createdAt: section.created_at,
-      updatedAt: section.updated_at
-    }))
+      updatedAt: section.updated_at,
+    }));
   } catch (error) {
-    console.error('Database connection error, using mock data:', error)
-    return mockSections
+    console.error('Database connection error, using mock data:', error);
+    return mockSections;
   }
 }
 
@@ -67,11 +68,11 @@ export async function getSectionBySlug(slug: string): Promise<BookSection | null
       .select('*')
       .eq('slug', slug)
       .eq('is_published', true)
-      .single()
+      .single();
 
     if (error) {
-      const mockSection = mockSections.find(s => s.slug === slug)
-      return mockSection || null
+      const mockSection = mockSections.find((s) => s.slug === slug);
+      return mockSection || null;
     }
 
     return {
@@ -91,11 +92,11 @@ export async function getSectionBySlug(slug: string): Promise<BookSection | null
       readingTime: data.reading_time,
       isPublished: data.is_published,
       createdAt: data.created_at,
-      updatedAt: data.updated_at
-    }
+      updatedAt: data.updated_at,
+    };
   } catch (error) {
-    const mockSection = mockSections.find(s => s.slug === slug)
-    return mockSection || null
+    const mockSection = mockSections.find((s) => s.slug === slug);
+    return mockSection || null;
   }
 }
 
@@ -116,17 +117,17 @@ export async function createSection(data: CreateSectionData): Promise<BookSectio
       audio_duration: data.audioDuration,
       reading_time: data.readingTime || 5,
       is_published: data.isPublished ?? true,
-    }
+    };
 
     const { data: result, error } = await supabase
       .from('book_sections')
       .insert(newSection)
       .select()
-      .single()
+      .single();
 
     if (error) {
-      console.error('Error creating section:', error)
-      return null
+      console.error('Error creating section:', error);
+      return null;
     }
 
     return {
@@ -146,11 +147,11 @@ export async function createSection(data: CreateSectionData): Promise<BookSectio
       readingTime: result.reading_time,
       isPublished: result.is_published,
       createdAt: result.created_at,
-      updatedAt: result.updated_at
-    }
+      updatedAt: result.updated_at,
+    };
   } catch (error) {
-    console.error('Database connection error creating section:', error)
-    return null
+    console.error('Database connection error creating section:', error);
+    return null;
   }
 }
 
@@ -159,6 +160,6 @@ export const ContentService = {
   getAllSections,
   getSectionBySlug,
   createSection,
-}
+};
 
-export { supabase }
+export { supabase };

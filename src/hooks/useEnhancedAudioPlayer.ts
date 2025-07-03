@@ -2,7 +2,11 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { CoreAudioEngine, type AudioEngineConfig, type EnhancedTrack } from '../lib/audio/CoreAudioEngine';
+import {
+  CoreAudioEngine,
+  type AudioEngineConfig,
+  type EnhancedTrack,
+} from '../lib/audio/CoreAudioEngine';
 import { AudioBufferManager } from '../lib/audio/AudioBufferManager';
 import { AudioAnalytics } from '../lib/audio/AudioAnalytics';
 import { AudioErrorRecovery } from '../lib/audio/AudioErrorRecovery';
@@ -28,13 +32,13 @@ export interface EnhancedAudioPlayerState {
   volume: number;
   muted: boolean;
   playbackRate: number;
-  
+
   // Enhanced state
   bufferHealth: number;
   loadingProgress: number;
   errorState: string | null;
   networkCondition: string;
-  
+
   // Engine stats
   engineStats: {
     bufferHealth: number;
@@ -55,13 +59,13 @@ export interface EnhancedAudioPlayerControls {
   setVolume: (volume: number) => void;
   setMuted: (muted: boolean) => void;
   setPlaybackRate: (rate: number) => void;
-  
+
   // Enhanced controls
   loadTrack: (track: EnhancedTrack) => Promise<void>;
   preloadTrack: (track: EnhancedTrack) => Promise<void>;
   skipForward: (seconds?: number) => void;
   skipBackward: (seconds?: number) => void;
-  
+
   // Engine controls
   getEngineStats: () => any;
   updateConfig: (config: Partial<AudioEngineConfig>) => void;
@@ -78,7 +82,7 @@ export function useEnhancedAudioPlayer(
   const errorRecoveryRef = useRef<AudioErrorRecovery | null>(null);
   const keyboardShortcutsRef = useRef<AudioKeyboardShortcuts | null>(null);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
-  
+
   // State management
   const [state, setState] = useState<EnhancedAudioPlayerState>({
     currentTrack: null,
@@ -100,10 +104,10 @@ export function useEnhancedAudioPlayer(
       errorCount: 0,
       totalPlayTime: 0,
       averageLoadTime: 0,
-      memoryUsage: 0
-    }
+      memoryUsage: 0,
+    },
   });
-  
+
   // Initialize engines
   useEffect(() => {
     const engineConfig: AudioEngineConfig = {
@@ -118,25 +122,25 @@ export function useEnhancedAudioPlayer(
       crossfadeDuration: 1000,
       gaplessPlayback: true,
       audioQualityOptimization: true,
-      ...config.engine
+      ...config.engine,
     };
-    
+
     // Initialize core engine
     engineRef.current = new CoreAudioEngine(engineConfig);
-    
+
     // Initialize buffer manager
     bufferManagerRef.current = new AudioBufferManager(engineConfig);
-    
+
     // Initialize analytics if enabled
     if (config.analytics !== false) {
       analyticsRef.current = new AudioAnalytics({
         enabled: true,
         trackPerformance: true,
         trackUserBehavior: true,
-        trackErrors: true
+        trackErrors: true,
       });
     }
-    
+
     // Initialize error recovery if enabled
     if (config.errorRecovery !== false) {
       errorRecoveryRef.current = new AudioErrorRecovery({
@@ -144,42 +148,42 @@ export function useEnhancedAudioPlayer(
         retryDelay: 1000,
         progressiveBackoff: true,
         enableNetworkRecovery: true,
-        enableResourceRecovery: true
+        enableResourceRecovery: true,
       });
     }
-    
+
     // Initialize keyboard shortcuts if enabled
     if (config.keyboardShortcuts !== false) {
       keyboardShortcutsRef.current = new AudioKeyboardShortcuts({
         enabled: true,
         preventDefaultOnInputs: true,
-        showNotifications: false
+        showNotifications: false,
       });
     }
-    
+
     // Create audio element
     audioElementRef.current = new Audio();
     audioElementRef.current.preload = 'auto';
-    
+
     // Set initial volume
     if (config.volume !== undefined) {
       audioElementRef.current.volume = config.volume;
     }
-    
+
     // Setup event listeners
     setupEventListeners();
-    
+
     return () => {
       cleanup();
     };
   }, []);
-  
+
   // Setup event listeners
   const setupEventListeners = useCallback(() => {
     if (!audioElementRef.current) return;
-    
+
     const audio = audioElementRef.current;
-    
+
     // Core audio events
     audio.addEventListener('loadstart', handleLoadStart);
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
@@ -191,105 +195,112 @@ export function useEnhancedAudioPlayer(
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('progress', handleProgress);
     audio.addEventListener('volumechange', handleVolumeChange);
-    
+
     // Setup keyboard shortcuts
     if (keyboardShortcutsRef.current) {
       keyboardShortcutsRef.current.setControls({
-        playPause: () => state.isPlaying ? pause() : play(),
+        playPause: () => (state.isPlaying ? pause() : play()),
         skipForward: (seconds) => skipForward(seconds),
         skipBackward: (seconds) => skipBackward(seconds),
         volumeUp: () => setVolume(Math.min(1, state.volume + 0.1)),
         volumeDown: () => setVolume(Math.max(0, state.volume - 0.1)),
         mute: () => setMuted(!state.muted),
-        seek: (time) => seek(time)
+        seek: (time) => seek(time),
       });
     }
   }, [state.isPlaying, state.volume, state.muted]);
-  
+
   // Event handlers
   const handleLoadStart = useCallback(() => {
-    setState(prev => ({ ...prev, isLoading: true, loadingProgress: 0 }));
+    setState((prev) => ({ ...prev, isLoading: true, loadingProgress: 0 }));
     analyticsRef.current?.trackUserBehavior('play', state.currentTrack?.id);
   }, [state.currentTrack]);
-  
+
   const handleLoadedMetadata = useCallback(() => {
     if (!audioElementRef.current) return;
-    setState(prev => ({ 
-      ...prev, 
+    setState((prev) => ({
+      ...prev,
       duration: audioElementRef.current!.duration,
-      loadingProgress: 50
+      loadingProgress: 50,
     }));
   }, []);
-  
+
   const handleCanPlay = useCallback(() => {
-    setState(prev => ({ ...prev, isLoading: false, loadingProgress: 100 }));
+    setState((prev) => ({ ...prev, isLoading: false, loadingProgress: 100 }));
   }, []);
-  
+
   const handlePlay = useCallback(() => {
-    setState(prev => ({ ...prev, isPlaying: true, isPaused: false }));
+    setState((prev) => ({ ...prev, isPlaying: true, isPaused: false }));
     analyticsRef.current?.trackUserBehavior('play', state.currentTrack?.id);
   }, [state.currentTrack]);
-  
+
   const handlePause = useCallback(() => {
-    setState(prev => ({ ...prev, isPlaying: false, isPaused: true }));
+    setState((prev) => ({ ...prev, isPlaying: false, isPaused: true }));
     analyticsRef.current?.trackUserBehavior('pause', state.currentTrack?.id);
   }, [state.currentTrack]);
-  
+
   const handleEnded = useCallback(() => {
-    setState(prev => ({ ...prev, isPlaying: false, isPaused: false }));
-    analyticsRef.current?.trackUserBehavior('track_complete', state.currentTrack?.id, state.duration);
+    setState((prev) => ({ ...prev, isPlaying: false, isPaused: false }));
+    analyticsRef.current?.trackUserBehavior(
+      'track_complete',
+      state.currentTrack?.id,
+      state.duration
+    );
   }, [state.currentTrack, state.duration]);
-  
-  const handleError = useCallback((event: Event) => {
-    if (!audioElementRef.current || !errorRecoveryRef.current) return;
-    
-    const audioError = errorRecoveryRef.current.analyzeError(event, audioElementRef.current);
-    setState(prev => ({ ...prev, errorState: audioError.message, isLoading: false }));
-    
-    analyticsRef.current?.trackError('playback', audioError.message, state.currentTrack?.id);
-    
-    // Attempt recovery
-    if (state.currentTrack) {
-      errorRecoveryRef.current.attemptRecovery(
-        audioError,
-        audioElementRef.current,
-        state.currentTrack.id
-      );
-    }
-  }, [state.currentTrack]);
-  
+
+  const handleError = useCallback(
+    (event: Event) => {
+      if (!audioElementRef.current || !errorRecoveryRef.current) return;
+
+      const audioError = errorRecoveryRef.current.analyzeError(event, audioElementRef.current);
+      setState((prev) => ({ ...prev, errorState: audioError.message, isLoading: false }));
+
+      analyticsRef.current?.trackError('playback', audioError.message, state.currentTrack?.id);
+
+      // Attempt recovery
+      if (state.currentTrack) {
+        errorRecoveryRef.current.attemptRecovery(
+          audioError,
+          audioElementRef.current,
+          state.currentTrack.id
+        );
+      }
+    },
+    [state.currentTrack]
+  );
+
   const handleTimeUpdate = useCallback(() => {
     if (!audioElementRef.current) return;
-    setState(prev => ({ ...prev, currentTime: audioElementRef.current!.currentTime }));
+    setState((prev) => ({ ...prev, currentTime: audioElementRef.current!.currentTime }));
   }, []);
-  
+
   const handleProgress = useCallback(() => {
     if (!audioElementRef.current || !bufferManagerRef.current || !state.currentTrack) return;
-    
+
     const bufferState = bufferManagerRef.current.monitorBufferHealth(
       state.currentTrack.id,
       audioElementRef.current
     );
-    
-    setState(prev => ({ ...prev, bufferHealth: bufferState.bufferHealth }));
+
+    setState((prev) => ({ ...prev, bufferHealth: bufferState.bufferHealth }));
     analyticsRef.current?.trackBufferHealth(state.currentTrack.id, bufferState.bufferHealth);
   }, [state.currentTrack]);
-  
+
   const handleVolumeChange = useCallback(() => {
     if (!audioElementRef.current) return;
-    setState(prev => ({ 
-      ...prev, 
+    setState((prev) => ({
+      ...prev,
       volume: audioElementRef.current!.volume,
-      muted: audioElementRef.current!.muted
+      muted: audioElementRef.current!.muted,
     }));
   }, []);
-  
+
   // Control functions
   const loadTrack = useCallback(async (track: EnhancedTrack) => {
     if (!audioElementRef.current) throw new Error('Audio element not initialized');
-    
-    setState(prev => ({ ...prev, currentTrack: track, errorState: null }));
-    
+
+    setState((prev) => ({ ...prev, currentTrack: track, errorState: null }));
+
     // Use engine for intelligent loading
     if (engineRef.current) {
       try {
@@ -303,122 +314,139 @@ export function useEnhancedAudioPlayer(
     } else {
       audioElementRef.current.src = track.sources[0]?.url || '';
     }
-    
+
     audioElementRef.current.load();
   }, []);
-  
+
   const play = useCallback(async () => {
     if (!audioElementRef.current) throw new Error('Audio element not initialized');
-    
+
     try {
       await audioElementRef.current.play();
     } catch (error) {
-      setState(prev => ({ ...prev, errorState: 'Failed to play audio' }));
+      setState((prev) => ({ ...prev, errorState: 'Failed to play audio' }));
       throw error;
     }
   }, []);
-  
+
   const pause = useCallback(() => {
     if (!audioElementRef.current) return;
     audioElementRef.current.pause();
   }, []);
-  
+
   const stop = useCallback(() => {
     if (!audioElementRef.current) return;
     audioElementRef.current.pause();
     audioElementRef.current.currentTime = 0;
-    setState(prev => ({ ...prev, isPlaying: false, isPaused: false, currentTime: 0 }));
+    setState((prev) => ({ ...prev, isPlaying: false, isPaused: false, currentTime: 0 }));
   }, []);
-  
-  const seek = useCallback((time: number) => {
-    if (!audioElementRef.current) return;
-    audioElementRef.current.currentTime = Math.max(0, Math.min(time, state.duration));
-    analyticsRef.current?.trackUserBehavior('seek', state.currentTrack?.id, undefined, time);
-  }, [state.duration, state.currentTrack]);
-  
-  const setVolume = useCallback((volume: number) => {
-    if (!audioElementRef.current) return;
-    const clampedVolume = Math.max(0, Math.min(1, volume));
-    audioElementRef.current.volume = clampedVolume;
-    analyticsRef.current?.trackUserBehavior('volume_change', state.currentTrack?.id, undefined, clampedVolume);
-  }, [state.currentTrack]);
-  
+
+  const seek = useCallback(
+    (time: number) => {
+      if (!audioElementRef.current) return;
+      audioElementRef.current.currentTime = Math.max(0, Math.min(time, state.duration));
+      analyticsRef.current?.trackUserBehavior('seek', state.currentTrack?.id, undefined, time);
+    },
+    [state.duration, state.currentTrack]
+  );
+
+  const setVolume = useCallback(
+    (volume: number) => {
+      if (!audioElementRef.current) return;
+      const clampedVolume = Math.max(0, Math.min(1, volume));
+      audioElementRef.current.volume = clampedVolume;
+      analyticsRef.current?.trackUserBehavior(
+        'volume_change',
+        state.currentTrack?.id,
+        undefined,
+        clampedVolume
+      );
+    },
+    [state.currentTrack]
+  );
+
   const setMuted = useCallback((muted: boolean) => {
     if (!audioElementRef.current) return;
     audioElementRef.current.muted = muted;
   }, []);
-  
+
   const setPlaybackRate = useCallback((rate: number) => {
     if (!audioElementRef.current) return;
     const clampedRate = Math.max(0.25, Math.min(4, rate));
     audioElementRef.current.playbackRate = clampedRate;
-    setState(prev => ({ ...prev, playbackRate: clampedRate }));
+    setState((prev) => ({ ...prev, playbackRate: clampedRate }));
   }, []);
-  
+
   const preloadTrack = useCallback(async (track: EnhancedTrack) => {
     if (!engineRef.current) return;
-    
+
     try {
       await engineRef.current.preloadAudio(track);
     } catch (error) {
       console.warn('Preload failed:', error);
     }
   }, []);
-  
-  const skipForward = useCallback((seconds: number = 10) => {
-    seek(state.currentTime + seconds);
-  }, [state.currentTime, seek]);
-  
-  const skipBackward = useCallback((seconds: number = 10) => {
-    seek(state.currentTime - seconds);
-  }, [state.currentTime, seek]);
-  
+
+  const skipForward = useCallback(
+    (seconds: number = 10) => {
+      seek(state.currentTime + seconds);
+    },
+    [state.currentTime, seek]
+  );
+
+  const skipBackward = useCallback(
+    (seconds: number = 10) => {
+      seek(state.currentTime - seconds);
+    },
+    [state.currentTime, seek]
+  );
+
   const getEngineStats = useCallback(() => {
     return {
       engine: engineRef.current?.getStats(),
       buffer: bufferManagerRef.current?.getBufferStats(),
       analytics: analyticsRef.current?.getSummary(),
-      errorRecovery: errorRecoveryRef.current?.getRecoveryStats()
+      errorRecovery: errorRecoveryRef.current?.getRecoveryStats(),
     };
   }, []);
-  
+
   const updateConfig = useCallback((newConfig: Partial<AudioEngineConfig>) => {
     engineRef.current?.updateConfig(newConfig);
   }, []);
-  
+
   const cleanup = useCallback(() => {
     engineRef.current?.cleanup();
     bufferManagerRef.current?.clearBufferStates();
     analyticsRef.current?.cleanup();
     errorRecoveryRef.current?.clearSessions();
     keyboardShortcutsRef.current?.cleanup();
-    
+
     if (audioElementRef.current) {
       audioElementRef.current.pause();
       audioElementRef.current.src = '';
     }
   }, []);
-  
+
   // Update engine stats periodically
   useEffect(() => {
     const interval = setInterval(() => {
       if (engineRef.current) {
         const stats = engineRef.current.getStats();
-        setState(prev => ({ ...prev, engineStats: stats }));
+        setState((prev) => ({ ...prev, engineStats: stats }));
       }
-      
+
       if (bufferManagerRef.current) {
         const networkCondition = bufferManagerRef.current.getNetworkCondition();
-        setState(prev => ({ 
-          ...prev, 
-          networkCondition: networkCondition?.effectiveType || 'unknown'
+        setState((prev) => ({
+          ...prev,
+          networkCondition: networkCondition?.effectiveType || 'unknown',
         }));
       }
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, []);
-  
+
   const controls: EnhancedAudioPlayerControls = {
     play,
     pause,
@@ -433,9 +461,9 @@ export function useEnhancedAudioPlayer(
     skipBackward,
     getEngineStats,
     updateConfig,
-    cleanup
+    cleanup,
   };
-  
+
   return [state, controls];
 }
 

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -70,45 +69,56 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="mx-auto h-16 w-16 sacred-icon-bg mb-6">
+          <div className="sacred-icon-bg mx-auto mb-6 h-16 w-16">
             <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+              />
             </svg>
           </div>
-          <h2 className="text-3xl font-serif font-bold text-sacred mb-2">
-            Reset Password
-          </h2>
+          <h2 className="text-sacred mb-2 font-serif text-3xl font-bold">Reset Password</h2>
           <p className="text-sacred-muted">
             Enter your email address and we&apos;ll send you a link to reset your password
           </p>
         </div>
 
         {/* Reset Form */}
-        <SacredCard variant="heavy" className="p-8 relative">
+        <SacredCard variant="heavy" className="relative p-8">
           {/* Loading Overlay */}
           {isLoading && (
-            <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-2xl z-10">
+            <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-sm">
               <div className="flex flex-col items-center space-y-3">
                 <LoadingSpinner size="lg" className="text-sacred-blue-500" />
-                <p className="text-sm text-sacred-blue-600 font-medium">Sending reset link...</p>
+                <p className="text-sm font-medium text-sacred-blue-600">Sending reset link...</p>
               </div>
             </div>
           )}
 
           {/* Success Message */}
           {isSuccess && message && (
-            <div className="mb-6 sacred-success">
+            <div className="sacred-success mb-6">
               <div className="flex items-start">
-                <svg className="h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <svg
+                  className="mr-3 mt-0.5 h-5 w-5 flex-shrink-0 text-green-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 <div>
                   <p className="font-medium text-green-800">Email sent successfully!</p>
-                  <p className="text-sm text-green-700 mt-1">{message}</p>
+                  <p className="mt-1 text-sm text-green-700">{message}</p>
                 </div>
               </div>
             </div>
@@ -116,10 +126,18 @@ export default function ForgotPasswordPage() {
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 sacred-error-message">
+            <div className="sacred-error-message mb-6">
               <div className="flex items-start">
-                <svg className="h-5 w-5 text-red-600 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                <svg
+                  className="mr-3 mt-0.5 h-5 w-5 flex-shrink-0 text-red-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 <p>{error}</p>
               </div>
@@ -172,9 +190,9 @@ export default function ForgotPasswordPage() {
           <div className="mt-8 text-center">
             <p className="text-sm text-sacred-blue-600">
               Remember your password?{' '}
-              <Link 
-                href="/login" 
-                className="font-semibold text-sacred-blue-700 hover:text-sacred-blue-800 underline transition-colors duration-200"
+              <Link
+                href="/login"
+                className="font-semibold text-sacred-blue-700 underline transition-colors duration-200 hover:text-sacred-blue-800"
               >
                 Back to Sign In
               </Link>
@@ -184,7 +202,7 @@ export default function ForgotPasswordPage() {
 
         {/* Additional Help */}
         <div className="text-center">
-          <p className="text-xs text-sacred-muted">
+          <p className="text-sacred-muted text-xs">
             Didn&apos;t receive the email? Check your spam folder or contact support.
           </p>
         </div>

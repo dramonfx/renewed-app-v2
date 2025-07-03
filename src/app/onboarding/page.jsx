@@ -32,16 +32,16 @@ export default function SacredJourneyPage() {
 
   // Simple helper functions
   const goToNextStep = (stepData = {}) => {
-    setJourneyData(prev => updateOnboardingData(prev, stepData));
-    setCurrentStep(prev => prev + 1);
+    setJourneyData((prev) => updateOnboardingData(prev, stepData));
+    setCurrentStep((prev) => prev + 1);
   };
 
   const goToPreviousStep = () => {
-    setCurrentStep(prev => Math.max(0, prev - 1));
+    setCurrentStep((prev) => Math.max(0, prev - 1));
   };
 
   const completeJourney = async (finalData = {}) => {
-    setJourneyData(prev => updateOnboardingData(prev, finalData));
+    setJourneyData((prev) => updateOnboardingData(prev, finalData));
     return true;
   };
 
@@ -50,33 +50,33 @@ export default function SacredJourneyPage() {
     {
       component: WelcomeScreen,
       title: 'Welcome Portal',
-      description: 'Sacred threshold between ordinary and extraordinary consciousness'
+      description: 'Sacred threshold between ordinary and extraordinary consciousness',
     },
     {
       component: TwoMindsStep,
       title: 'Consciousness Awakening',
-      description: 'Deep spiritual education about dual nature of mind'
+      description: 'Deep spiritual education about dual nature of mind',
     },
     {
       component: AssessmentStep,
       title: 'Inner Landscape',
-      description: 'Sacred self-examination and honest reflection'
+      description: 'Sacred self-examination and honest reflection',
     },
     {
       component: PathSelectionStep,
       title: 'Path Consecration',
-      description: 'Sacred commitment to transformation approach'
+      description: 'Sacred commitment to transformation approach',
     },
     {
       component: IntentionsStep,
       title: 'Sacred Intentions',
-      description: 'Formal setting of spiritual intentions as sacred vows'
+      description: 'Formal setting of spiritual intentions as sacred vows',
     },
     {
       component: CompletionStep,
       title: 'Journey Begins',
-      description: 'Sacred celebration and official beginning of transformed life'
-    }
+      description: 'Sacred celebration and official beginning of transformed life',
+    },
   ];
 
   // Handle navigation with smooth transitions
@@ -106,13 +106,13 @@ export default function SacredJourneyPage() {
   // Show loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-sacred-journey-gradient">
+      <div className="bg-sacred-journey-gradient flex min-h-screen items-center justify-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
-          <div className="w-16 h-16 mx-auto mb-4 relative">
+          <div className="relative mx-auto mb-4 h-16 w-16">
             <div className="absolute inset-0 rounded-full border-4 border-sacred-gold-200"></div>
             <motion.div
               animate={{ rotate: 360 }}
@@ -120,12 +120,10 @@ export default function SacredJourneyPage() {
               className="absolute inset-0 rounded-full border-4 border-transparent border-t-sacred-gold-500"
             ></motion.div>
           </div>
-          <h3 className="text-xl font-serif text-sacred-blue-900 mb-2">
+          <h3 className="mb-2 font-serif text-xl text-sacred-blue-900">
             Preparing Your Sacred Journey
           </h3>
-          <p className="text-sacred-blue-600">
-            Creating a spiritually immersive experience...
-          </p>
+          <p className="text-sacred-blue-600">Creating a spiritually immersive experience...</p>
         </motion.div>
       </div>
     );
@@ -134,24 +132,20 @@ export default function SacredJourneyPage() {
   // Show error state
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-sacred-journey-gradient p-4">
+      <div className="bg-sacred-journey-gradient flex min-h-screen items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-md text-center bg-white/80 backdrop-blur-md rounded-2xl p-8 border border-white/30 shadow-lg"
+          className="max-w-md rounded-2xl border border-white/30 bg-white/80 p-8 text-center shadow-lg backdrop-blur-md"
         >
-          <div className="w-16 h-16 mx-auto mb-4 bg-sacred-rose-100 rounded-full flex items-center justify-center">
+          <div className="bg-sacred-rose-100 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
             <span className="text-2xl">⚠️</span>
           </div>
-          <h3 className="text-xl font-serif text-sacred-blue-900 mb-4">
-            Sacred Journey Pause
-          </h3>
-          <p className="text-sacred-blue-600 mb-6">
-            {error}
-          </p>
+          <h3 className="mb-4 font-serif text-xl text-sacred-blue-900">Sacred Journey Pause</h3>
+          <p className="mb-6 text-sacred-blue-600">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-sacred-gradient text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-300"
+            className="rounded-xl bg-sacred-gradient px-6 py-3 font-medium text-white transition-all duration-300 hover:shadow-lg"
           >
             Continue Journey
           </button>
@@ -164,7 +158,7 @@ export default function SacredJourneyPage() {
 
   if (!CurrentStepComponent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-sacred-journey-gradient">
+      <div className="bg-sacred-journey-gradient flex min-h-screen items-center justify-center">
         <div className="text-center text-sacred-blue-900">
           Sacred journey step not found. Please refresh to continue.
         </div>
@@ -173,11 +167,11 @@ export default function SacredJourneyPage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-sacred-journey-gradient">
+    <div className="bg-sacred-journey-gradient relative min-h-screen overflow-hidden">
       {/* Simple Progress Indicator */}
-      <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50">
-        <div className="bg-white/20 backdrop-blur-md rounded-2xl p-4 border border-white/30 shadow-lg">
-          <p className="text-white text-sm">
+      <div className="fixed left-1/2 top-6 z-50 -translate-x-1/2 transform">
+        <div className="rounded-2xl border border-white/30 bg-white/20 p-4 shadow-lg backdrop-blur-md">
+          <p className="text-sm text-white">
             Step {currentStep + 1} of {sacredSteps.length}: {sacredSteps[currentStep].title}
           </p>
         </div>
@@ -215,7 +209,7 @@ const SacredAmbientControls = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 2 }}
-        className="bg-white/20 backdrop-blur-md rounded-2xl p-3 border border-white/30 shadow-lg"
+        className="rounded-2xl border border-white/30 bg-white/20 p-3 shadow-lg backdrop-blur-md"
       >
         <div className="flex space-x-3">
           {/* Ambient Visuals Toggle */}
@@ -223,9 +217,9 @@ const SacredAmbientControls = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsAmbientEnabled(!isAmbientEnabled)}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
-              isAmbientEnabled 
-                ? 'bg-sacred-gold-500 text-white shadow-lg' 
+            className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300 ${
+              isAmbientEnabled
+                ? 'bg-sacred-gold-500 text-white shadow-lg'
                 : 'bg-white/30 text-sacred-blue-700 hover:bg-white/50'
             }`}
             title="Toggle ambient visuals"
@@ -238,9 +232,9 @@ const SacredAmbientControls = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsSoundsEnabled(!isSoundsEnabled)}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 ${
-              isSoundsEnabled 
-                ? 'bg-sacred-purple-500 text-white shadow-lg' 
+            className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300 ${
+              isSoundsEnabled
+                ? 'bg-sacred-purple-500 text-white shadow-lg'
                 : 'bg-white/30 text-sacred-blue-700 hover:bg-white/50'
             }`}
             title="Toggle ambient sounds"

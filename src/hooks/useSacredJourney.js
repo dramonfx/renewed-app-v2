@@ -19,20 +19,18 @@ export const useSacredJourney = () => {
     const loadJourneyState = async () => {
       try {
         setIsLoading(true);
-        
+
         // Try to load existing journey data
         const savedData = SacredJourneyStorage.loadJourneyData();
         const tempData = SacredJourneyStorage.loadTempData();
-        
+
         if (savedData) {
           setJourneyData(savedData);
-          console.log('Loaded existing journey data');
         } else if (tempData?.stepData) {
           setJourneyData(tempData.stepData);
           setCurrentStep(tempData.stepIndex || 0);
-          console.log('Restored from temporary data');
         }
-        
+
         setError(null);
       } catch (err) {
         console.error('Failed to load journey state:', err);
@@ -65,7 +63,7 @@ export const useSacredJourney = () => {
   // Update journey data with validation
   const updateJourneyData = useCallback((newData) => {
     try {
-      setJourneyData(prev => {
+      setJourneyData((prev) => {
         const updated = updateOnboardingData(prev, newData);
         setHasUnsavedChanges(true);
         return updated;
@@ -78,40 +76,46 @@ export const useSacredJourney = () => {
   }, []);
 
   // Navigate to next step
-  const goToNextStep = useCallback((stepData = {}) => {
-    updateJourneyData(stepData);
-    setCurrentStep(prev => prev + 1);
-  }, [updateJourneyData]);
+  const goToNextStep = useCallback(
+    (stepData = {}) => {
+      updateJourneyData(stepData);
+      setCurrentStep((prev) => prev + 1);
+    },
+    [updateJourneyData]
+  );
 
   // Navigate to previous step
   const goToPreviousStep = useCallback(() => {
-    setCurrentStep(prev => Math.max(0, prev - 1));
+    setCurrentStep((prev) => Math.max(0, prev - 1));
   }, []);
 
   // Complete the sacred journey
-  const completeJourney = useCallback(async (finalData = {}) => {
-    try {
-      setIsLoading(true);
-      
-      const finalJourneyData = updateOnboardingData(journeyData, finalData);
-      const success = SacredJourneyStorage.markJourneyComplete(finalJourneyData);
-      
-      if (success) {
-        setJourneyData(finalJourneyData);
-        setHasUnsavedChanges(false);
-        setError(null);
-        return true;
-      } else {
-        throw new Error('Failed to save completion');
+  const completeJourney = useCallback(
+    async (finalData = {}) => {
+      try {
+        setIsLoading(true);
+
+        const finalJourneyData = updateOnboardingData(journeyData, finalData);
+        const success = SacredJourneyStorage.markJourneyComplete(finalJourneyData);
+
+        if (success) {
+          setJourneyData(finalJourneyData);
+          setHasUnsavedChanges(false);
+          setError(null);
+          return true;
+        } else {
+          throw new Error('Failed to save completion');
+        }
+      } catch (err) {
+        console.error('Failed to complete journey:', err);
+        setError('Failed to save your sacred journey completion. Please try again.');
+        return false;
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      console.error('Failed to complete journey:', err);
-      setError('Failed to save your sacred journey completion. Please try again.');
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [journeyData, updateJourneyData]);
+    },
+    [journeyData, updateJourneyData]
+  );
 
   // Save journey progress manually
   const saveProgress = useCallback(async () => {
@@ -157,7 +161,7 @@ export const useSacredJourney = () => {
     isLoading,
     error,
     hasUnsavedChanges,
-    
+
     // Actions
     updateJourneyData,
     goToNextStep,
@@ -165,13 +169,13 @@ export const useSacredJourney = () => {
     completeJourney,
     saveProgress,
     resetJourney,
-    
+
     // Utilities
     isJourneyComplete,
-    
+
     // Direct step setters for advanced use
     setCurrentStep,
-    setJourneyData
+    setJourneyData,
   };
 };
 
