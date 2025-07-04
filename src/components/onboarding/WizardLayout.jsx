@@ -22,27 +22,7 @@ const WizardLayout = ({
         <div className="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 transform rounded-full bg-indigo-100/40 blur-3xl"></div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="relative z-20 w-full border-b border-white/50 bg-white/80 py-4 backdrop-blur-sm">
-        <div className="mx-auto max-w-4xl px-6">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-600">
-              Step {currentStep} of {totalSteps - 1}
-            </span>
-            <span className="text-sm font-medium text-slate-600">
-              {Math.round(progress)}% Complete
-            </span>
-          </div>
-          <div className="h-2 w-full rounded-full bg-slate-200">
-            <motion.div
-              className="h-2 rounded-full bg-blue-600"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
-            />
-          </div>
-        </div>
-      </div>
+
 
       {/* Main Content Area */}
       <div className="relative z-10 min-h-screen pb-16 pt-8">

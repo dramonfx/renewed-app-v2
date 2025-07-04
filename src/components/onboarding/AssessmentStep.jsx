@@ -65,8 +65,8 @@ const AssessmentStep = ({ onNext, onboardingData = {}, data = {} }) => {
           transition={{ duration: 0.6 }}
           className="mb-10 text-center"
         >
-          <SacredCard variant="heavy" className="p-8 md:p-12">
-            <h2 className="mb-4 font-serif text-3xl text-sacred-blue-900 md:text-4xl">
+          <SacredCard variant="heavy" className="p-8 md:p-12 border border-sacred-gold-200 shadow-lg shadow-sacred-gold-100/30">
+            <h2 className="mb-4 font-serif text-3xl text-sacred-blue-900 md:text-4xl border-b border-sacred-gold-200 pb-3">
               Current State{' '}
               <span className="bg-sacred-gradient bg-clip-text text-transparent">Assessment</span>
             </h2>
@@ -85,8 +85,8 @@ const AssessmentStep = ({ onNext, onboardingData = {}, data = {} }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <SacredCard variant="glass" className="p-6">
-                <h3 className="mb-6 font-serif text-xl text-sacred-blue-900">
+              <SacredCard variant="glass" className="p-6 border border-sacred-gold-100 hover:border-sacred-gold-200 transition-all duration-300">
+                <h3 className="mb-6 font-serif text-xl text-sacred-blue-900 border-b border-sacred-gold-100 pb-2">
                   {question.question}
                 </h3>
                 <div className="space-y-3">
@@ -97,8 +97,8 @@ const AssessmentStep = ({ onNext, onboardingData = {}, data = {} }) => {
                         flex cursor-pointer items-center rounded-xl p-4 shadow-sm transition-all duration-300
                         ${
                           responses[question.id] === option.value
-                            ? 'border-2 border-sacred-blue-400 bg-sacred-blue-100'
-                            : 'border-2 border-gray-200 bg-white/50 hover:border-sacred-blue-200 hover:bg-white/80'
+                            ? 'border-2 border-sacred-gold-400 bg-sacred-gold-50 shadow-md shadow-sacred-gold-200/50'
+                            : 'border-2 border-sacred-gold-100 bg-white/50 hover:border-sacred-gold-200 hover:bg-sacred-gold-50/30'
                         }
                       `}
                       whileHover={{ scale: 1.02 }}
@@ -117,8 +117,8 @@ const AssessmentStep = ({ onNext, onboardingData = {}, data = {} }) => {
                         mr-4 flex h-5 w-5 items-center justify-center rounded-full border-2
                         ${
                           responses[question.id] === option.value
-                            ? 'border-sacred-blue-500 bg-sacred-blue-500'
-                            : 'border-gray-300'
+                            ? 'border-sacred-gold-500 bg-sacred-gold-500'
+                            : 'border-sacred-gold-300'
                         }
                       `}
                       >

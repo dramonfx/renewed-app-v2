@@ -1,3 +1,4 @@
+
 'use client';
 import { motion } from 'framer-motion';
 import SacredButton from '@/components/ui/sacred-button';
@@ -35,68 +36,70 @@ const WelcomeScreen = ({ onNext }) => {
           </SacredCard>
         </motion.div>
 
-        {/* Features */}
+        {/* Features - Unified Tile Approach */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           className="mb-8"
         >
-          <h2 className="mb-6 font-serif text-2xl text-sacred-blue-900">Sacred Journey Features</h2>
-          <div className="grid gap-6 md:grid-cols-3">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 }}
-            >
-              <SacredCard variant="glass" className="h-full p-6 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-gradient shadow-lg">
-                  <span className="text-2xl text-white">🕊️</span>
-                </div>
-                <h3 className="mb-2 font-serif text-xl text-sacred-blue-900">
-                  Peaceful Experience
-                </h3>
-                <p className="text-sm leading-relaxed text-sacred-blue-600">
-                  Find tranquility through guided meditations and calming spiritual practices that
-                  nurture your soul
-                </p>
-              </SacredCard>
-            </motion.div>
+          <SacredCard variant="heavy" className="p-8">
+            <h2 className="mb-6 font-serif text-2xl text-sacred-blue-900 text-center">Sacred Journey Features</h2>
+            <div className="grid gap-6 md:grid-cols-3">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+              >
+                <SacredCard variant="glass" className="h-full p-6 text-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-gradient shadow-lg">
+                    <span className="text-2xl text-white">🕊️</span>
+                  </div>
+                  <h3 className="mb-2 font-serif text-xl text-sacred-blue-900">
+                    Peaceful Experience
+                  </h3>
+                  <p className="text-sm leading-relaxed text-sacred-blue-600">
+                    Find tranquility through guided meditations and calming spiritual practices that
+                    nurture your soul
+                  </p>
+                </SacredCard>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-            >
-              <SacredCard variant="glass" className="h-full p-6 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-gold-gradient shadow-lg">
-                  <span className="text-2xl text-white">🛡️</span>
-                </div>
-                <h3 className="mb-2 font-serif text-xl text-sacred-blue-900">Sacred Security</h3>
-                <p className="text-sm leading-relaxed text-sacred-blue-600">
-                  Build confidence in your spiritual journey with trusted guidance and unwavering
-                  support
-                </p>
-              </SacredCard>
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+              >
+                <SacredCard variant="glass" className="h-full p-6 text-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-gold-gradient shadow-lg">
+                    <span className="text-2xl text-white">🛡️</span>
+                  </div>
+                  <h3 className="mb-2 font-serif text-xl text-sacred-blue-900">Sacred Security</h3>
+                  <p className="text-sm leading-relaxed text-sacred-blue-600">
+                    Build confidence in your spiritual journey with trusted guidance and unwavering
+                    support
+                  </p>
+                </SacredCard>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.3 }}
-            >
-              <SacredCard variant="glass" className="h-full p-6 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-purple-gradient shadow-lg">
-                  <span className="text-2xl text-white">⭐</span>
-                </div>
-                <h3 className="mb-2 font-serif text-xl text-sacred-blue-900">Guided Renewal</h3>
-                <p className="text-sm leading-relaxed text-sacred-blue-600">
-                  Transform your life with structured pathways to personal and spiritual
-                  enlightenment
-                </p>
-              </SacredCard>
-            </motion.div>
-          </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
+              >
+                <SacredCard variant="glass" className="h-full p-6 text-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-purple-gradient shadow-lg">
+                    <span className="text-2xl text-white">⭐</span>
+                  </div>
+                  <h3 className="mb-2 font-serif text-xl text-sacred-blue-900">Guided Renewal</h3>
+                  <p className="text-sm leading-relaxed text-sacred-blue-600">
+                    Transform your life with structured pathways to personal and spiritual
+                    enlightenment
+                  </p>
+                </SacredCard>
+              </motion.div>
+            </div>
+          </SacredCard>
         </motion.div>
 
         {/* Call to Action */}

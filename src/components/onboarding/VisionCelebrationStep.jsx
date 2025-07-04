@@ -1,11 +1,14 @@
 
+
 'use client';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import SacredCard from '@/components/ui/sacred-card';
 import SacredButton from '@/components/ui/sacred-button';
 
 const VisionCelebrationStep = ({ onNext, journeyData = {}, data = {} }) => {
+  const router = useRouter();
   // Use journeyData if available, fallback to data prop
   const safeData = journeyData || data || {};
 
@@ -38,6 +41,17 @@ const VisionCelebrationStep = ({ onNext, journeyData = {}, data = {} }) => {
 
   // Get first few intentions to display
   const displayIntentions = safeData.intentions?.slice(0, 3) || [];
+
+  const handleBeginJourney = () => {
+    // Store completion data
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('renewedOnboardingCompleted', 'true');
+      localStorage.setItem('renewedOnboardingData', JSON.stringify(safeData));
+    }
+    
+    // Navigate directly to dashboard
+    router.push('/dashboard');
+  };
 
   return (
     <div className="min-h-screen p-6 lg:p-8">
@@ -235,14 +249,7 @@ const VisionCelebrationStep = ({ onNext, journeyData = {}, data = {} }) => {
                 whileTap={{ scale: 0.95 }}
               >
                 <SacredButton
-                  onClick={() => {
-                    // Store completion data and proceed
-                    if (typeof window !== 'undefined') {
-                      localStorage.setItem('renewedOnboardingCompleted', 'true');
-                      localStorage.setItem('renewedOnboardingData', JSON.stringify(safeData));
-                    }
-                    onNext && onNext(safeData);
-                  }}
+                  onClick={handleBeginJourney}
                   variant="gold"
                   size="lg"
                   className="px-12 py-4 text-xl font-bold shadow-2xl"
