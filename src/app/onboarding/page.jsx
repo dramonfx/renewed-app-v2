@@ -17,6 +17,7 @@ import AssessmentStep from '@/components/onboarding/AssessmentStep';
 import PathSelectionStep from '@/components/onboarding/PathSelectionStep';
 import IntentionsStep from '@/components/onboarding/IntentionsStep';
 import CompletionStep from '@/components/onboarding/CompletionStep';
+import VisionCelebrationStep from '@/components/onboarding/VisionCelebrationStep';
 
 /**
  * Sacred Journey Onboarding - Completely Reimagined
@@ -71,6 +72,11 @@ export default function SacredJourneyPage() {
       component: IntentionsStep,
       title: 'Sacred Intentions',
       description: 'Formal setting of spiritual intentions as sacred vows',
+    },
+    {
+      component: VisionCelebrationStep,
+      title: 'Vision Celebration',
+      description: 'Sacred celebration of your completed vision and journey preview',
     },
     {
       component: CompletionStep,
