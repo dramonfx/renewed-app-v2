@@ -236,11 +236,6 @@ const VisionCelebrationStep = ({ onNext, journeyData = {}, data = {} }) => {
               >
                 <SacredButton
                   onClick={() => {
-                    // Store completion data and proceed
-                    if (typeof window !== 'undefined') {
-                      localStorage.setItem('renewedOnboardingCompleted', 'true');
-                      localStorage.setItem('renewedOnboardingData', JSON.stringify(safeData));
-                    }
                     onNext && onNext(safeData);
                   }}
                   variant="gold"

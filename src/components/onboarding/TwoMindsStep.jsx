@@ -48,17 +48,21 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
           >
             <SacredCard
               variant="glass"
-              className={`h-full p-8 transition-all duration-300 ${
-                selectedMind === 'old' ? 'bg-sacred-purple-50 ring-2 ring-sacred-purple-400' : ''
+              className={`h-full p-8 transition-all duration-300 border border-sacred-gold-100 ${
+                selectedMind === 'old' ? 'bg-sacred-purple-50 ring-2 ring-sacred-gold-400 shadow-lg shadow-sacred-gold-200/50' : 'hover:border-sacred-gold-200'
               }`}
               hover={true}
               onClick={() => setSelectedMind('old')}
             >
               <div className="text-center">
-                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gray-400 shadow-lg">
-                  <span className="text-2xl text-white">🌫️</span>
+                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 shadow-lg ring-2 ring-sacred-gold-200">
+                  <img 
+                    src="https://www.svgrepo.com/show/404878/brain.svg" 
+                    alt="Multicolored brain" 
+                    className="h-8 w-8 filter brightness-0 invert"
+                  />
                 </div>
-                <h3 className="mb-4 font-serif text-2xl text-sacred-blue-900">The Old Mind</h3>
+                <h3 className="mb-4 font-serif text-2xl text-sacred-blue-900 border-b border-sacred-gold-200 pb-2">The Old Mind</h3>
                 <p className="mb-4 leading-relaxed text-sacred-blue-600">
                   Driven by fear, scarcity, and reactive patterns. Lives in the past or future,
                   seeking external validation and operating from limitation.

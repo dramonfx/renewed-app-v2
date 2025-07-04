@@ -87,14 +87,23 @@ export default function SacredJourneyPage() {
 
   // Handle navigation with smooth transitions
   const handleNext = async (stepData = {}) => {
-    if (currentStep === sacredSteps.length - 1) {
-      // Complete the sacred journey
+    if (currentStep === sacredSteps.length - 2) {
+      // VisionCelebrationStep (index 5) should complete the journey
       const success = await completeJourney(stepData);
       if (success) {
-        // Smooth transition to dashboard instead of hard redirect
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 2000); // Allow time for celebration
+        // Store completion data
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('renewedOnboardingCompleted', 'true');
+          localStorage.setItem('renewedOnboardingData', JSON.stringify({...journeyData, ...stepData}));
+        }
+        // Direct navigation to dashboard
+        router.push('/dashboard');
+      }
+    } else if (currentStep === sacredSteps.length - 1) {
+      // CompletionStep (final step) - should also go to dashboard
+      const success = await completeJourney(stepData);
+      if (success) {
+        router.push('/dashboard');
       }
     } else {
       setDirection('forward');
@@ -174,14 +183,7 @@ export default function SacredJourneyPage() {
 
   return (
     <div className="bg-sacred-journey-gradient relative min-h-screen overflow-hidden">
-      {/* Simple Progress Indicator */}
-      <div className="fixed left-1/2 top-6 z-50 -translate-x-1/2 transform">
-        <div className="rounded-2xl border border-white/30 bg-white/20 p-4 shadow-lg backdrop-blur-md">
-          <p className="text-sm text-white">
-            Step {currentStep + 1} of {sacredSteps.length}: {sacredSteps[currentStep].title}
-          </p>
-        </div>
-      </div>
+
 
       {/* Simple Step Content */}
       <CurrentStepComponent
