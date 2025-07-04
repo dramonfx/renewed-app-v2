@@ -88,7 +88,7 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
             </SacredCard>
           </motion.div>
 
-          {/* New Mind - Enhanced with Gold Styling */}
+          {/* New Mind - Fixed to Sacred Blue with Gold Accents */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -103,10 +103,16 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
               onClick={() => setSelectedMind('new')}
             >
               <div className="text-center">
-                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-gold-gradient shadow-lg ring-2 ring-sacred-gold-200">
+                {/* Fixed: Sacred Blue orb with gold halo/ring */}
+                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-sacred-blue-500 to-sacred-blue-600 shadow-lg ring-4 ring-sacred-gold-300">
                   <span className="text-2xl text-white">✨</span>
+                  {/* Add floating stars around the orb */}
+                  <div className="absolute -top-1 -right-1 text-xs text-sacred-gold-400">⭐</div>
+                  <div className="absolute -bottom-1 -left-1 text-xs text-sacred-gold-400">⭐</div>
+                  <div className="absolute top-0 -left-2 text-xs text-sacred-gold-400">✨</div>
                 </div>
-                <h3 className="mb-4 font-serif text-2xl text-sacred-blue-900 border-b border-sacred-gold-200 pb-2">The New Mind</h3>
+                {/* Gold underline for the title */}
+                <h3 className="mb-4 font-serif text-2xl text-sacred-blue-900 border-b-2 border-sacred-gold-300 pb-2">The New Mind</h3>
                 <p className="mb-4 leading-relaxed text-sacred-blue-600">
                   Rooted in love, abundance, and conscious choice. Lives in the present moment,
                   guided by inner wisdom and operating from possibility.

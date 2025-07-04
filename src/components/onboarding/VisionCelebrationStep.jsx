@@ -1,5 +1,4 @@
 
-
 'use client';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
@@ -43,10 +42,24 @@ const VisionCelebrationStep = ({ onNext, journeyData = {}, data = {} }) => {
   const displayIntentions = safeData.intentions?.slice(0, 3) || [];
 
   const handleBeginJourney = () => {
-    // Store completion data
+    // Store completion data - Fixed: Only store serializable data to avoid circular structure error
     if (typeof window !== 'undefined') {
       localStorage.setItem('renewedOnboardingCompleted', 'true');
-      localStorage.setItem('renewedOnboardingData', JSON.stringify(safeData));
+      
+      // Create a clean, serializable version of the data
+      const cleanData = {
+        selectedMind: safeData.selectedMind,
+        selectedPath: safeData.selectedPath,
+        intentions: safeData.intentions || [],
+        completedAt: new Date().toISOString()
+      };
+      
+      try {
+        localStorage.setItem('renewedOnboardingData', JSON.stringify(cleanData));
+      } catch (error) {
+        console.warn('Could not save onboarding data to localStorage:', error);
+        // Still proceed with navigation even if localStorage fails
+      }
     }
     
     // Navigate directly to dashboard
