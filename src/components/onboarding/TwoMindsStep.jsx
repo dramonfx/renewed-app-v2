@@ -1,3 +1,4 @@
+
 'use client';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
@@ -87,7 +88,7 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
             </SacredCard>
           </motion.div>
 
-          {/* New Mind */}
+          {/* New Mind - Enhanced with Gold Styling */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -95,17 +96,17 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
           >
             <SacredCard
               variant="glass"
-              className={`h-full p-8 transition-all duration-300 ${
-                selectedMind === 'new' ? 'bg-sacred-gold-50 ring-2 ring-sacred-gold-400' : ''
+              className={`h-full p-8 transition-all duration-300 border border-sacred-gold-200 ${
+                selectedMind === 'new' ? 'bg-sacred-gold-50 ring-2 ring-sacred-gold-400 shadow-lg shadow-sacred-gold-200/50' : 'hover:border-sacred-gold-300'
               }`}
               hover={true}
               onClick={() => setSelectedMind('new')}
             >
               <div className="text-center">
-                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-gradient shadow-lg">
+                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-gold-gradient shadow-lg ring-2 ring-sacred-gold-200">
                   <span className="text-2xl text-white">✨</span>
                 </div>
-                <h3 className="mb-4 font-serif text-2xl text-sacred-blue-900">The New Mind</h3>
+                <h3 className="mb-4 font-serif text-2xl text-sacred-blue-900 border-b border-sacred-gold-200 pb-2">The New Mind</h3>
                 <p className="mb-4 leading-relaxed text-sacred-blue-600">
                   Rooted in love, abundance, and conscious choice. Lives in the present moment,
                   guided by inner wisdom and operating from possibility.
@@ -120,7 +121,7 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="mt-4 inline-flex items-center rounded-full bg-sacred-gradient px-4 py-2 text-sm font-medium text-white"
+                    className="mt-4 inline-flex items-center rounded-full bg-sacred-gold-gradient px-4 py-2 text-sm font-medium text-white"
                   >
                     <span className="mr-2">✓</span>
                     Selected
