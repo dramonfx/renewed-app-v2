@@ -1,10 +1,9 @@
-
 // src/hooks/useAudioPlayerFixed.ts
 'use client';
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useSimpleBookmarks } from './useSimpleBookmarks';
-import type { SimpleBookmark } from './useSimpleBookmarks';
+import { useBookmarks } from './useBookmarks';
+import type { Bookmark } from './useBookmarks';
 
 export interface AudioTrack {
   id: string;
@@ -12,16 +11,20 @@ export interface AudioTrack {
   slug?: string;
   audioUrl?: string;
   duration?: number;
+  description?: string;
+  order?: number;
 }
 
-export interface UseAudioPlayerOptions {
+export interface UseAudioPlayerFixedOptions {
+  mode: 'single' | 'full';
+  singleTrackSlug?: string | null;
   autoLoad?: boolean;
   autoPlay?: boolean;
-  mode?: 'single' | 'full';
-  singleTrackSlug?: string | null;
+  saveProgress?: boolean;
+  restoreProgress?: boolean;
 }
 
-export interface UseAudioPlayerReturn {
+export interface UseAudioPlayerFixedReturn {
   // State values
   tracks: AudioTrack[];
   currentTrack: AudioTrack | null;
@@ -35,58 +38,65 @@ export interface UseAudioPlayerReturn {
   isMuted: boolean;
   isLoading: boolean;
   error: string | null;
-  bookmarks: SimpleBookmark[];
+  bookmarks: Bookmark[];
 
   // Audio element ref
   audioRef: React.RefObject<HTMLAudioElement>;
 
   // Control functions
   playPause: () => void;
+  play: () => void;
+  pause: () => void;
+  stop: () => void;
+  seek: (time: number) => void;
+  setSpeed: (speed: number) => void;
+  setVolume: (volume: number) => void;
+  toggleMute: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
-  playTrackAtIndex: (index: number) => void;
-  seek: (time: number) => void;
-  skip: (seconds: number) => void;
-  skipForward10: () => void;
-  skipBackward10: () => void;
-  restart: () => void;
-  changeSpeed: () => void;
-  setVolume: (volume: number) => void;
+  selectTrack: (index: number) => void;
+  skipForward: (seconds?: number) => void;
+  skipBackward: (seconds?: number) => void;
   toggleMute: () => void;
 
   // Bookmark functions
   saveBookmark: (time?: number, label?: string) => void;
-  jumpToBookmark: (bookmark: SimpleBookmark) => void;
+  jumpToBookmark: (bookmark: Bookmark) => void;
   deleteBookmark: (bookmarkId: string) => void;
   clearBookmarks: () => void;
   canSaveBookmark: boolean;
 
   // Utility functions
-  loadTracks: () => Promise<AudioTrack[]>;
   formatTime: (time: number) => string;
-
-  // Progress key for external access
-  progressKey: string | null;
+  loadTracks: () => Promise<void>;
+  restoreProgress: () => void;
+  saveProgress: () => void;
 }
 
 /**
  * Fixed Audio Player Hook with Simple Bookmark System
  * 
- * Clean implementation that focuses on core functionality:
+ * Features:
  * - Single Player: 1 bookmark per chapter
  * - Full Player: 2 bookmarks max
- * - Simple "Resume from X:XX" functionality
- * - Persistence between sessions
+ * - Progress saving/restoration
+ * - Clean error handling
+ * - Professional implementation
  */
-export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAudioPlayerReturn {
+export function useAudioPlayerFixed(
+  options: UseAudioPlayerFixedOptions = { mode: 'full' }
+): UseAudioPlayerFixedReturn {
   const {
-    autoLoad = true,
-    autoPlay = false,
     mode = 'full',
     singleTrackSlug = null,
+    autoLoad = true,
+    autoPlay = false,
+    saveProgress: shouldSaveProgress = true,
+    restoreProgress: shouldRestoreProgress = true,
   } = options;
 
-  // === CORE STATE MANAGEMENT ===
+  // === CORE STATE ===
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [tracks, setTracks] = useState<AudioTrack[]>([]);
   const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -94,16 +104,12 @@ export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAud
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [speed, setSpeed] = useState<number>(1);
-  const [volume, setVolume] = useState<number>(0.8);
+  const [volume, setVolume] = useState<number>(1);
   const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // === REFS ===
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  // === COMPUTED VALUES ===
+  // === DERIVED STATE ===
   const currentTrack = useMemo((): AudioTrack | null => {
     return tracks[currentTrackIndex] || null;
   }, [tracks, currentTrackIndex]);
@@ -120,7 +126,7 @@ export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAud
     deleteBookmark,
     clearBookmarks,
     canSaveBookmark,
-  } = useSimpleBookmarks(
+  } = useBookmarks(
     {
       mode,
       trackId: mode === 'single' ? singleTrackSlug || undefined : currentTrack?.id,
@@ -140,179 +146,187 @@ export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAud
     if (isNaN(time) || time === Infinity) return '0:00';
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }, []);
 
-  // === API LOADING ===
-  const loadTracks = useCallback(async (): Promise<AudioTrack[]> => {
+  // === TRACK LOADING ===
+  const loadTracks = useCallback(async (): Promise<void> => {
     try {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch('/api/audio-tracks');
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || `API request failed with status ${response.status}`);
-      }
-
-      if (!data.success) {
-        throw new Error(data.error || 'API returned unsuccessful response');
-      }
-
-      let validTracks: AudioTrack[] = data.tracks || [];
-
-      // If single track mode, filter by slug
-      if (singleTrackSlug) {
-        validTracks = validTracks.filter((track) => track.slug === singleTrackSlug);
-
-        if (validTracks.length === 0) {
-          throw new Error(`No audio track found with slug "${singleTrackSlug}"`);
+      if (mode === 'single' && singleTrackSlug) {
+        // Single mode: load one track
+        const response = await fetch(`/api/book/sections?slug=${singleTrackSlug}`);
+        if (!response.ok) {
+          throw new Error(`Failed to load track: ${response.statusText}`);
+        }
+        const data = await response.json();
+        
+        if (data.section && data.section.audio_url) {
+          const track: AudioTrack = {
+            id: data.section.id || singleTrackSlug,
+            title: data.section.title || 'Audio Track',
+            slug: data.section.slug || singleTrackSlug,
+            audioUrl: data.section.audio_url,
+            duration: data.section.duration,
+            description: data.section.description,
+            order: data.section.order || 1,
+          };
+          setTracks([track]);
+          setCurrentTrackIndex(0);
+        } else {
+          throw new Error('No audio URL found for this section');
+        }
+      } else {
+        // Full mode: load all tracks
+        const response = await fetch('/api/book/sections');
+        if (!response.ok) {
+          throw new Error(`Failed to load tracks: ${response.statusText}`);
+        }
+        const data = await response.json();
+        
+        if (data.sections && Array.isArray(data.sections)) {
+          const audioTracks: AudioTrack[] = data.sections
+            .filter((section: any) => section.audio_url)
+            .map((section: any) => ({
+              id: section.id,
+              title: section.title,
+              slug: section.slug,
+              audioUrl: section.audio_url,
+              duration: section.duration,
+              description: section.description,
+              order: section.order || 0,
+            }))
+            .sort((a: AudioTrack, b: AudioTrack) => (a.order || 0) - (b.order || 0));
+          
+          setTracks(audioTracks);
+          if (audioTracks.length > 0) {
+            setCurrentTrackIndex(0);
+          }
+        } else {
+          throw new Error('No sections found');
         }
       }
-
-      setTracks(validTracks);
-      setIsLoading(false);
-      return validTracks;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-      console.error('❌ Error loading tracks via API:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load audio tracks';
       setError(errorMessage);
+      console.error('Error loading tracks:', err);
+    } finally {
       setIsLoading(false);
-      return [];
     }
-  }, [singleTrackSlug]);
+  }, [mode, singleTrackSlug]);
 
-  // === PROGRESS PERSISTENCE ===
+  // === PROGRESS MANAGEMENT ===
   const saveProgress = useCallback((): void => {
-    if (!audioRef.current || !progressKey) return;
-
-    const { currentTime: time, duration: dur } = audioRef.current;
-    if (time > 0 && dur > 0 && time < dur - 5 && !isNaN(dur)) {
-      localStorage.setItem(progressKey, time.toString());
+    if (shouldSaveProgress && progressKey && currentTime > 0) {
+      try {
+        localStorage.setItem(progressKey, currentTime.toString());
+      } catch (error) {
+        console.warn('Failed to save progress:', error);
+      }
     }
-  }, [progressKey]);
+  }, [shouldSaveProgress, progressKey, currentTime]);
 
   const restoreProgress = useCallback((): void => {
-    if (!audioRef.current || !progressKey) return;
-
-    const savedTime = localStorage.getItem(progressKey);
-    if (savedTime && !isNaN(parseFloat(savedTime))) {
-      const timeToSet = parseFloat(savedTime);
-      if (timeToSet < (audioRef.current.duration || Infinity) && timeToSet > 0.1) {
-        audioRef.current.currentTime = timeToSet;
-        setCurrentTime(timeToSet);
+    if (shouldRestoreProgress && progressKey) {
+      try {
+        const savedProgress = localStorage.getItem(progressKey);
+        if (savedProgress) {
+          const progress = parseFloat(savedProgress);
+          if (!isNaN(progress) && progress > 0 && audioRef.current) {
+            audioRef.current.currentTime = progress;
+            setCurrentTime(progress);
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to restore progress:', error);
       }
     }
-  }, [progressKey]);
+  }, [shouldRestoreProgress, progressKey]);
 
   // === PLAYBACK CONTROLS ===
-  const playPause = useCallback((): void => {
-    if (!audioRef.current || !currentTrack || !currentTrack.audioUrl) return;
-    setIsPlaying((prev) => !prev);
+  const play = useCallback(async (): Promise<void> => {
+    if (audioRef.current && currentTrack?.audioUrl) {
+      try {
+        setError(null);
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to play audio';
+        setError(errorMessage);
+        setIsPlaying(false);
+        console.error('Play error:', err);
+      }
+    }
   }, [currentTrack]);
 
-  const seek = useCallback(
-    (time: number): void => {
-      if (!audioRef.current || !currentTrack) return;
+  const pause = useCallback((): void => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+  }, []);
 
-      const seekTime = Math.max(0, Math.min(duration, time));
-      audioRef.current.currentTime = seekTime;
-      setCurrentTime(seekTime);
+  const stop = useCallback((): void => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setIsPlaying(false);
+      setCurrentTime(0);
+    }
+  }, []);
 
-      if (progressKey) {
-        localStorage.setItem(progressKey, seekTime.toString());
-      }
-    },
-    [currentTrack, duration, progressKey]
-  );
+  const playPause = useCallback((): void => {
+    if (isPlaying) {
+      pause();
+    } else {
+      play();
+    }
+  }, [isPlaying, play, pause]);
 
-  const skip = useCallback(
-    (seconds: number): void => {
-      if (!audioRef.current) return;
+  const seek = useCallback((time: number): void => {
+    if (audioRef.current && !isNaN(time) && time >= 0) {
+      audioRef.current.currentTime = Math.min(time, duration || 0);
+      setCurrentTime(time);
+    }
+  }, [duration]);
 
-      const newTime = Math.max(0, Math.min(duration, currentTime + seconds));
-      seek(newTime);
-    },
-    [currentTime, duration, seek]
-  );
+  const skipForward = useCallback((seconds: number = 15): void => {
+    seek(currentTime + seconds);
+  }, [currentTime, seek]);
 
-  const skipForward10 = useCallback((): void => {
-    skip(10);
-  }, [skip]);
+  const skipBackward = useCallback((seconds: number = 15): void => {
+    seek(Math.max(0, currentTime - seconds));
+  }, [currentTime, seek]);
 
-  const skipBackward10 = useCallback((): void => {
-    skip(-10);
-  }, [skip]);
-
-  const restart = useCallback((): void => {
-    seek(0);
-  }, [seek]);
-
-  // === TRACK NAVIGATION ===
   const nextTrack = useCallback((): void => {
     if (currentTrackIndex < tracks.length - 1) {
-      if (currentTrack && progressKey) {
-        localStorage.removeItem(progressKey);
-      }
-      setCurrentTrackIndex((prev) => prev + 1);
-      setIsPlaying(true);
+      setCurrentTrackIndex(prev => prev + 1);
     }
-  }, [currentTrackIndex, tracks.length, currentTrack, progressKey]);
+  }, [currentTrackIndex, tracks.length]);
 
   const previousTrack = useCallback((): void => {
     if (currentTrackIndex > 0) {
-      if (currentTrack && progressKey) {
-        localStorage.removeItem(progressKey);
-      }
-      setCurrentTrackIndex((prev) => prev - 1);
-      setIsPlaying(true);
+      setCurrentTrackIndex(prev => prev - 1);
     }
-  }, [currentTrackIndex, currentTrack, progressKey]);
+  }, [currentTrackIndex]);
 
-  const playTrackAtIndex = useCallback(
-    (index: number): void => {
-      if (index >= 0 && index < tracks.length) {
-        if (currentTrack && progressKey) {
-          localStorage.removeItem(progressKey);
-        }
-        setCurrentTrackIndex(index);
-        setIsPlaying(true);
-      }
-    },
-    [tracks.length, currentTrack, progressKey]
-  );
-
-  // === SPEED CONTROL ===
-  const changeSpeed = useCallback((): void => {
-    const speedOptions = [1, 1.25, 1.5, 2];
-    const currentIndex = speedOptions.indexOf(speed);
-    const nextIndex = (currentIndex + 1) % speedOptions.length;
-    const newSpeed = speedOptions[nextIndex] ?? 1;
-    setSpeed(newSpeed);
-  }, [speed]);
-
-  // === VOLUME CONTROL ===
-  const setVolumeLevel = useCallback((newVolume: number): void => {
-    const clampedVolume = Math.max(0, Math.min(1, newVolume));
-    setVolume(clampedVolume);
-
-    if (audioRef.current) {
-      audioRef.current.volume = clampedVolume;
+  const selectTrack = useCallback((index: number): void => {
+    if (index >= 0 && index < tracks.length) {
+      setCurrentTrackIndex(index);
     }
-
-    setIsMuted(clampedVolume === 0);
-  }, []);
+  }, [tracks.length]);
 
   const toggleMute = useCallback((): void => {
-    if (!audioRef.current) return;
-
-    if (isMuted) {
-      audioRef.current.volume = volume;
-      setIsMuted(false);
-    } else {
-      audioRef.current.volume = 0;
-      setIsMuted(true);
+    if (audioRef.current) {
+      if (isMuted) {
+        audioRef.current.volume = volume;
+        setIsMuted(false);
+      } else {
+        audioRef.current.volume = 0;
+        setIsMuted(true);
+      }
     }
   }, [isMuted, volume]);
 
@@ -320,120 +334,148 @@ export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAud
   const saveBookmark = useCallback((time?: number, label?: string): void => {
     const bookmarkTime = time ?? currentTime;
     if (bookmarkTime > 0) {
-      saveBookmarkInternal(bookmarkTime, label);
+      // Pass the current section slug for cross-section navigation
+      const currentSectionSlug = mode === 'single' ? singleTrackSlug : currentTrack?.slug;
+      saveBookmarkInternal(bookmarkTime, label, currentSectionSlug || undefined);
     }
-  }, [currentTime, saveBookmarkInternal]);
+  }, [currentTime, saveBookmarkInternal, mode, singleTrackSlug, currentTrack]);
 
-  const jumpToBookmark = useCallback((bookmark: SimpleBookmark): void => {
+  const jumpToBookmark = useCallback((bookmark: Bookmark): void => {
     jumpToBookmarkInternal(bookmark);
   }, [jumpToBookmarkInternal]);
 
   // === AUDIO ELEMENT LIFECYCLE ===
   useEffect(() => {
     const audioElement = audioRef.current;
-    if (!audioElement || !currentTrack || !currentTrack.audioUrl) {
-      if (audioElement) audioElement.src = '';
-      setIsPlaying(false);
-      setIsActuallyPlaying(false);
-      setDuration(0);
-      setCurrentTime(0);
-      return;
-    }
+    if (!audioElement) return;
 
-    const currentSrc = audioElement.src;
-    const newSrc = currentTrack.audioUrl;
-
-    if (currentSrc !== newSrc) {
-      audioElement.src = newSrc;
-      setCurrentTime(0);
-      setDuration(0);
-      audioElement.load();
-    }
-
-    audioElement.playbackRate = speed;
-  }, [currentTrack, speed]);
-
-  // === PLAY/PAUSE INTENT HANDLING ===
-  useEffect(() => {
-    const audioElement = audioRef.current;
-    if (!audioElement || !currentTrack || !currentTrack.audioUrl) return;
-
-    if (isPlaying) {
-      audioElement
-        .play()
-        .then(() => {
-          setIsActuallyPlaying(true);
-        })
-        .catch((e) => {
-          console.error('Error attempting to play audio:', e);
-          setIsPlaying(false);
-          setIsActuallyPlaying(false);
-          setError('Playback failed');
-        });
-    } else {
-      audioElement.pause();
-      setIsActuallyPlaying(false);
-    }
-  }, [isPlaying, currentTrack]);
-
-  // === AUDIO EVENT LISTENERS ===
-  useEffect(() => {
-    const audioElement = audioRef.current;
-    if (!audioElement || !currentTrack) return;
-
-    const handleTimeUpdate = (): void => setCurrentTime(audioElement.currentTime);
-
-    const handleLoadedMetadata = (): void => {
-      setDuration(audioElement.duration || 0);
-      restoreProgress();
+    const handleTimeUpdate = () => {
+      setCurrentTime(audioElement.currentTime);
     };
 
-    const handlePlay = (): void => setIsActuallyPlaying(true);
-    const handlePause = (): void => setIsActuallyPlaying(false);
+    const handleDurationChange = () => {
+      setDuration(audioElement.duration || 0);
+    };
 
-    const handleEnded = (): void => {
-      if (currentTrackIndex < tracks.length - 1) {
+    const handlePlay = () => {
+      setIsActuallyPlaying(true);
+    };
+
+    const handlePause = () => {
+      setIsActuallyPlaying(false);
+    };
+
+    const handleEnded = () => {
+      setIsPlaying(false);
+      setIsActuallyPlaying(false);
+      if (mode === 'full' && currentTrackIndex < tracks.length - 1) {
         nextTrack();
-      } else {
-        setIsPlaying(false);
-        setIsActuallyPlaying(false);
       }
     };
 
-    const handleError = (e: Event): void => {
-      console.error('Audio error:', e);
-      setError('Audio playback error');
-      setIsPlaying(false);
-      setIsActuallyPlaying(false);
-    };
-
-    // Add event listeners
     audioElement.addEventListener('timeupdate', handleTimeUpdate);
-    audioElement.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audioElement.addEventListener('durationchange', handleDurationChange);
     audioElement.addEventListener('play', handlePlay);
     audioElement.addEventListener('pause', handlePause);
     audioElement.addEventListener('ended', handleEnded);
-    audioElement.addEventListener('error', handleError);
-
-    // Start progress save interval
-    progressIntervalRef.current = setInterval(saveProgress, 5000);
 
     return () => {
       audioElement.removeEventListener('timeupdate', handleTimeUpdate);
-      audioElement.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audioElement.removeEventListener('durationchange', handleDurationChange);
       audioElement.removeEventListener('play', handlePlay);
       audioElement.removeEventListener('pause', handlePause);
       audioElement.removeEventListener('ended', handleEnded);
-      audioElement.removeEventListener('error', handleError);
+    };
+  }, [mode, currentTrackIndex, tracks.length, nextTrack]);
 
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
+  // === TRACK CHANGE EFFECTS ===
+  useEffect(() => {
+    const audioElement = audioRef.current;
+    if (audioElement && currentTrack?.audioUrl) {
+      // Save progress before changing tracks
+      saveProgress();
+      
+      // Load new track
+      audioElement.src = currentTrack.audioUrl;
+      audioElement.playbackRate = speed;
+      audioElement.volume = isMuted ? 0 : volume;
+      
+      // Reset state
+      setCurrentTime(0);
+      setDuration(0);
+      setError(null);
+      
+      // Restore progress after a short delay
+      const restoreTimer = setTimeout(() => {
+        restoreProgress();
+      }, 100);
+      
+      return () => clearTimeout(restoreTimer);
+    }
+  }, [currentTrack, speed, volume, isMuted, saveProgress, restoreProgress]);
+
+  // === SPEED AND VOLUME EFFECTS ===
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = speed;
+    }
+  }, [speed]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume;
+    }
+  }, [volume, isMuted]);
+
+  // === PROGRESS SAVING ===
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (isPlaying && currentTime > 0) {
+        saveProgress();
+      }
+    }, 5000); // Save every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [isPlaying, currentTime, saveProgress]);
+
+  // === KEYBOARD SHORTCUTS ===
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        return; // Don't interfere with form inputs
+      }
+
+      switch (event.code) {
+        case 'Space':
+          event.preventDefault();
+          playPause();
+          break;
+        case 'ArrowLeft':
+          event.preventDefault();
+          skipBackward();
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          skipForward();
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          if (mode === 'full') previousTrack();
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          if (mode === 'full') nextTrack();
+          break;
       }
     };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
   }, [
-    currentTrack,
-    currentTrackIndex,
-    tracks.length,
+    playPause,
+    skipBackward,
+    skipForward,
+    previousTrack,
     nextTrack,
     restoreProgress,
     saveProgress,
@@ -452,6 +494,31 @@ export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAud
       setIsPlaying(true);
     }
   }, [autoPlay, currentTrack, isPlaying, isLoading]);
+
+  // === PENDING BOOKMARK NAVIGATION ===
+  useEffect(() => {
+    const checkPendingBookmark = () => {
+      const pendingTime = sessionStorage.getItem('pendingBookmarkTime');
+      if (pendingTime && audioRef.current) {
+        const time = parseFloat(pendingTime);
+        if (!isNaN(time) && time > 0) {
+          // Small delay to ensure audio is ready
+          setTimeout(() => {
+            if (audioRef.current) {
+              audioRef.current.currentTime = time;
+              setCurrentTime(time);
+              sessionStorage.removeItem('pendingBookmarkTime');
+            }
+          }, 500);
+        }
+      }
+    };
+
+    // Check on mount and when current track changes
+    if (currentTrack) {
+      checkPendingBookmark();
+    }
+  }, [currentTrack]);
 
   // === RETURN COMPREHENSIVE API ===
   return {
@@ -475,17 +542,18 @@ export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAud
 
     // Control functions
     playPause,
+    play,
+    pause,
+    stop,
+    seek,
+    setSpeed,
+    setVolume,
+    toggleMute,
     nextTrack,
     previousTrack,
-    playTrackAtIndex,
-    seek,
-    skip,
-    skipForward10,
-    skipBackward10,
-    restart,
-    changeSpeed,
-    setVolume: setVolumeLevel,
-    toggleMute,
+    selectTrack,
+    skipForward,
+    skipBackward,
 
     // Bookmark functions
     saveBookmark,
@@ -495,12 +563,9 @@ export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAud
     canSaveBookmark,
 
     // Utility functions
-    loadTracks,
     formatTime,
-
-    // Progress key for external access
-    progressKey,
+    loadTracks,
+    restoreProgress,
+    saveProgress,
   };
 }
-
-export default useAudioPlayerFixed;

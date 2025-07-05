@@ -131,26 +131,8 @@ export function useBookmarks(
           // Navigate to the correct section
           router.push(targetPath);
           
-          // Set up a one-time listener for route change completion
-          const handleRouteChange = () => {
-            // Small delay to ensure the audio player is ready
-            setTimeout(() => {
-              const pendingTime = sessionStorage.getItem('pendingBookmarkTime');
-              if (pendingTime && onJumpToTime) {
-                onJumpToTime(parseFloat(pendingTime));
-                sessionStorage.removeItem('pendingBookmarkTime');
-              }
-            }, 100);
-          };
-          
-          // Listen for route change completion
-          router.events?.on('routeChangeComplete', handleRouteChange);
-          
-          // Cleanup listener after a reasonable timeout
-          setTimeout(() => {
-            router.events?.off('routeChangeComplete', handleRouteChange);
-          }, 5000);
-          
+          // For App Router, we'll use a different approach to detect navigation completion
+          // The audio player will check for pendingBookmarkTime on mount/section change
           return;
         }
       }
