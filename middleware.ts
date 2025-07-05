@@ -3,6 +3,7 @@
 // =============================================================================
 // Forged from first principles to protect all sacred paths with unwavering strength
 // Compatible with Next.js 14 App Router and Supabase authentication
+// Enhanced with SKIP_AUTH development bypass capability
 // =============================================================================
 
 import { NextResponse } from 'next/server'
@@ -15,6 +16,8 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
  * This middleware serves as the sole guardian of all protected routes in the RENEWED application.
  * It ensures that only authenticated users can access sacred paths while providing seamless
  * authentication flow with proper returnUrl handling.
+ * 
+ * DEVELOPMENT BYPASS: Set SKIP_AUTH=true in environment to bypass authentication for testing
  */
 export async function middleware(req: NextRequest) {
   console.log('🛡️  THE ONE TRUE GATEKEEPER AWAKENS - Protecting:', req.nextUrl.pathname)
@@ -22,6 +25,19 @@ export async function middleware(req: NextRequest) {
   const startTime = Date.now()
   const { pathname, search, origin } = req.nextUrl
   const fullPath = pathname + search
+  
+  // =============================================================================
+  // DEVELOPMENT BYPASS - Skip authentication if SKIP_AUTH is enabled
+  // =============================================================================
+  const skipAuth = process.env.SKIP_AUTH === 'true'
+  if (skipAuth) {
+    console.log('🚧 DEVELOPMENT MODE - SKIP_AUTH enabled, bypassing all authentication')
+    console.log('⚠️  WARNING: This should NEVER be enabled in production!')
+    const response = NextResponse.next()
+    response.headers.set('X-Auth-Bypass', 'true')
+    response.headers.set('X-Environment', 'development')
+    return response
+  }
   
   // Create response object that will carry any necessary headers/cookies
   const response = NextResponse.next()
@@ -43,7 +59,8 @@ export async function middleware(req: NextRequest) {
     '/',
     '/login',
     '/signup', 
-    '/forgot-password'
+    '/forgot-password',
+    '/bookmark-test-public'  // Added public bookmark test page
   ]
   
   // Development/test routes (protect in production)
@@ -51,6 +68,12 @@ export async function middleware(req: NextRequest) {
     '/test-',
     '/design-test',
     '/supabase-test'
+  ]
+  
+  // Public API routes that don't require authentication
+  const publicApiRoutes = [
+    '/api/public/',
+    '/api/bookmark-test/'
   ]
   
   // =============================================================================
@@ -68,15 +91,20 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith(route)
   )
   
+  const isPublicApiRoute = publicApiRoutes.some(route => 
+    pathname.startsWith(route)
+  )
+  
   console.log('🔍 GATEKEEPER ANALYSIS:', {
     path: pathname,
     isProtected: isProtectedRoute,
     isPublic: isPublicRoute,
-    isDev: isDevRoute
+    isDev: isDevRoute,
+    isPublicApi: isPublicApiRoute
   })
   
-  // Allow public routes to pass through
-  if (isPublicRoute) {
+  // Allow public routes and public API routes to pass through
+  if (isPublicRoute || isPublicApiRoute) {
     console.log('✅ PUBLIC ROUTE - Access granted without authentication')
     return response
   }
