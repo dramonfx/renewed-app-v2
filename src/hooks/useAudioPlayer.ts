@@ -1,39 +1,93 @@
-// src/hooks/useAudioPlayer.ts
+
+// src/hooks/useAudioPlayerFixed.ts
 'use client';
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import type {
-  UseAudioPlayerReturn,
-  AudioPlayerOptions,
-  AudioBookmark,
-  TrackWithUrl,
-} from './types';
+import { useSimpleBookmarks } from './useSimpleBookmarks';
+import type { SimpleBookmark } from './useSimpleBookmarks';
+
+export interface AudioTrack {
+  id: string;
+  title: string;
+  slug?: string;
+  audioUrl?: string;
+  duration?: number;
+}
+
+export interface UseAudioPlayerOptions {
+  autoLoad?: boolean;
+  autoPlay?: boolean;
+  mode?: 'single' | 'full';
+  singleTrackSlug?: string | null;
+}
+
+export interface UseAudioPlayerReturn {
+  // State values
+  tracks: AudioTrack[];
+  currentTrack: AudioTrack | null;
+  currentTrackIndex: number;
+  isPlaying: boolean;
+  isActuallyPlaying: boolean;
+  currentTime: number;
+  duration: number;
+  speed: number;
+  volume: number;
+  isMuted: boolean;
+  isLoading: boolean;
+  error: string | null;
+  bookmarks: SimpleBookmark[];
+
+  // Audio element ref
+  audioRef: React.RefObject<HTMLAudioElement>;
+
+  // Control functions
+  playPause: () => void;
+  nextTrack: () => void;
+  previousTrack: () => void;
+  playTrackAtIndex: (index: number) => void;
+  seek: (time: number) => void;
+  skip: (seconds: number) => void;
+  skipForward10: () => void;
+  skipBackward10: () => void;
+  restart: () => void;
+  changeSpeed: () => void;
+  setVolume: (volume: number) => void;
+  toggleMute: () => void;
+
+  // Bookmark functions
+  saveBookmark: (time?: number, label?: string) => void;
+  jumpToBookmark: (bookmark: SimpleBookmark) => void;
+  deleteBookmark: (bookmarkId: string) => void;
+  clearBookmarks: () => void;
+  canSaveBookmark: boolean;
+
+  // Utility functions
+  loadTracks: () => Promise<AudioTrack[]>;
+  formatTime: (time: number) => string;
+
+  // Progress key for external access
+  progressKey: string | null;
+}
 
 /**
- * Master Audio Player Hook - Uses Golden Snippet Pattern
- *
- * Based on proven working Supabase connection from /supabase-test
- * Direct environment variable access, no wrapper dependencies
- *
- * Features:
- * - Golden snippet Supabase integration
- * - Playlist management with real signed URLs
- * - Playback speed control (1x, 1.25x, 1.5x, 2x)
- * - Bookmark system with persistence
- * - Progress tracking and restoration
- * - Comprehensive error handling
- * - Single and multi-track support
+ * Fixed Audio Player Hook with Simple Bookmark System
+ * 
+ * Clean implementation that focuses on core functionality:
+ * - Single Player: 1 bookmark per chapter
+ * - Full Player: 2 bookmarks max
+ * - Simple "Resume from X:XX" functionality
+ * - Persistence between sessions
  */
-export function useAudioPlayer(options: AudioPlayerOptions = {}): UseAudioPlayerReturn {
+export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAudioPlayerReturn {
   const {
     autoLoad = true,
     autoPlay = false,
+    mode = 'full',
     singleTrackSlug = null,
-    mode = 'full', // Add mode for context-aware bookmarks
   } = options;
 
   // === CORE STATE MANAGEMENT ===
-  const [tracks, setTracks] = useState<TrackWithUrl[]>([]);
+  const [tracks, setTracks] = useState<AudioTrack[]>([]);
   const [currentTrackIndex, setCurrentTrackIndex] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isActuallyPlaying, setIsActuallyPlaying] = useState<boolean>(false);
@@ -44,14 +98,13 @@ export function useAudioPlayer(options: AudioPlayerOptions = {}): UseAudioPlayer
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [bookmarks, setBookmarks] = useState<AudioBookmark[]>([]);
 
   // === REFS ===
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // === COMPUTED VALUES ===
-  const currentTrack = useMemo((): TrackWithUrl | null => {
+  const currentTrack = useMemo((): AudioTrack | null => {
     return tracks[currentTrackIndex] || null;
   }, [tracks, currentTrackIndex]);
 
@@ -59,15 +112,28 @@ export function useAudioPlayer(options: AudioPlayerOptions = {}): UseAudioPlayer
     return currentTrack ? `audio-progress-${currentTrack.slug || currentTrack.id}` : null;
   }, [currentTrack]);
 
-  // Context-aware bookmark storage key
-  const bookmarkStorageKey = useMemo((): string => {
-    if (mode === 'single' && singleTrackSlug) {
-      return `audio-bookmarks-section-${singleTrackSlug}`;
+  // === BOOKMARK SYSTEM ===
+  const {
+    bookmarks,
+    saveBookmark: saveBookmarkInternal,
+    jumpToBookmark: jumpToBookmarkInternal,
+    deleteBookmark,
+    clearBookmarks,
+    canSaveBookmark,
+  } = useSimpleBookmarks(
+    {
+      mode,
+      trackId: mode === 'single' ? singleTrackSlug || undefined : currentTrack?.id,
+      maxBookmarks: mode === 'single' ? 1 : 2,
+    },
+    (time: number) => {
+      // Handle jump to bookmark time
+      if (audioRef.current) {
+        audioRef.current.currentTime = time;
+        setCurrentTime(time);
+      }
     }
-    return 'audio-bookmarks'; // Global for full audiobook mode
-  }, [mode, singleTrackSlug]);
-
-  const globalBookmarkKey = 'audio-bookmark-global';
+  );
 
   // === UTILITY FUNCTIONS ===
   const formatTime = useCallback((time: number): string => {
@@ -77,13 +143,12 @@ export function useAudioPlayer(options: AudioPlayerOptions = {}): UseAudioPlayer
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   }, []);
 
-  // === GOLDEN SNIPPET API BRIDGE LOADING ===
-  const loadTracks = useCallback(async (): Promise<TrackWithUrl[]> => {
+  // === API LOADING ===
+  const loadTracks = useCallback(async (): Promise<AudioTrack[]> => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Fetch from our golden snippet API route (which uses server-side working pattern)
       const response = await fetch('/api/audio-tracks');
       const data = await response.json();
 
@@ -95,7 +160,7 @@ export function useAudioPlayer(options: AudioPlayerOptions = {}): UseAudioPlayer
         throw new Error(data.error || 'API returned unsuccessful response');
       }
 
-      let validTracks: TrackWithUrl[] = data.tracks || [];
+      let validTracks: AudioTrack[] = data.tracks || [];
 
       // If single track mode, filter by slug
       if (singleTrackSlug) {
@@ -118,100 +183,12 @@ export function useAudioPlayer(options: AudioPlayerOptions = {}): UseAudioPlayer
     }
   }, [singleTrackSlug]);
 
-  // === BOOKMARK SYSTEM ===
-  const loadBookmarks = useCallback((): void => {
-    try {
-      const stored = localStorage.getItem(bookmarkStorageKey);
-      const parsed = stored ? JSON.parse(stored) : [];
-      setBookmarks(Array.isArray(parsed) ? parsed : []);
-    } catch (err) {
-      console.error('Error loading bookmarks:', err);
-      setBookmarks([]);
-    }
-  }, [bookmarkStorageKey]);
-
-  const saveBookmark = useCallback((): void => {
-    if (!audioRef.current || !currentTrack) return;
-
-    const bookmark: AudioBookmark = {
-      id: Date.now(),
-      trackIndex: currentTrackIndex,
-      time: audioRef.current.currentTime,
-      trackTitle: currentTrack.title,
-      trackSlug: currentTrack.slug,
-      sectionSlug: mode === 'single' ? singleTrackSlug : null, // Add section context
-      mode: mode, // Store the mode for context reference
-      timestamp: new Date().toISOString(),
-    };
-
-    const newBookmarks = [...bookmarks, bookmark];
-    setBookmarks(newBookmarks);
-    localStorage.setItem(bookmarkStorageKey, JSON.stringify(newBookmarks));
-  }, [currentTrack, currentTrackIndex, bookmarks, bookmarkStorageKey, mode, singleTrackSlug]);
-
-  const jumpToBookmark = useCallback(
-    (bookmark: AudioBookmark): void => {
-      if (!bookmark) return;
-
-      try {
-        const trackIndex = tracks.findIndex((t) => t.slug === bookmark.trackSlug);
-        if (trackIndex === -1) {
-          throw new Error('Bookmarked track not found');
-        }
-
-        setIsPlaying(false);
-
-        if (currentTrackIndex === trackIndex) {
-          // Same track - just seek to bookmark time
-          if (audioRef.current) {
-            audioRef.current.currentTime = bookmark.time;
-            setCurrentTime(bookmark.time);
-          }
-          setIsPlaying(true);
-        } else {
-          // Different track - set flag to jump after track loads
-          sessionStorage.setItem('jumpToBookmarkTime', bookmark.time.toString());
-          setCurrentTrackIndex(trackIndex);
-          setIsPlaying(true);
-        }
-      } catch (err) {
-        console.error('Error jumping to bookmark:', err);
-        setError('Unable to jump to bookmark');
-      }
-    },
-    [tracks, currentTrackIndex]
-  );
-
-  const deleteBookmark = useCallback(
-    (bookmarkId: number): void => {
-      try {
-        const updatedBookmarks = bookmarks.filter((bookmark) => bookmark.id !== bookmarkId);
-        setBookmarks(updatedBookmarks);
-        localStorage.setItem(bookmarkStorageKey, JSON.stringify(updatedBookmarks));
-      } catch (err) {
-        console.error('Error deleting bookmark:', err);
-      }
-    },
-    [bookmarks, bookmarkStorageKey]
-  );
-
-  const clearBookmarks = useCallback((): void => {
-    setBookmarks([]);
-    localStorage.removeItem(bookmarkStorageKey);
-  }, [bookmarkStorageKey]);
-
-  // === BOOKMARK CONTEXT LOADING ===
-  useEffect(() => {
-    loadBookmarks();
-  }, [loadBookmarks]);
-
   // === PROGRESS PERSISTENCE ===
   const saveProgress = useCallback((): void => {
     if (!audioRef.current || !progressKey) return;
 
     const { currentTime: time, duration: dur } = audioRef.current;
     if (time > 0 && dur > 0 && time < dur - 5 && !isNaN(dur)) {
-      // Don't save if near end
       localStorage.setItem(progressKey, time.toString());
     }
   }, [progressKey]);
@@ -219,20 +196,6 @@ export function useAudioPlayer(options: AudioPlayerOptions = {}): UseAudioPlayer
   const restoreProgress = useCallback((): void => {
     if (!audioRef.current || !progressKey) return;
 
-    // Check for bookmark jump first
-    const jumpToBookmarkTimeStr = sessionStorage.getItem('jumpToBookmarkTime');
-    if (jumpToBookmarkTimeStr !== null) {
-      const jumpTime = parseFloat(jumpToBookmarkTimeStr);
-      sessionStorage.removeItem('jumpToBookmarkTime');
-
-      if (!isNaN(jumpTime) && jumpTime < (audioRef.current.duration || Infinity)) {
-        audioRef.current.currentTime = jumpTime;
-        setCurrentTime(jumpTime);
-        return;
-      }
-    }
-
-    // Otherwise restore normal progress
     const savedTime = localStorage.getItem(progressKey);
     if (savedTime && !isNaN(parseFloat(savedTime))) {
       const timeToSet = parseFloat(savedTime);
@@ -353,6 +316,18 @@ export function useAudioPlayer(options: AudioPlayerOptions = {}): UseAudioPlayer
     }
   }, [isMuted, volume]);
 
+  // === BOOKMARK FUNCTIONS ===
+  const saveBookmark = useCallback((time?: number, label?: string): void => {
+    const bookmarkTime = time ?? currentTime;
+    if (bookmarkTime > 0) {
+      saveBookmarkInternal(bookmarkTime, label);
+    }
+  }, [currentTime, saveBookmarkInternal]);
+
+  const jumpToBookmark = useCallback((bookmark: SimpleBookmark): void => {
+    jumpToBookmarkInternal(bookmark);
+  }, [jumpToBookmarkInternal]);
+
   // === AUDIO ELEMENT LIFECYCLE ===
   useEffect(() => {
     const audioElement = audioRef.current;
@@ -462,16 +437,14 @@ export function useAudioPlayer(options: AudioPlayerOptions = {}): UseAudioPlayer
     nextTrack,
     restoreProgress,
     saveProgress,
-    formatTime,
   ]);
 
   // === INITIAL LOADING ===
   useEffect(() => {
     if (autoLoad) {
       loadTracks();
-      loadBookmarks();
     }
-  }, [autoLoad, loadTracks, loadBookmarks]);
+  }, [autoLoad, loadTracks]);
 
   // === AUTO PLAY ===
   useEffect(() => {
@@ -497,7 +470,7 @@ export function useAudioPlayer(options: AudioPlayerOptions = {}): UseAudioPlayer
     error,
     bookmarks,
 
-    // Audio element ref (for advanced usage)
+    // Audio element ref
     audioRef,
 
     // Control functions
@@ -519,7 +492,7 @@ export function useAudioPlayer(options: AudioPlayerOptions = {}): UseAudioPlayer
     jumpToBookmark,
     deleteBookmark,
     clearBookmarks,
-    loadBookmarks,
+    canSaveBookmark,
 
     // Utility functions
     loadTracks,
@@ -527,8 +500,7 @@ export function useAudioPlayer(options: AudioPlayerOptions = {}): UseAudioPlayer
 
     // Progress key for external access
     progressKey,
-    globalBookmarkKey,
   };
 }
 
-export default useAudioPlayer;
+export default useAudioPlayerFixed;

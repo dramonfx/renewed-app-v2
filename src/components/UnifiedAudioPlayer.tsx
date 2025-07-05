@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { MouseEvent } from 'react';
@@ -8,59 +9,37 @@ import {
   Pause,
   SkipBack,
   SkipForward,
-  RotateCcw, // Skip Backward 10s
-  RotateCw, // Skip Forward 10s
+  RotateCcw,
+  RotateCw,
   Bookmark,
   BookmarkCheck,
   Gauge,
   Trash2,
   Volume2,
   VolumeX,
-  X,
 } from 'lucide-react';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import type { AudioTrack } from '@/types';
+import { useAudioPlayerFixed } from '@/hooks/useAudioPlayerFixed';
+import type { SimpleBookmark } from '@/hooks/useSimpleBookmarks';
 
-/**
- * Audio player mode types
- */
 export type AudioPlayerMode = 'full' | 'single';
 
-/**
- * Props for the UnifiedAudioPlayer component
- */
-export interface UnifiedAudioPlayerProps {
-  /** Player mode: 'full' for full audiobook, 'single' for single section */
+export interface UnifiedAudioPlayerFixedProps {
   mode?: AudioPlayerMode;
-  /** Slug for single track mode (required when mode='single') */
   singleTrackSlug?: string | null;
-  /** Additional CSS classes */
   className?: string;
-  /** Optional callback when track changes */
-  onTrackChange?: (track: AudioTrack | null) => void;
-  /** Optional callback when playback state changes */
+  onTrackChange?: (track: any) => void;
   onPlayStateChange?: (isPlaying: boolean) => void;
 }
 
-/**
- * Bookmark display component props
- */
 interface BookmarkItemProps {
-  bookmark: {
-    id: string;
-    time: number;
-    label?: string;
-  };
-  onJump: (time: number) => void;
+  bookmark: SimpleBookmark;
+  onJump: (bookmark: SimpleBookmark) => void;
   onDelete: (id: string) => void;
   formatTime: (time: number) => string;
 }
 
-/**
- * Volume control component props
- */
 interface VolumeControlProps {
   volume: number;
   isMuted: boolean;
@@ -68,19 +47,13 @@ interface VolumeControlProps {
   onToggleMute: () => void;
 }
 
-/**
- * Speed control component props
- */
 interface SpeedControlProps {
   speed: number;
-  onSpeedChange: (speed: number) => void;
+  onSpeedChange: () => void;
 }
 
-/**
- * Track navigation component props
- */
 interface TrackNavigationProps {
-  tracks: AudioTrack[];
+  tracks: any[];
   currentTrackIndex: number;
   onTrackSelect: (index: number) => void;
   canGoBack: boolean;
@@ -95,11 +68,11 @@ interface TrackNavigationProps {
 const BookmarkItem: React.FC<BookmarkItemProps> = ({ bookmark, onJump, onDelete, formatTime }) => (
   <div className="mb-2 flex items-center justify-between rounded-lg bg-white/20 p-2">
     <button
-      onClick={() => onJump(bookmark.time)}
+      onClick={() => onJump(bookmark)}
       className="flex-1 text-left text-sm text-sacred-blue-700 transition-colors hover:text-sacred-blue-900"
     >
       <BookmarkCheck className="mr-2 inline h-3 w-3" />
-      {bookmark.label || `Bookmark at ${formatTime(bookmark.time)}`}
+      {bookmark.label || `Resume from ${formatTime(bookmark.time)}`}
     </button>
     <button
       onClick={() => onDelete(bookmark.id)}
@@ -144,27 +117,18 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
 /**
  * Speed Control Component
  */
-const SpeedControl: React.FC<SpeedControlProps> = ({ speed, onSpeedChange }) => {
-  const speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
-
-  return (
-    <div className="flex items-center space-x-2">
-      <Gauge className="h-4 w-4 text-sacred-blue-600" />
-      <select
-        value={speed}
-        onChange={(e) => onSpeedChange(parseFloat(e.target.value))}
-        className="rounded border border-sacred-blue-300 bg-white/20 px-2 py-1 text-xs text-sacred-blue-700 focus:outline-none focus:ring-2 focus:ring-sacred-blue-500"
-        aria-label="Playback speed"
-      >
-        {speedOptions.map((speedOption) => (
-          <option key={speedOption} value={speedOption}>
-            {speedOption}x
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-};
+const SpeedControl: React.FC<SpeedControlProps> = ({ speed, onSpeedChange }) => (
+  <div className="flex items-center space-x-2">
+    <Gauge className="h-4 w-4 text-sacred-blue-600" />
+    <button
+      onClick={onSpeedChange}
+      className="rounded border border-sacred-blue-300 bg-white/20 px-2 py-1 text-xs text-sacred-blue-700 transition-colors hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-sacred-blue-500"
+      aria-label="Change playback speed"
+    >
+      {speed}x
+    </button>
+  </div>
+);
 
 /**
  * Track Navigation Component
@@ -179,7 +143,6 @@ const TrackNavigation: React.FC<TrackNavigationProps> = ({
   onNext,
 }) => (
   <div className="space-y-3">
-    {/* Track Navigation Buttons */}
     <div className="flex justify-center space-x-4">
       <SacredButton
         variant="ghost"
@@ -204,7 +167,6 @@ const TrackNavigation: React.FC<TrackNavigationProps> = ({
       </SacredButton>
     </div>
 
-    {/* Track List */}
     {tracks.length > 1 && (
       <div className="max-h-32 space-y-1 overflow-y-auto">
         {tracks.map((track, index) => (
@@ -226,40 +188,33 @@ const TrackNavigation: React.FC<TrackNavigationProps> = ({
 );
 
 /**
- * Unified Audio Player Component
- *
- * A single, comprehensive audio player component that provides consistent UI/UX
- * across all audio contexts in the application. Enhanced with full TypeScript
- * support and improved error handling.
+ * Fixed Unified Audio Player Component
+ * 
+ * Clean implementation with working bookmark system:
+ * - Single Player: 1 bookmark per chapter
+ * - Full Player: 2 bookmarks max
+ * - Simple "Resume from X:XX" functionality
+ * - Persistence between sessions
  */
-export default function UnifiedAudioPlayer({
+export default function UnifiedAudioPlayerFixed({
   mode = 'full',
   singleTrackSlug = null,
   className = '',
   onTrackChange,
   onPlayStateChange,
-}: UnifiedAudioPlayerProps): JSX.Element {
+}: UnifiedAudioPlayerFixedProps): JSX.Element {
   // Validate props
   if (mode === 'single' && !singleTrackSlug) {
-    console.warn('UnifiedAudioPlayer: singleTrackSlug is required when mode is "single"');
+    console.warn('UnifiedAudioPlayerFixed: singleTrackSlug is required when mode is "single"');
   }
 
-  // Initialize audio player with appropriate configuration
-  const hookOptions = {
-    autoLoad: true,
-    autoPlay: false,
-    mode: mode,
-    ...(mode === 'single' && singleTrackSlug && { singleTrackSlug }),
-  };
-
-  // Get all state and functions from the useAudioPlayer hook
+  // Initialize fixed audio player
   const {
     // State values
     tracks,
     currentTrack,
     currentTrackIndex,
     isPlaying,
-    isActuallyPlaying,
     currentTime,
     duration,
     speed,
@@ -281,16 +236,24 @@ export default function UnifiedAudioPlayer({
     skipForward10,
     skipBackward10,
     changeSpeed,
+    setVolume,
+    toggleMute,
+
+    // Bookmark functions
     saveBookmark,
     jumpToBookmark,
     deleteBookmark,
     clearBookmarks,
-    setVolume,
-    toggleMute,
+    canSaveBookmark,
 
     // Utility functions
     formatTime,
-  } = useAudioPlayer(hookOptions);
+  } = useAudioPlayerFixed({
+    autoLoad: true,
+    autoPlay: false,
+    mode,
+    singleTrackSlug,
+  });
 
   // Notify parent of track changes
   React.useEffect(() => {
@@ -315,17 +278,10 @@ export default function UnifiedAudioPlayer({
     seek(newTime);
   };
 
-  // Handle volume change
-  const handleVolumeChange = (newVolume: number): void => {
-    setVolume(newVolume);
-  };
-
   // Handle bookmark save
   const handleSaveBookmark = (): void => {
     if (!currentTrack || !currentTime) return;
-
-    const label = `${currentTrack.title} - ${formatTime(currentTime)}`;
-    saveBookmark(currentTime, label);
+    saveBookmark(currentTime);
   };
 
   // Determine what controls to show based on mode
@@ -427,7 +383,6 @@ export default function UnifiedAudioPlayer({
 
         {/* Main Controls */}
         <div className="flex items-center justify-center space-x-6">
-          {/* Skip Backward 10s */}
           <SacredButton
             variant="ghost"
             size="sm"
@@ -439,7 +394,6 @@ export default function UnifiedAudioPlayer({
             <RotateCcw className="h-5 w-5" />
           </SacredButton>
 
-          {/* Play/Pause Button */}
           <SacredButton
             variant="primary"
             size="lg"
@@ -452,7 +406,6 @@ export default function UnifiedAudioPlayer({
             {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="ml-1 h-6 w-6" />}
           </SacredButton>
 
-          {/* Skip Forward 10s */}
           <SacredButton
             variant="ghost"
             size="sm"
@@ -467,25 +420,27 @@ export default function UnifiedAudioPlayer({
 
         {/* Additional Controls */}
         <div className="flex items-center justify-between text-sm">
-          {/* Volume Control */}
           <VolumeControl
             volume={volume}
             isMuted={isMuted}
-            onVolumeChange={handleVolumeChange}
+            onVolumeChange={setVolume}
             onToggleMute={toggleMute}
           />
 
-          {/* Speed Control */}
           <SpeedControl speed={speed} onSpeedChange={changeSpeed} />
 
-          {/* Bookmark Button */}
           <SacredButton
             variant="ghost"
             size="sm"
             onClick={handleSaveBookmark}
-            disabled={!currentTrack || !currentTime}
+            disabled={!currentTrack || !currentTime || !canSaveBookmark}
             className="opacity-80 hover:opacity-100"
             aria-label="Save bookmark"
+            title={
+              !canSaveBookmark 
+                ? `Maximum ${mode === 'single' ? '1' : '2'} bookmark${mode === 'single' ? '' : 's'} reached`
+                : 'Save bookmark'
+            }
           >
             <Bookmark className="h-4 w-4" />
           </SacredButton>
@@ -509,7 +464,7 @@ export default function UnifiedAudioPlayer({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <h4 className="text-sm font-semibold text-sacred-blue-700">
-                Bookmarks ({bookmarks.length})
+                Bookmarks ({bookmarks.length}/{mode === 'single' ? '1' : '2'})
               </h4>
               {bookmarks.length > 0 && (
                 <SacredButton
@@ -541,9 +496,8 @@ export default function UnifiedAudioPlayer({
   );
 }
 
-// Export component types for external use
 export type {
-  UnifiedAudioPlayerProps as AudioPlayerProps,
+  UnifiedAudioPlayerFixedProps as AudioPlayerProps,
   AudioPlayerMode as PlayerMode,
   BookmarkItemProps,
   VolumeControlProps,
