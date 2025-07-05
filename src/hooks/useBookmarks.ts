@@ -119,14 +119,38 @@ export function useBookmarks(
   // Jump to bookmark with cross-section navigation
   const jumpToBookmark = useCallback((bookmark: Bookmark) => {
     try {
-      // If bookmark has a section slug and it's different from current, navigate
+      // If bookmark has a section slug, check if we need to navigate
       if (bookmark.sectionSlug) {
         const currentPath = window.location.pathname;
-        const targetPath = `/sections/${bookmark.sectionSlug}`;
+        const targetPath = `/book/${bookmark.sectionSlug}`;
         
         if (currentPath !== targetPath) {
-          // Navigate to the section with time parameter
-          router.push(`${targetPath}?t=${bookmark.time}`);
+          // Store the timestamp in sessionStorage for pickup after navigation
+          sessionStorage.setItem('pendingBookmarkTime', bookmark.time.toString());
+          
+          // Navigate to the correct section
+          router.push(targetPath);
+          
+          // Set up a one-time listener for route change completion
+          const handleRouteChange = () => {
+            // Small delay to ensure the audio player is ready
+            setTimeout(() => {
+              const pendingTime = sessionStorage.getItem('pendingBookmarkTime');
+              if (pendingTime && onJumpToTime) {
+                onJumpToTime(parseFloat(pendingTime));
+                sessionStorage.removeItem('pendingBookmarkTime');
+              }
+            }, 100);
+          };
+          
+          // Listen for route change completion
+          router.events?.on('routeChangeComplete', handleRouteChange);
+          
+          // Cleanup listener after a reasonable timeout
+          setTimeout(() => {
+            router.events?.off('routeChangeComplete', handleRouteChange);
+          }, 5000);
+          
           return;
         }
       }
