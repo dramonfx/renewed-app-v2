@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useMemo, useState } from 'react';
+import { Suspense, useMemo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
@@ -8,7 +8,7 @@ import { BookOpen, Headphones, Star, ExternalLink } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import SacredCard from '@/components/ui/sacred-card';
 import SacredButton from '@/components/ui/sacred-button';
-import UnifiedAudioPlayer from '@/components/UnifiedAudioPlayer';
+import EnhancedUnifiedAudioPlayer from '@/components/EnhancedUnifiedAudioPlayer';
 
 // Lazy load ReactMarkdown for better performance
 const ReactMarkdown = dynamic(() => import('react-markdown'), {
@@ -79,6 +79,23 @@ function ImmersiveMarkdownContent({ content, components }) {
 export default function ImmersiveSectionPlayer({ section, visuals, visualsMap, params }) {
   // Destructure sectionSlug from params in client component
   const { sectionSlug } = params;
+
+  // Extract timestamp from URL for deep linking from reflections
+  const [startFromTimestamp, setStartFromTimestamp] = useState(null);
+
+  useEffect(() => {
+    // Check for timestamp parameter in URL (from Deep Reflection navigation)
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const timestamp = urlParams.get('t');
+      if (timestamp && !isNaN(parseInt(timestamp))) {
+        setStartFromTimestamp(parseInt(timestamp));
+        // Clean up URL parameter after extracting
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, '', newUrl);
+      }
+    }
+  }, []);
 
   // Ensure we have valid section data
   // Process markdown content with useMemo (always called)
@@ -265,9 +282,10 @@ export default function ImmersiveSectionPlayer({ section, visuals, visualsMap, p
                   </SacredCard>
                 }
               >
-                <UnifiedAudioPlayer
+                <EnhancedUnifiedAudioPlayer
                   mode="single"
                   singleTrackSlug={params?.sectionSlug || section.slug}
+                  startFromTimestamp={startFromTimestamp}
                 />
               </ErrorBoundary>
             </motion.div>
