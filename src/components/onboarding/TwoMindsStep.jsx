@@ -56,14 +56,14 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
               onClick={() => setSelectedMind('old')}
             >
               <div className="text-center">
-                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 shadow-lg ring-2 ring-sacred-gold-200">
+                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 shadow-lg ring-4 ring-sacred-gold-300">
                   <img 
                     src="https://www.svgrepo.com/show/404878/brain.svg" 
                     alt="Multicolored brain" 
                     className="h-8 w-8 filter brightness-0 invert"
                   />
                 </div>
-                <h3 className="mb-4 font-serif text-2xl text-sacred-blue-900 border-b border-sacred-gold-200 pb-2">The Old Mind</h3>
+                <h3 className="mb-4 font-serif text-2xl text-sacred-blue-900 border-b-2 border-sacred-gold-300 pb-2">The Old Mind</h3>
                 <p className="mb-4 leading-relaxed text-sacred-blue-600">
                   Driven by fear, scarcity, and reactive patterns. Lives in the past or future,
                   seeking external validation and operating from limitation.
@@ -103,15 +103,9 @@ const TwoMindsStep = ({ onNext, data = {} }) => {
               onClick={() => setSelectedMind('new')}
             >
               <div className="text-center">
-                {/* Fixed: Sacred Blue orb with gold halo/ring */}
                 <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-sacred-blue-500 to-sacred-blue-600 shadow-lg ring-4 ring-sacred-gold-300">
                   <span className="text-2xl text-white">✨</span>
-                  {/* Add floating stars around the orb */}
-                  <div className="absolute -top-1 -right-1 text-xs text-sacred-gold-400">⭐</div>
-                  <div className="absolute -bottom-1 -left-1 text-xs text-sacred-gold-400">⭐</div>
-                  <div className="absolute top-0 -left-2 text-xs text-sacred-gold-400">✨</div>
                 </div>
-                {/* Gold underline for the title */}
                 <h3 className="mb-4 font-serif text-2xl text-sacred-blue-900 border-b-2 border-sacred-gold-300 pb-2">The New Mind</h3>
                 <p className="mb-4 leading-relaxed text-sacred-blue-600">
                   Rooted in love, abundance, and conscious choice. Lives in the present moment,
