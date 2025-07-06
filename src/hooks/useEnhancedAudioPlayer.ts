@@ -39,8 +39,11 @@ export interface UseEnhancedAudioPlayerReturn {
 
   // Deep Reflections
   reflections: DeepReflection[];
+  allReflections: Record<string, DeepReflection[]>;
   canSaveReflection: boolean;
   getSpiritualPrompt: () => string;
+  getSectionReflectionCount: (sectionSlug: string) => number;
+  getAllSectionsWithReflections: () => Array<{ sectionSlug: string; count: number }>;
 
   // Global Resume
   hasValidResumeState: boolean;
@@ -122,11 +125,15 @@ export function useEnhancedAudioPlayer(options: UseEnhancedAudioPlayerOptions = 
   // Deep Reflections System
   const {
     reflections,
+    allReflections,
     saveReflection,
     deleteReflection,
     clearAllReflections,
+    clearSectionReflections,
     canSaveReflection,
     getSpiritualPrompt,
+    getSectionReflectionCount,
+    getAllSectionsWithReflections,
   } = useDeepReflections(
     {
       mode,
@@ -465,7 +472,19 @@ export function useEnhancedAudioPlayer(options: UseEnhancedAudioPlayerOptions = 
   // === INITIAL LOADING ===
   useEffect(() => {
     if (autoLoad) {
-      loadTracks();
+      loadTracks().catch((err) => {
+        console.error('Failed to load tracks in useEffect:', err);
+        setError('Failed to load audio tracks');
+        setIsLoading(false);
+      });
+      
+      // Fallback timeout to prevent infinite loading
+      const timeoutId = setTimeout(() => {
+        console.warn('Audio loading timeout - forcing loading to false');
+        setIsLoading(false);
+      }, 10000); // 10 second timeout
+      
+      return () => clearTimeout(timeoutId);
     }
   }, [autoLoad, loadTracks]);
 
@@ -501,8 +520,11 @@ export function useEnhancedAudioPlayer(options: UseEnhancedAudioPlayerOptions = 
 
     // Deep Reflections
     reflections,
+    allReflections,
     canSaveReflection,
     getSpiritualPrompt,
+    getSectionReflectionCount,
+    getAllSectionsWithReflections,
 
     // Global Resume
     hasValidResumeState,

@@ -23,22 +23,26 @@ export interface UseDeepReflectionsOptions {
 
 export interface UseDeepReflectionsReturn {
   reflections: DeepReflection[];
+  allReflections: Record<string, DeepReflection[]>;
   saveReflection: (timestamp: number, reflectionText?: string) => void;
   deleteReflection: (reflectionId: string) => void;
   clearAllReflections: () => void;
+  clearSectionReflections: (sectionSlug: string) => void;
   canSaveReflection: boolean;
   getReflectionSummary: (reflection: DeepReflection) => string;
   getSpiritualPrompt: () => string;
+  getSectionReflectionCount: (sectionSlug: string) => number;
+  getAllSectionsWithReflections: () => Array<{ sectionSlug: string; count: number }>;
 }
 
 /**
- * Deep Reflections Hook - Spiritual Bookmark System
+ * Deep Reflections Hook - Section-Specific Spiritual Bookmark System
  * 
  * Transforms basic bookmarks into meaningful spiritual engagement points:
  * - "Deep Reflections" framing for spiritual growth
- * - Section context and spiritual prompts
+ * - Section-specific context and spiritual prompts
  * - Intent-based engagement
- * - Limited to 5 total reflections for focused meditation
+ * - Limited to 5 reflections per section for focused meditation
  */
 export function useDeepReflections(
   options: UseDeepReflectionsOptions,
@@ -51,10 +55,12 @@ export function useDeepReflections(
     maxReflections = 5 
   } = options;
   
+  // State for all reflections (section-keyed) and current section reflections
+  const [allReflections, setAllReflections] = useState<Record<string, DeepReflection[]>>({});
   const [reflections, setReflections] = useState<DeepReflection[]>([]);
 
-  // Storage key for global reflections
-  const storageKey = 'deep-reflections-v1';
+  // Storage key for section-keyed reflections
+  const storageKey = 'deep-reflections-v2';
 
   // Spiritual prompts for intent-based engagement
   const spiritualPrompts = useMemo(() => [
@@ -68,35 +74,62 @@ export function useDeepReflections(
     "How is this renewing your thinking?",
   ], []);
 
-  // Load reflections from localStorage
-  const loadReflections = useCallback(() => {
+  // Load all reflections from localStorage
+  const loadAllReflections = useCallback(() => {
     try {
       const stored = localStorage.getItem(storageKey);
       if (stored) {
         const parsed = JSON.parse(stored);
-        setReflections(Array.isArray(parsed) ? parsed : []);
+        // Handle migration from old format (v1) to new format (v2)
+        if (Array.isArray(parsed)) {
+          // Migrate old global array to section-keyed structure
+          const migrated: Record<string, DeepReflection[]> = {};
+          parsed.forEach((reflection: DeepReflection) => {
+            const sectionKey = reflection.sectionSlug || 'unknown';
+            if (!migrated[sectionKey]) {
+              migrated[sectionKey] = [];
+            }
+            migrated[sectionKey].push(reflection);
+          });
+          setAllReflections(migrated);
+          // Save migrated format
+          localStorage.setItem(storageKey, JSON.stringify(migrated));
+        } else if (typeof parsed === 'object' && parsed !== null) {
+          setAllReflections(parsed);
+        } else {
+          setAllReflections({});
+        }
       } else {
-        setReflections([]);
+        setAllReflections({});
       }
     } catch (error) {
       console.error('Error loading Deep Reflections:', error);
-      setReflections([]);
+      setAllReflections({});
     }
   }, [storageKey]);
 
-  // Save reflections to localStorage
-  const saveReflectionsToStorage = useCallback((reflectionsToSave: DeepReflection[]) => {
+  // Save all reflections to localStorage
+  const saveAllReflectionsToStorage = useCallback((allReflectionsToSave: Record<string, DeepReflection[]>) => {
     try {
-      localStorage.setItem(storageKey, JSON.stringify(reflectionsToSave));
+      localStorage.setItem(storageKey, JSON.stringify(allReflectionsToSave));
     } catch (error) {
       console.error('Error saving Deep Reflections:', error);
     }
   }, [storageKey]);
 
-  // Load reflections on mount
+  // Load all reflections on mount
   useEffect(() => {
-    loadReflections();
-  }, [loadReflections]);
+    loadAllReflections();
+  }, [loadAllReflections]);
+
+  // Filter reflections for current section
+  useEffect(() => {
+    if (currentTrackSlug && allReflections[currentTrackSlug]) {
+      setReflections(allReflections[currentTrackSlug]);
+    } else {
+      setReflections([]);
+    }
+  }, [currentTrackSlug, allReflections]);
 
   // Get random spiritual prompt for engagement
   const getSpiritualPrompt = useCallback((): string => {
@@ -117,7 +150,7 @@ export function useDeepReflections(
     return `${reflection.sectionTitle} - ${timeStr} - Deep Reflection`;
   }, [formatTime]);
 
-  // Save a new deep reflection
+  // Save a new deep reflection (section-specific)
   const saveReflection = useCallback((timestamp: number, reflectionText?: string) => {
     if (!currentTrackSlug || !currentTrackTitle) {
       console.warn('Cannot save reflection: missing track information');
@@ -127,29 +160,32 @@ export function useDeepReflections(
     const newReflection: DeepReflection = {
       id: `reflection-${Date.now()}`,
       timestamp,
-      sectionSlug: currentTrackSlug || '',
-      sectionTitle: currentTrackTitle || '',
+      sectionSlug: currentTrackSlug,
+      sectionTitle: currentTrackTitle,
       reflectionText: reflectionText || getSpiritualPrompt(),
       spiritualPrompt: getSpiritualPrompt(),
       createdAt: new Date().toISOString(),
       isFromFullPlayer: mode === 'full',
     };
 
-    setReflections(prev => {
-      let updatedReflections = [...prev];
+    setAllReflections(prev => {
+      const updated = { ...prev };
+      const sectionKey = currentTrackSlug; // TypeScript-safe assignment
+      const sectionReflections = updated[sectionKey] || [];
       
       // Add new reflection
-      updatedReflections.push(newReflection);
+      let updatedSectionReflections = [...sectionReflections, newReflection];
       
-      // Keep only the most recent reflections up to maxReflections
-      if (updatedReflections.length > maxReflections) {
-        updatedReflections = updatedReflections
+      // Keep only the most recent reflections up to maxReflections per section
+      if (updatedSectionReflections.length > maxReflections) {
+        updatedSectionReflections = updatedSectionReflections
           .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
           .slice(0, maxReflections);
       }
       
-      saveReflectionsToStorage(updatedReflections);
-      return updatedReflections;
+      updated[sectionKey] = updatedSectionReflections;
+      saveAllReflectionsToStorage(updated);
+      return updated;
     });
   }, [
     mode, 
@@ -157,35 +193,73 @@ export function useDeepReflections(
     currentTrackTitle, 
     maxReflections, 
     getSpiritualPrompt, 
-    saveReflectionsToStorage
+    saveAllReflectionsToStorage
   ]);
 
-  // Delete a specific reflection
+  // Delete a specific reflection (section-aware)
   const deleteReflection = useCallback((reflectionId: string) => {
-    setReflections(prev => {
-      const updated = prev.filter(reflection => reflection.id !== reflectionId);
-      saveReflectionsToStorage(updated);
+    if (!currentTrackSlug) return;
+
+    setAllReflections(prev => {
+      const updated = { ...prev };
+      const sectionKey = currentTrackSlug; // TypeScript-safe assignment
+      const sectionReflections = updated[sectionKey] || [];
+      updated[sectionKey] = sectionReflections.filter(reflection => reflection.id !== reflectionId);
+      
+      // Remove section key if no reflections left
+      if (updated[sectionKey].length === 0) {
+        delete updated[sectionKey];
+      }
+      
+      saveAllReflectionsToStorage(updated);
       return updated;
     });
-  }, [saveReflectionsToStorage]);
+  }, [currentTrackSlug, saveAllReflectionsToStorage]);
 
-  // Clear all reflections
+  // Clear all reflections across all sections
   const clearAllReflections = useCallback(() => {
-    setReflections([]);
+    setAllReflections({});
     localStorage.removeItem(storageKey);
   }, [storageKey]);
 
-  // Check if we can save a new reflection
+  // Clear reflections for a specific section
+  const clearSectionReflections = useCallback((sectionSlug: string) => {
+    setAllReflections(prev => {
+      const updated = { ...prev };
+      delete updated[sectionSlug];
+      saveAllReflectionsToStorage(updated);
+      return updated;
+    });
+  }, [saveAllReflectionsToStorage]);
+
+  // Get reflection count for a specific section
+  const getSectionReflectionCount = useCallback((sectionSlug: string): number => {
+    return allReflections[sectionSlug]?.length || 0;
+  }, [allReflections]);
+
+  // Get all sections that have reflections with their counts
+  const getAllSectionsWithReflections = useCallback((): Array<{ sectionSlug: string; count: number }> => {
+    return Object.entries(allReflections).map(([sectionSlug, sectionReflections]) => ({
+      sectionSlug,
+      count: sectionReflections.length,
+    }));
+  }, [allReflections]);
+
+  // Check if we can save a new reflection (section-specific)
   const canSaveReflection = reflections.length < maxReflections;
 
   return {
     reflections,
+    allReflections,
     saveReflection,
     deleteReflection,
     clearAllReflections,
+    clearSectionReflections,
     canSaveReflection,
     getReflectionSummary,
     getSpiritualPrompt,
+    getSectionReflectionCount,
+    getAllSectionsWithReflections,
   };
 }
 

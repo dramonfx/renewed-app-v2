@@ -41,12 +41,34 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
   const [currentIndex, setCurrentIndex] = useState(currentTrackIndex);
   const [showPlaylistPanel, setShowPlaylistPanel] = useState(showPlaylist);
 
-  const [state, controls] = useEnhancedAudioPlayer({
+  const audioPlayer = useEnhancedAudioPlayer({
+    autoLoad: true,
     autoPlay,
-    analytics: true,
-    keyboardShortcuts: true,
-    errorRecovery: true,
+    mode: 'full',
   });
+  
+  // Extract commonly used state and controls for backward compatibility
+  const state = {
+    isPlaying: audioPlayer.isPlaying,
+    currentTime: audioPlayer.currentTime,
+    duration: audioPlayer.duration,
+    volume: audioPlayer.volume,
+    speed: audioPlayer.speed,
+    error: audioPlayer.error,
+    isLoading: audioPlayer.isLoading,
+    currentTrack: audioPlayer.currentTrack,
+  };
+  
+  const controls = {
+    play: () => audioPlayer.playPause(),
+    pause: () => audioPlayer.playPause(),
+    stop: () => audioPlayer.seek(0),
+    seek: (time: number) => audioPlayer.seek(time),
+    setVolume: (volume: number) => audioPlayer.setVolume(volume),
+    nextTrack: () => audioPlayer.nextTrack(),
+    previousTrack: () => audioPlayer.previousTrack(),
+    loadTrack: (track: any) => console.log('Loading track:', track), // Mock implementation
+  };
 
   // Load initial track
   useEffect(() => {

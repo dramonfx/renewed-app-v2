@@ -25,6 +25,8 @@ export interface DeepReflectionsPanelProps {
   formatTime: (time: number) => string;
   mode: 'single' | 'full';
   className?: string;
+  currentSection?: string; // Current section for filtering
+  allReflections?: Record<string, DeepReflection[]>; // All reflections for cross-section info
 }
 
 interface ReflectionItemProps {
@@ -152,9 +154,21 @@ export default function DeepReflectionsPanel({
   formatTime,
   mode,
   className = '',
+  currentSection,
+  allReflections,
 }: DeepReflectionsPanelProps) {
   const hasReflections = reflections.length > 0;
   const maxReflections = 5;
+  
+  // Calculate total reflections across all sections
+  const totalReflectionsCount = allReflections 
+    ? Object.values(allReflections).reduce((total, sectionReflections) => total + sectionReflections.length, 0)
+    : reflections.length;
+  
+  // Calculate sections with reflections count
+  const sectionsWithReflections = allReflections 
+    ? Object.keys(allReflections).length 
+    : (hasReflections ? 1 : 0);
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -166,10 +180,23 @@ export default function DeepReflectionsPanel({
           </div>
           <div>
             <h3 className="text-lg font-semibold text-sacred-blue-900">
-              Deep Reflections
+              {mode === 'single' && currentSection ? 'Section Reflections' : 'Deep Reflections'}
             </h3>
             <p className="text-sm text-sacred-blue-600">
-              {reflections.length} of {maxReflections} sacred moments captured
+              {mode === 'single' && currentSection ? (
+                <>
+                  {reflections.length} of {maxReflections} in this section
+                  {totalReflectionsCount > reflections.length && (
+                    <span className="ml-2 text-xs opacity-75">
+                      ({totalReflectionsCount} total across {sectionsWithReflections} sections)
+                    </span>
+                  )}
+                </>
+              ) : (
+                <>
+                  {totalReflectionsCount} total reflections across {sectionsWithReflections} sections
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -191,13 +218,21 @@ export default function DeepReflectionsPanel({
         <div className="flex items-start space-x-3">
           <Sparkles className="w-5 h-5 text-sacred-gold-500 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-sacred-blue-700">
-            <p className="font-medium mb-1">Moments of Divine Revelation</p>
+            <p className="font-medium mb-1">
+              {mode === 'single' && currentSection ? 'Section Meditation Space' : 'Moments of Divine Revelation'}
+            </p>
             <p className="text-xs opacity-90 leading-relaxed">
-              These are sacred moments where the Spirit spoke to your heart. 
-              {mode === 'full' 
-                ? ' Click to study them deeply in focused meditation.' 
-                : ' Click to return to those transformative moments.'
-              }
+              {mode === 'single' && currentSection ? (
+                'These are sacred moments from this specific section where the Spirit spoke to your heart. Each section becomes its own focused meditation space.'
+              ) : (
+                <>
+                  These are sacred moments where the Spirit spoke to your heart across your spiritual journey. 
+                  {mode === 'full' 
+                    ? ' Click to study them deeply in their original context.' 
+                    : ' Click to return to those transformative moments.'
+                  }
+                </>
+              )}
             </p>
           </div>
         </div>

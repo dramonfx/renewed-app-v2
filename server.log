@@ -1,11 +1,46 @@
-Internal Error: renewed-app-v2@workspace:.: This package doesn't seem to be present in your lockfile; run "yarn install" to update the lockfile
-    at jR.getCandidates (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:204:8149)
-    at em.getCandidates (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:141:1311)
-    at /home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:8420
-    at qE (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:140:54028)
-    at dt (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:8400)
-    at async Promise.allSettled (index 0)
-    at async Uu (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:140:53356)
-    at async /home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:9166
-    at async Yi.startProgressPromise (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:140:140548)
-    at async t.resolveEverything (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:7138)
+   ▲ Next.js 15.3.2
+   - Local:        http://localhost:3000
+   - Network:      http://100.113.61.5:3000
+   - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Ready in 2.3s
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 877ms (108 modules)
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 9.3s (1707 modules)
+ GET /dashboard 200 in 10094ms
+ ✓ Compiled in 896ms (785 modules)
+ ○ Compiling /onboarding ...
+ ✓ Compiled /onboarding in 749ms (938 modules)
+ ✓ Compiled in 1132ms (781 modules)
+ GET /favicon.ico 200 in 2429ms
+ GET /onboarding 200 in 2436ms
+ GET /favicon.ico 200 in 15ms
+ GET /favicon.ico 200 in 16ms
+ ○ Compiling /full-audio-player ...
+ ✓ Compiled /full-audio-player in 910ms (1840 modules)
+ GET /full-audio-player 200 in 1227ms
+ GET /favicon.ico 200 in 27ms
+ ○ Compiling /api/chart-visual ...
+ ✓ Compiled /api/chart-visual in 1038ms (1928 modules)
+ GET /api/chart-visual 200 in 1977ms
+ GET /api/audio-tracks 200 in 2058ms
+ ○ Compiling /book/[sectionSlug] ...
+ ✓ Compiled /book/[sectionSlug] in 2.4s (2504 modules)
+Section fetch error for slug: prologue Error: JSON object requested, multiple (or no) rows returned
+Unexpected error in SectionPage: Error: NEXT_HTTP_ERROR_FALLBACK;404
+    at notFound (../../../src/client/components/not-found.ts:25:16)
+    at SectionPage (src/app/book/[sectionSlug]/page.js:100:14)
+  23 | export function notFound(): never {
+  24 |   // eslint-disable-next-line no-throw-literal
+> 25 |   const error = new Error(DIGEST) as HTTPAccessFallbackError
+     |                ^
+  26 |   ;(error as HTTPAccessFallbackError).digest = DIGEST
+  27 |
+  28 |   throw error {
+  digest: 'NEXT_HTTP_ERROR_FALLBACK;404'
+}
+Section failed after 404ms
+ GET /book/prologue 404 in 4184ms
+ GET /favicon.ico 200 in 28ms

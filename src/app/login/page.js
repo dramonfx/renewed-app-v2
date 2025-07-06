@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useLogin } from '@/hooks/useLogin';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
@@ -10,7 +10,7 @@ import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
 import SacredInput from '@/components/ui/sacred-input';
 
-export default function LoginPage() {
+function LoginContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginSuccess, setLoginSuccess] = useState(false);
@@ -266,5 +266,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <LoginContent />
+    </Suspense>
   );
 }
