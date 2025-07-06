@@ -19,6 +19,18 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 export async function middleware(req: NextRequest) {
   console.log('🛡️  THE ONE TRUE GATEKEEPER AWAKENS - Protecting:', req.nextUrl.pathname)
   
+  // =============================================================================
+  // AUTHENTICATION BYPASS - Check for SKIP_AUTH environment variable
+  // =============================================================================
+  const skipAuth = process.env.SKIP_AUTH === 'true'
+  if (skipAuth) {
+    console.log('🚧 AUTHENTICATION BYPASS ACTIVE - SKIP_AUTH=true detected')
+    console.log('✅ ACCESS GRANTED - Authentication bypassed for testing')
+    const response = NextResponse.next()
+    response.headers.set('X-Auth-Bypassed', 'true')
+    return response
+  }
+  
   const startTime = Date.now()
   const { pathname, search, origin } = req.nextUrl
   const fullPath = pathname + search

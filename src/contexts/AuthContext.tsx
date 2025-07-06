@@ -38,7 +38,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true); // Start with loading true
   const router = useRouter();
 
+  // Check if authentication should be bypassed
+  const skipAuth = process.env.NEXT_PUBLIC_SKIP_AUTH === 'true';
+
   useEffect(() => {
+    // If authentication is bypassed, provide mock user and skip session checks
+    if (skipAuth) {
+      console.log('🚧 AuthContext: SKIP_AUTH active - providing mock authenticated user');
+      const mockUser: User = {
+        id: 'mock-user-id',
+        email: 'test@example.com',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      setUser(mockUser);
+      setLoading(false);
+      return;
+    }
+
     // Check for an existing session
     const getSession = async (): Promise<void> => {
       try {
@@ -78,6 +95,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Signup function
   const signUp = async (email: string, password: string): Promise<AuthResult> => {
+    // If auth is bypassed, return mock success
+    if (skipAuth) {
+      console.log('🚧 AuthContext: SKIP_AUTH active - mock signup success');
+      const mockUser: User = {
+        id: 'mock-user-id',
+        email: email,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      setUser(mockUser);
+      return {
+        user: mockUser,
+        session: { user: mockUser },
+        error: null,
+      };
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -107,6 +141,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     password: string,
     redirectPath?: string
   ): Promise<AuthResult> => {
+    // If auth is bypassed, return mock success
+    if (skipAuth) {
+      console.log('🚧 AuthContext: SKIP_AUTH active - mock login success');
+      const mockUser: User = {
+        id: 'mock-user-id',
+        email: email,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      setUser(mockUser);
+      
+      // Handle redirect after successful mock login
+      const targetPath = redirectPath || '/dashboard';
+      setTimeout(() => {
+        router.push(targetPath);
+      }, 500);
+      
+      return {
+        user: mockUser,
+        session: { user: mockUser },
+        error: null,
+      };
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -141,6 +199,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Logout function
   const logout = async (): Promise<AuthError> => {
+    // If auth is bypassed, return mock success
+    if (skipAuth) {
+      console.log('🚧 AuthContext: SKIP_AUTH active - mock logout success');
+      setUser(null);
+      router.push('/login');
+      return { error: null };
+    }
+
     setLoading(true);
     try {
       const { error } = await supabase.auth.signOut();
