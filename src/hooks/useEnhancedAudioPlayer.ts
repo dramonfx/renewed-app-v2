@@ -167,9 +167,8 @@ export function useEnhancedAudioPlayer(options: UseEnhancedAudioPlayerOptions = 
   // === API LOADING ===
   const loadTracks = useCallback(async (): Promise<AudioTrack[]> => {
     try {
-      setIsLoading(true);
-      setError(null);
-
+      console.log('🔄 Loading tracks...', { mode, singleTrackSlug });
+      
       const response = await fetch('/api/audio-tracks');
       const data = await response.json();
 
@@ -182,10 +181,12 @@ export function useEnhancedAudioPlayer(options: UseEnhancedAudioPlayerOptions = 
       }
 
       let validTracks: AudioTrack[] = data.tracks || [];
+      console.log('📊 Raw tracks loaded:', validTracks.length);
 
       // If single track mode, filter by slug
       if (singleTrackSlug) {
         validTracks = validTracks.filter((track) => track.slug === singleTrackSlug);
+        console.log(`🎯 Filtered tracks for slug "${singleTrackSlug}":`, validTracks.length);
 
         if (validTracks.length === 0) {
           throw new Error(`No audio track found with slug "${singleTrackSlug}"`);
@@ -193,13 +194,12 @@ export function useEnhancedAudioPlayer(options: UseEnhancedAudioPlayerOptions = 
       }
 
       setTracks(validTracks);
-      setIsLoading(false);
+      console.log('✅ Tracks set successfully:', validTracks.length);
       return validTracks;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       console.error('❌ Error loading tracks via API:', err);
       setError(errorMessage);
-      setIsLoading(false);
       return [];
     }
   }, [singleTrackSlug]);
@@ -472,19 +472,33 @@ export function useEnhancedAudioPlayer(options: UseEnhancedAudioPlayerOptions = 
   // === INITIAL LOADING ===
   useEffect(() => {
     if (autoLoad) {
-      loadTracks().catch((err) => {
-        console.error('Failed to load tracks in useEffect:', err);
-        setError('Failed to load audio tracks');
-        setIsLoading(false);
-      });
+      // Start loading immediately
+      setIsLoading(true);
+      setError(null);
+      
+      loadTracks()
+        .then((loadedTracks) => {
+          console.log('✅ Tracks loaded successfully:', loadedTracks.length);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.error('Failed to load tracks in useEffect:', err);
+          setError('Failed to load audio tracks');
+          setIsLoading(false);
+        });
       
       // Fallback timeout to prevent infinite loading
       const timeoutId = setTimeout(() => {
         console.warn('Audio loading timeout - forcing loading to false');
         setIsLoading(false);
-      }, 10000); // 10 second timeout
+        if (!tracks || tracks.length === 0) {
+          setError('Loading timeout - please refresh the page');
+        }
+      }, 8000); // 8 second timeout
       
       return () => clearTimeout(timeoutId);
+    } else {
+      setIsLoading(false);
     }
     // Return empty cleanup function when autoLoad is false
     return () => {};
