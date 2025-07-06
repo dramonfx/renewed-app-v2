@@ -486,6 +486,8 @@ export function useEnhancedAudioPlayer(options: UseEnhancedAudioPlayerOptions = 
       
       return () => clearTimeout(timeoutId);
     }
+    // Return empty cleanup function when autoLoad is false
+    return () => {};
   }, [autoLoad, loadTracks]);
 
   // === AUTO-RESUME FOR FULL PLAYER ===

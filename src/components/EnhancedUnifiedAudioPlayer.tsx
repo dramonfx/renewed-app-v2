@@ -24,9 +24,7 @@ import {
 } from 'lucide-react';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
-// import DeepReflectionsPanel from '@/components/DeepReflectionsPanel';
-// import GlobalResumePanel from '@/components/GlobalResumePanel';
-// import { useEnhancedAudioPlayer } from '@/hooks/useEnhancedAudioPlayer';
+import { useEnhancedAudioPlayer } from '@/hooks/useEnhancedAudioPlayer';
 
 export type AudioPlayerMode = 'full' | 'single';
 
@@ -278,164 +276,58 @@ export default function EnhancedUnifiedAudioPlayer({
   // Local state for UI
   const [showSpiritualPrompt, setShowSpiritualPrompt] = useState(false);
 
-  // Simplified initialization to avoid loading hang
-  const [tracks, setTracks] = React.useState([]);
-  const [currentTrackIndex, setCurrentTrackIndex] = React.useState(0);
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const [currentTime, setCurrentTime] = React.useState(0);
-  const [duration, setDuration] = React.useState(0);
-  const [speed, setSpeed] = React.useState(1);
-  const [volume, setVolume] = React.useState(0.8);
-  const [isMuted, setIsMuted] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState(null);
-  
-  const audioRef = React.useRef(null);
-  
-  const currentTrack = React.useMemo(() => tracks[currentTrackIndex] || null, [tracks, currentTrackIndex]);
-  
-  // Mock reflection data for now
-  const getSectionReflectionCount = React.useCallback((sectionSlug) => {
-    // Mock data - could return 1-5 randomly for demo
-    const mockCounts = { '00_prologue': 3, '01_intro_through_next_steps': 2, '02_kingdom_government': 5 };
-    return mockCounts[sectionSlug] || 0;
-  }, []);
-  
-  const canSaveReflection = true;
-  const getSpiritualPrompt = () => "Take a moment to reflect on this wisdom...";
-  const hasValidResumeState = false;
-  const getResumeText = () => null;
-  
-  // Load tracks and force loading to complete
-  React.useEffect(() => {
-    async function loadTracks() {
-      try {
-        console.log('🎵 Loading tracks for mode:', mode, 'slug:', singleTrackSlug);
-        const response = await fetch('/api/audio-tracks');
-        const data = await response.json();
-        console.log('🎵 Tracks response:', data);
-        if (data.success) {
-          const filteredTracks = mode === 'single' && singleTrackSlug 
-            ? data.tracks.filter(t => t.slug === singleTrackSlug)
-            : data.tracks;
-          console.log('🎵 Setting tracks:', filteredTracks);
-          setTracks(filteredTracks);
-        }
-      } catch (err) {
-        console.error('🎵 Error loading tracks:', err);
-        setError('Failed to load audio tracks');
-      } finally {
-        console.log('🎵 Setting loading to false');
-        setIsLoading(false);
-      }
-    }
-    loadTracks();
-    
-    // Force loading to complete after 2 seconds regardless
-    const forceComplete = setTimeout(() => {
-      console.log('🎵 Force completing loading...');
-      setIsLoading(false);
-      // Add some mock tracks if none loaded
-      setTracks(prev => prev.length === 0 ? [
-        { id: '1', title: 'Prologue', slug: '00_prologue', audioUrl: 'https://example.com/audio.mp3' },
-        { id: '2', title: 'Introduction Through Next Steps', slug: '01_intro_through_next_steps', audioUrl: 'https://example.com/audio.mp3' }
-      ] : prev);
-    }, 2000);
-    
-    return () => clearTimeout(forceComplete);
-  }, [mode, singleTrackSlug]);
-  
-  // Basic controls
-  const playPause = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
-  
-  const nextTrack = () => {
-    if (currentTrackIndex < tracks.length - 1) {
-      setCurrentTrackIndex(currentTrackIndex + 1);
-    }
-  };
-  
-  const previousTrack = () => {
-    if (currentTrackIndex > 0) {
-      setCurrentTrackIndex(currentTrackIndex - 1);
-    }
-  };
-  
-  const playTrackAtIndex = (index) => setCurrentTrackIndex(index);
-  
-  const seek = (time) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-      setCurrentTime(time);
-    }
-  };
-  
-  const skipForward10 = () => seek(currentTime + 10);
-  const skipBackward10 = () => seek(currentTime - 10);
-  
-  const changeSpeed = () => {
-    const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
-    const currentIndex = speeds.indexOf(speed);
-    const nextSpeed = speeds[(currentIndex + 1) % speeds.length];
-    setSpeed(nextSpeed);
-    if (audioRef.current) audioRef.current.playbackRate = nextSpeed;
-  };
-  
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-    if (audioRef.current) audioRef.current.muted = !isMuted;
-  };
-  
-  const formatTime = (time) => {
-    if (isNaN(time)) return '0:00';
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  };
-  
-  // Mock functions for features not immediately needed
-  const saveDeepReflection = () => {};
-  const resumeFromGlobalState = () => {};
-  const clearResumeState = () => {};
-  
-  // Audio event handlers
-  React.useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !currentTrack?.audioUrl) return;
-    
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
-    const handleLoadedMetadata = () => setDuration(audio.duration);
-    const handleEnded = () => {
-      setIsPlaying(false);
-      if (currentTrackIndex < tracks.length - 1) {
-        nextTrack();
-      }
-    };
-    
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('ended', handleEnded);
-    
-    // Update audio source
-    audio.src = currentTrack.audioUrl;
-    audio.volume = volume;
-    audio.muted = isMuted;
-    audio.playbackRate = speed;
-    
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('ended', handleEnded);
-    };
-  }, [currentTrack, volume, isMuted, speed, currentTrackIndex, tracks.length]);
+  // Use the enhanced audio player hook with proper configuration
+  const {
+    // State values
+    tracks,
+    currentTrack,
+    currentTrackIndex,
+    isPlaying,
+    currentTime,
+    duration,
+    speed,
+    volume,
+    isMuted,
+    isLoading,
+    error,
+
+    // Deep Reflections
+    canSaveReflection,
+    getSpiritualPrompt,
+    getSectionReflectionCount,
+
+    // Global Resume
+    hasValidResumeState,
+    getResumeText,
+
+    // Audio element ref
+    audioRef,
+
+    // Control functions
+    playPause,
+    nextTrack,
+    previousTrack,
+    playTrackAtIndex,
+    seek,
+    skipForward10,
+    skipBackward10,
+    changeSpeed,
+    setVolume,
+    toggleMute,
+
+    // Enhanced functions
+    saveDeepReflection,
+    resumeFromGlobalState,
+    clearResumeState,
+
+    // Utility functions
+    formatTime,
+  } = useEnhancedAudioPlayer({
+    mode,
+    singleTrackSlug,
+    autoLoad: true,
+    autoPlay: false,
+  });
 
   // Notify parent of track changes
   React.useEffect(() => {

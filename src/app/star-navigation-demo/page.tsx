@@ -14,7 +14,7 @@ const mockTracks = [
   { id: '5', title: 'Characteristics of Principles', slug: '04_characteristics_of_principles' },
 ];
 
-const mockReflectionCounts = {
+const mockReflectionCounts: Record<string, number> = {
   '00_prologue': 3,
   '01_intro_through_next_steps': 2,
   '02_kingdom_government': 5,

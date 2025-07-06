@@ -170,7 +170,7 @@ export function useDeepReflections(
 
     setAllReflections(prev => {
       const updated = { ...prev };
-      const sectionKey = currentTrackSlug; // TypeScript-safe assignment
+      const sectionKey = currentTrackSlug!; // TypeScript-safe assignment (we already checked above)
       const sectionReflections = updated[sectionKey] || [];
       
       // Add new reflection
@@ -202,7 +202,7 @@ export function useDeepReflections(
 
     setAllReflections(prev => {
       const updated = { ...prev };
-      const sectionKey = currentTrackSlug; // TypeScript-safe assignment
+      const sectionKey = currentTrackSlug!; // TypeScript-safe assignment (we already checked above)
       const sectionReflections = updated[sectionKey] || [];
       updated[sectionKey] = sectionReflections.filter(reflection => reflection.id !== reflectionId);
       

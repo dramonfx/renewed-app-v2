@@ -1,60 +1,11 @@
-
-> renewed-app-v2@0.1.0 dev
-> next dev
-
-   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
-   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
-   ▲ Next.js 15.3.2
-   - Local:        http://localhost:3000
-   - Network:      http://100.113.89.136:3000
-   - Environments: .env.local, .env
-
- ✓ Starting...
-   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
-   Loading config from /home/ubuntu/renewed-app-v2/next.config.mjs
- ✓ Ready in 3.1s
- ○ Compiling /middleware ...
- ✓ Compiled /middleware in 525ms (108 modules)
- ○ Compiling /full-audio-player ...
- ✓ Compiled /full-audio-player in 6.1s (1789 modules)
- GET /full-audio-player 200 in 7111ms
- ✓ Compiled in 795ms (824 modules)
- ○ Compiling /api/chart-visual ...
- ✓ Compiled /api/chart-visual in 787ms (981 modules)
- ✓ Compiled in 1031ms (813 modules)
- GET /favicon.ico 200 in 2708ms
- GET /api/chart-visual 200 in 2881ms
- GET /api/audio-tracks 200 in 2883ms
- GET /full-audio-player 200 in 138ms
- GET /favicon.ico 200 in 25ms
- GET /api/chart-visual 200 in 472ms
- GET /api/audio-tracks 200 in 611ms
- GET /full-audio-player 200 in 68ms
- GET /favicon.ico 200 in 23ms
- GET /api/chart-visual 200 in 479ms
- GET /api/audio-tracks 200 in 930ms
- ○ Compiling /book/[sectionSlug] ...
- ✓ Compiled /book/[sectionSlug] in 1889ms (2461 modules)
-Section fetch error for slug: prologue Error: JSON object requested, multiple (or no) rows returned
-Unexpected error in SectionPage: Error: NEXT_HTTP_ERROR_FALLBACK;404
-    at notFound (.next/server/vendor-chunks/next.js:858:41)
-    at SectionPage (.next/server/app/book/[sectionSlug]/page.js:347:70) {
-  digest: 'NEXT_HTTP_ERROR_FALLBACK;404'
-}
-Section failed after 334ms
- GET /book/prologue 404 in 3136ms
- GET /favicon.ico 200 in 22ms
- GET /favicon.ico 200 in 21ms
- ✓ Compiled /dashboard in 487ms (2468 modules)
- GET /dashboard 200 in 606ms
- GET /favicon.ico 200 in 21ms
- ○ Compiling /onboarding ...
- ✓ Compiled /onboarding in 773ms (2491 modules)
- GET /onboarding 200 in 838ms
- GET /favicon.ico 200 in 20ms
-[?25h
-npm notice
-npm notice New major version of npm available! 10.9.2 -> 11.4.2
-npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.4.2
-npm notice To update run: npm install -g npm@11.4.2
-npm notice
+Internal Error: renewed-app-v2@workspace:.: This package doesn't seem to be present in your lockfile; run "yarn install" to update the lockfile
+    at jR.getCandidates (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:204:8149)
+    at em.getCandidates (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:141:1311)
+    at /home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:8420
+    at qE (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:140:54028)
+    at dt (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:8400)
+    at async Promise.allSettled (index 0)
+    at async Uu (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:140:53356)
+    at async /home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:9166
+    at async Yi.startProgressPromise (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:140:140548)
+    at async t.resolveEverything (/home/ubuntu/.cache/node/corepack/v1/yarn/4.9.2/yarn.js:209:7138)

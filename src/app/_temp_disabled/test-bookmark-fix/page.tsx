@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import SacredCard from '@/components/ui/sacred-card';
 import SacredButton from '@/components/ui/sacred-button';
-import UnifiedAudioPlayerFixed from '@/components/UnifiedAudioPlayerFixed';
+import EnhancedUnifiedAudioPlayer from '@/components/EnhancedUnifiedAudioPlayer';
 
 /**
  * Bookmark System Fix Test Page
@@ -99,7 +99,7 @@ export default function TestBookmarkFixPage() {
             <h2 className="mb-4 text-center text-xl font-semibold text-sacred-blue-900">
               {mode === 'single' ? 'Single Player Test' : 'Full Player Test'}
             </h2>
-            <UnifiedAudioPlayerFixed
+            <EnhancedUnifiedAudioPlayer
               mode={mode}
               singleTrackSlug={mode === 'single' ? 'section-1' : null}
               onTrackChange={(track) => {
