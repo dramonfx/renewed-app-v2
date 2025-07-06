@@ -21,7 +21,7 @@ import {
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
 import { useAudioPlayerFixed } from '@/hooks/useAudioPlayerFixed';
-import type { SimpleBookmark } from '@/hooks/useSimpleBookmarks';
+import type { Bookmark as BookmarkType } from '@/hooks/useBookmarks';
 
 export type AudioPlayerMode = 'full' | 'single';
 
@@ -34,8 +34,8 @@ export interface UnifiedAudioPlayerFixedProps {
 }
 
 interface BookmarkItemProps {
-  bookmark: SimpleBookmark;
-  onJump: (bookmark: SimpleBookmark) => void;
+  bookmark: BookmarkType;
+  onJump: (bookmark: BookmarkType) => void;
   onDelete: (id: string) => void;
   formatTime: (time: number) => string;
 }

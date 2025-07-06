@@ -3,8 +3,8 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useSimpleBookmarks } from './useSimpleBookmarks';
-import type { SimpleBookmark } from './useSimpleBookmarks';
+import { useBookmarks } from './useBookmarks';
+import type { Bookmark } from './useBookmarks';
 
 export interface AudioTrack {
   id: string;
@@ -35,7 +35,7 @@ export interface UseAudioPlayerReturn {
   isMuted: boolean;
   isLoading: boolean;
   error: string | null;
-  bookmarks: SimpleBookmark[];
+  bookmarks: Bookmark[];
 
   // Audio element ref
   audioRef: React.RefObject<HTMLAudioElement>;
@@ -56,7 +56,7 @@ export interface UseAudioPlayerReturn {
 
   // Bookmark functions
   saveBookmark: (time?: number, label?: string) => void;
-  jumpToBookmark: (bookmark: SimpleBookmark) => void;
+  jumpToBookmark: (bookmark: Bookmark) => void;
   deleteBookmark: (bookmarkId: string) => void;
   clearBookmarks: () => void;
   canSaveBookmark: boolean;
@@ -120,7 +120,7 @@ export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAud
     deleteBookmark,
     clearBookmarks,
     canSaveBookmark,
-  } = useSimpleBookmarks(
+  } = useBookmarks(
     {
       mode,
       trackId: mode === 'single' ? singleTrackSlug || undefined : currentTrack?.id,
@@ -320,11 +320,13 @@ export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAud
   const saveBookmark = useCallback((time?: number, label?: string): void => {
     const bookmarkTime = time ?? currentTime;
     if (bookmarkTime > 0) {
-      saveBookmarkInternal(bookmarkTime, label);
+      // Pass the current section slug for cross-section navigation
+      const currentSectionSlug = mode === 'single' ? singleTrackSlug : currentTrack?.slug;
+      saveBookmarkInternal(bookmarkTime, label, currentSectionSlug || undefined);
     }
-  }, [currentTime, saveBookmarkInternal]);
+  }, [currentTime, saveBookmarkInternal, mode, singleTrackSlug, currentTrack]);
 
-  const jumpToBookmark = useCallback((bookmark: SimpleBookmark): void => {
+  const jumpToBookmark = useCallback((bookmark: Bookmark): void => {
     jumpToBookmarkInternal(bookmark);
   }, [jumpToBookmarkInternal]);
 
@@ -452,6 +454,31 @@ export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAud
       setIsPlaying(true);
     }
   }, [autoPlay, currentTrack, isPlaying, isLoading]);
+
+  // === PENDING BOOKMARK NAVIGATION ===
+  useEffect(() => {
+    const checkPendingBookmark = () => {
+      const pendingTime = sessionStorage.getItem('pendingBookmarkTime');
+      if (pendingTime && audioRef.current) {
+        const time = parseFloat(pendingTime);
+        if (!isNaN(time) && time > 0) {
+          // Small delay to ensure audio is ready
+          setTimeout(() => {
+            if (audioRef.current) {
+              audioRef.current.currentTime = time;
+              setCurrentTime(time);
+              sessionStorage.removeItem('pendingBookmarkTime');
+            }
+          }, 500);
+        }
+      }
+    };
+
+    // Check on mount and when current track changes
+    if (currentTrack) {
+      checkPendingBookmark();
+    }
+  }, [currentTrack]);
 
   // === RETURN COMPREHENSIVE API ===
   return {
