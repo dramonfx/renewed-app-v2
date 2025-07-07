@@ -60,6 +60,11 @@ interface TrackNavigationProps {
   canGoForward: boolean;
   onPrevious: () => void;
   onNext: () => void;
+  // New props for inline bookmark display
+  allBookmarks: SimpleBookmark[];
+  onBookmarkJump: (bookmark: SimpleBookmark) => void;
+  onBookmarkDelete: (bookmarkId: string) => void;
+  formatTime: (time: number) => string;
 }
 
 /**
@@ -131,7 +136,7 @@ const SpeedControl: React.FC<SpeedControlProps> = ({ speed, onSpeedChange }) => 
 );
 
 /**
- * Track Navigation Component
+ * Track Navigation Component with Inline Bookmarks
  */
 const TrackNavigation: React.FC<TrackNavigationProps> = ({
   tracks,
@@ -141,51 +146,111 @@ const TrackNavigation: React.FC<TrackNavigationProps> = ({
   canGoForward,
   onPrevious,
   onNext,
-}) => (
-  <div className="space-y-3">
-    <div className="flex justify-center space-x-4">
-      <SacredButton
-        variant="ghost"
-        size="sm"
-        onClick={onPrevious}
-        disabled={!canGoBack}
-        className="opacity-80 hover:opacity-100"
-        aria-label="Previous track"
-      >
-        <SkipBack className="h-4 w-4" />
-      </SacredButton>
+  allBookmarks,
+  onBookmarkJump,
+  onBookmarkDelete,
+  formatTime,
+}) => {
+  // Get bookmarks for a specific track
+  const getBookmarksForTrack = (trackId: string): SimpleBookmark[] => {
+    return allBookmarks.filter(bookmark => bookmark.trackId === trackId);
+  };
 
-      <SacredButton
-        variant="ghost"
-        size="sm"
-        onClick={onNext}
-        disabled={!canGoForward}
-        className="opacity-80 hover:opacity-100"
-        aria-label="Next track"
-      >
-        <SkipForward className="h-4 w-4" />
-      </SacredButton>
-    </div>
+  return (
+    <div className="space-y-3">
+      <div className="flex justify-center space-x-4">
+        <SacredButton
+          variant="ghost"
+          size="sm"
+          onClick={onPrevious}
+          disabled={!canGoBack}
+          className="opacity-80 hover:opacity-100"
+          aria-label="Previous track"
+        >
+          <SkipBack className="h-4 w-4" />
+        </SacredButton>
 
-    {tracks.length > 1 && (
-      <div className="max-h-32 space-y-1 overflow-y-auto">
-        {tracks.map((track, index) => (
-          <button
-            key={track.id}
-            onClick={() => onTrackSelect(index)}
-            className={`w-full rounded p-2 text-left text-xs transition-colors ${
-              index === currentTrackIndex
-                ? 'bg-sacred-blue-200 text-sacred-blue-900'
-                : 'bg-white/10 text-sacred-blue-700 hover:bg-white/20'
-            }`}
-          >
-            {index + 1}. {track.title}
-          </button>
-        ))}
+        <SacredButton
+          variant="ghost"
+          size="sm"
+          onClick={onNext}
+          disabled={!canGoForward}
+          className="opacity-80 hover:opacity-100"
+          aria-label="Next track"
+        >
+          <SkipForward className="h-4 w-4" />
+        </SacredButton>
       </div>
-    )}
-  </div>
-);
+
+      {tracks.length > 1 && (
+        <div className="max-h-48 space-y-1 overflow-y-auto">
+          {tracks.map((track, index) => {
+            const trackBookmarks = getBookmarksForTrack(track.id);
+            
+            return (
+              <div key={track.id} className="space-y-1">
+                {/* Main track button */}
+                <button
+                  onClick={() => onTrackSelect(index)}
+                  className={`w-full rounded p-2 text-left text-xs transition-colors ${
+                    index === currentTrackIndex
+                      ? 'bg-sacred-blue-200 text-sacred-blue-900'
+                      : 'bg-white/10 text-sacred-blue-700 hover:bg-white/20'
+                  }`}
+                >
+                  <div className="space-y-1">
+                    {/* Track title with bookmarks inline */}
+                    <div className="font-medium">
+                      {index + 1}. {track.title}
+                      {trackBookmarks.length > 0 && (
+                        <span className="text-sacred-blue-500">
+                          {trackBookmarks.map((bookmark, bmIndex) => (
+                            <span key={bookmark.id}>
+                              {' • '}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onBookmarkJump(bookmark);
+                                }}
+                                className="hover:text-sacred-blue-700 hover:underline"
+                                title={`Jump to ${bookmark.label || 'bookmark'}`}
+                              >
+                                Bookmark {bmIndex + 1} – {formatTime(bookmark.time)}
+                              </button>
+                            </span>
+                          ))}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Bookmark management for current track */}
+                    {trackBookmarks.length > 0 && index === currentTrackIndex && (
+                      <div className="flex flex-wrap gap-1 text-xs">
+                        {trackBookmarks.map((bookmark) => (
+                          <button
+                            key={bookmark.id}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onBookmarkDelete(bookmark.id);
+                            }}
+                            className="text-red-400 hover:text-red-600 opacity-70 hover:opacity-100"
+                            title={`Delete ${bookmark.label || 'bookmark'}`}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
 
 /**
  * Fixed Unified Audio Player Component
@@ -446,7 +511,7 @@ export default function UnifiedAudioPlayerFixed({
           </SacredButton>
         </div>
 
-        {/* Track Navigation */}
+        {/* Track Navigation with Inline Bookmarks */}
         {showTrackNavigation && (
           <TrackNavigation
             tracks={tracks}
@@ -456,38 +521,29 @@ export default function UnifiedAudioPlayerFixed({
             canGoForward={canGoForward}
             onPrevious={previousTrack}
             onNext={nextTrack}
+            allBookmarks={bookmarks}
+            onBookmarkJump={jumpToBookmark}
+            onBookmarkDelete={deleteBookmark}
+            formatTime={formatTime}
           />
         )}
 
-        {/* Bookmarks */}
-        {bookmarks && bookmarks.length > 0 && (
+        {/* Bookmark Management (simplified) */}
+        {mode === 'full' && bookmarks && bookmarks.length > 0 && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-semibold text-sacred-blue-700">
-                Bookmarks ({bookmarks.length}/{mode === 'single' ? '1' : '2'})
-              </h4>
-              {bookmarks.length > 0 && (
-                <SacredButton
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearBookmarks}
-                  className="text-xs opacity-70 hover:opacity-100"
-                >
-                  Clear All
-                </SacredButton>
-              )}
-            </div>
-
-            <div className="max-h-32 space-y-1 overflow-y-auto">
-              {bookmarks.map((bookmark) => (
-                <BookmarkItem
-                  key={bookmark.id}
-                  bookmark={bookmark}
-                  onJump={jumpToBookmark}
-                  onDelete={deleteBookmark}
-                  formatTime={formatTime}
-                />
-              ))}
+              <p className="text-xs text-sacred-blue-600">
+                Bookmarks are shown inline above with each section
+              </p>
+              <SacredButton
+                variant="ghost"
+                size="sm"
+                onClick={clearBookmarks}
+                className="text-xs opacity-70 hover:opacity-100"
+                title="Clear all bookmarks"
+              >
+                Clear All
+              </SacredButton>
             </div>
           </div>
         )}

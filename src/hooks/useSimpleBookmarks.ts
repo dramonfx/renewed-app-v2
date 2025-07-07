@@ -2,7 +2,7 @@
 // src/hooks/useSimpleBookmarks.ts
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 export interface SimpleBookmark {
   id: string;
@@ -97,13 +97,32 @@ export function useSimpleBookmarks(
       if (mode === 'single') {
         updatedBookmarks = [newBookmark];
       } else {
-        // For full mode, add new bookmark and keep only maxBookmarks
-        updatedBookmarks.push(newBookmark);
-        if (updatedBookmarks.length > maxBookmarks) {
-          // Remove oldest bookmark
-          updatedBookmarks = updatedBookmarks
-            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-            .slice(0, maxBookmarks);
+        // For full mode, enforce per-track limits (up to maxBookmarks per track)
+        if (trackId) {
+          // Get existing bookmarks for this specific track
+          const trackBookmarks = updatedBookmarks.filter(b => b.trackId === trackId);
+          const otherBookmarks = updatedBookmarks.filter(b => b.trackId !== trackId);
+          
+          // Add new bookmark to this track's bookmarks
+          const newTrackBookmarks = [...trackBookmarks, newBookmark];
+          
+          // Keep only maxBookmarks for this track (remove oldest if needed)
+          const limitedTrackBookmarks = newTrackBookmarks.length > maxBookmarks
+            ? newTrackBookmarks
+                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                .slice(0, maxBookmarks)
+            : newTrackBookmarks;
+          
+          // Combine with bookmarks from other tracks
+          updatedBookmarks = [...otherBookmarks, ...limitedTrackBookmarks];
+        } else {
+          // Fallback to old behavior if no trackId
+          updatedBookmarks.push(newBookmark);
+          if (updatedBookmarks.length > maxBookmarks) {
+            updatedBookmarks = updatedBookmarks
+              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .slice(0, maxBookmarks);
+          }
         }
       }
       
@@ -135,7 +154,20 @@ export function useSimpleBookmarks(
   }, [storageKey]);
 
   // Check if we can save a new bookmark
-  const canSaveBookmark = mode === 'single' || bookmarks.length < maxBookmarks;
+  const canSaveBookmark = useMemo(() => {
+    if (mode === 'single') {
+      return true; // Single mode always allows saving (replaces existing)
+    }
+    
+    // For full mode, check per-track limits
+    if (trackId) {
+      const trackBookmarks = bookmarks.filter(b => b.trackId === trackId);
+      return trackBookmarks.length < maxBookmarks;
+    }
+    
+    // Fallback to global limit if no trackId
+    return bookmarks.length < maxBookmarks;
+  }, [mode, trackId, bookmarks, maxBookmarks]);
 
   return {
     bookmarks,

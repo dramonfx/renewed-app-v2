@@ -1,10 +1,17 @@
 "use client";
-import type { EnhancedTrack } from '@/hooks/types';
 // src/components/audio/EnhancedAudioPlayer.tsx
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useEnhancedAudioPlayer } from '../../hooks/useEnhancedAudioPlayer';
-import type { EnhancedTrack, AudioPlayerProps } from '../../hooks/types';
+import type { AudioPlayerProps } from '../../hooks/types';
+
+// Define EnhancedTrack locally to avoid conflicts
+interface EnhancedTrack {
+  id: string;
+  title: string;
+  url: string;
+  duration?: number;
+}
 
 /**
  * Enhanced Audio Player Component - Phase 2
