@@ -329,9 +329,9 @@ export default function WizardLayout({
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentStep}
-                initial={animateTransitions ? stepAnimationVariants.enter : false}
+                initial={animateTransitions ? stepAnimationVariants.enter : undefined}
                 animate={stepAnimationVariants.center}
-                exit={animateTransitions ? stepAnimationVariants.exit : false}
+                exit={animateTransitions ? stepAnimationVariants.exit : undefined}
                 transition={{ duration: 0.6, ease: 'easeOut' }}
                 className="overflow-hidden rounded-2xl bg-white shadow-xl"
               >

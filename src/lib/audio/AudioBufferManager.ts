@@ -90,9 +90,9 @@ export class AudioBufferManager {
     if (typeof window === 'undefined') return;
 
     try {
-      // @ts-ignore - Navigator connection API
-      const connection =
-        navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      // Navigator connection API - cast to any for browser compatibility
+      const nav = navigator as any;
+      const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
 
       if (connection) {
         this.updateNetworkCondition(connection);

@@ -38,7 +38,7 @@ export interface UseAudioPlayerReturn {
   bookmarks: SimpleBookmark[];
 
   // Audio element ref
-  audioRef: React.RefObject<HTMLAudioElement>;
+  audioRef: React.RefObject<HTMLAudioElement | null>;
 
   // Control functions
   playPause: () => void;

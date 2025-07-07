@@ -129,10 +129,14 @@ export const useLogin = (): UseLoginReturn => {
 
   return {
     handleLogin,
+    login: handleLogin,
     isLoading,
     error,
     validationErrors,
-    clearErrors,
+    clearError: () => {
+      setError(null);
+      setValidationErrors({});
+    },
     validateEmail,
   };
 };

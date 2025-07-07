@@ -77,7 +77,7 @@ export default function TestBookmarkFixPage() {
               </div>
 
               <div className="flex justify-center space-x-4">
-                <SacredButton variant="secondary" onClick={runBookmarkTests}>
+                <SacredButton variant="primary" onClick={runBookmarkTests}>
                   Run Tests
                 </SacredButton>
                 <SacredButton variant="ghost" onClick={clearTestResults}>
