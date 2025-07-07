@@ -29,13 +29,19 @@ CREATE TABLE reflections_backup_20250107 AS
 SELECT * FROM public.reflections;
 ```
 
-### Step 2: Apply the Corrected Migration
+### Step 2: Apply the Enhanced Schema Migration
 1. Open **Supabase Dashboard** → **SQL Editor**
 2. Copy the entire contents of `20250107_enhance_reflections_for_audio_CORRECTED.sql`
 3. Paste into SQL Editor
 4. Click **Run** to execute the migration
 
-### Step 3: Verify Migration Success
+### Step 3: Apply the RLS Policies and Security Fix
+1. In the same **Supabase SQL Editor**
+2. Copy the entire contents of `20250107_fix_reflections_rls_policies.sql`
+3. Paste into SQL Editor
+4. Click **Run** to execute the security migration
+
+### Step 4: Verify Migration Success
 Run these verification queries in Supabase SQL Editor:
 
 ```sql
@@ -50,11 +56,29 @@ SELECT constraint_name, constraint_type
 FROM information_schema.table_constraints 
 WHERE table_name = 'reflections';
 
+-- 🔐 SECURITY VERIFICATION: Check RLS policies exist
+SELECT 
+    schemaname,
+    tablename,
+    policyname,
+    permissive,
+    roles,
+    cmd,
+    qual,
+    with_check
+FROM pg_policies 
+WHERE schemaname = 'public' AND tablename = 'reflections'
+ORDER BY policyname;
+
+-- 🔍 DEBUG: Test authentication context (very important!)
+SELECT public.debug_user_auth_context();
+
 -- Test the deep_reflections_view
 SELECT * FROM public.deep_reflections_view LIMIT 1;
 
--- Test the function
+-- Test the security-hardened functions
 SELECT public.user_has_reflections();
+SELECT public.get_section_reflections('test-section', 5);
 ```
 
 ### Step 4: Test Deep Reflections Feature
@@ -90,15 +114,61 @@ SELECT public.user_has_reflections();
    INSERT INTO public.reflections SELECT * FROM reflections_backup_20250107;
    ```
 
+### 🔐 If You Get "RLS Policy Violation" Errors:
+**Error:** `new row violates row-level security policy for table 'reflections'`
+
+**Solutions:**
+1. **Verify RLS policies exist:**
+   ```sql
+   SELECT COUNT(*) FROM pg_policies 
+   WHERE schemaname = 'public' AND tablename = 'reflections';
+   -- Should return 4 (one for each CRUD operation)
+   ```
+
+2. **Check authentication context:**
+   ```sql
+   SELECT public.debug_user_auth_context();
+   -- Should show authenticated = true and your user_id
+   ```
+
+3. **Verify user_id is being set correctly** in your app:
+   - Check that your app passes `user_id: auth.uid()` when inserting reflections
+   - Ensure you're using the authenticated Supabase client, not anon client
+   - Verify auth headers are included in API requests
+
+4. **Test RLS manually:**
+   ```sql
+   -- This should work (returns your reflections)
+   SELECT * FROM public.reflections;
+   
+   -- This should fail with RLS error if user_id doesn't match
+   INSERT INTO public.reflections (user_id, question_text, answer_text, reflection_type)
+   VALUES ('00000000-0000-0000-0000-000000000000', 'Test', 'Test', 'deep_reflection');
+   ```
+
+### If Supabase Security Advisor Still Shows Warnings:
+1. **Check function security warnings are resolved:**
+   - Functions should have `SET search_path = ''`
+   - Views should not use `SECURITY DEFINER`
+2. **Run the security verification again:**
+   ```sql
+   SELECT routine_name, security_type, security_invoker 
+   FROM information_schema.routines 
+   WHERE routine_schema = 'public';
+   ```
+
 ### If App Still Shows Mock Data:
 1. **Clear browser cache** and refresh
 2. **Check Supabase connection** in app (should show green checkmarks)
-3. **Verify RLS policies** are working correctly
+3. **Verify authentication state** in browser dev tools
+4. **Check that useDeepReflection hook** is using real Supabase client
 
 ### If Deep Reflections Don't Save:
 1. **Check browser console** for JavaScript errors
 2. **Verify authentication** (user must be logged in)
-3. **Test API endpoint** manually in browser dev tools
+3. **Test authentication context** with debug function
+4. **Check network tab** for failed API requests
+5. **Verify user_id is being passed** in reflection data
 
 ## 🎉 Expected Results
 
