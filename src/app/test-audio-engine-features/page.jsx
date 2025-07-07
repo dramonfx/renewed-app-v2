@@ -388,11 +388,11 @@ const TestAudioEngineFeaturesPage = () => {
               </div>
               <div>
                 Memory Usage:{' '}
-                <span style={{ color: '#a78bfa' }}>{formattedStats.engine.memoryUsage || 0}MB</span>
+                <span style={{ color: '#a78bfa' }}>{formattedStats?.engine?.memoryUsage || 0}MB</span>
               </div>
               <div>
                 Error Count:{' '}
-                <span style={{ color: '#f87171' }}>{formattedStats.engine.errorCount || 0}</span>
+                <span style={{ color: '#f87171' }}>{formattedStats?.engine?.errorCount || 0}</span>
               </div>
             </div>
           </div>
@@ -413,7 +413,7 @@ const TestAudioEngineFeaturesPage = () => {
               <div>
                 Strategy:{' '}
                 <span style={{ color: '#60a5fa' }}>
-                  {formattedStats.buffer.currentStrategy || 'Balanced'}
+                  {formattedStats?.buffer?.currentStrategy || 'Balanced'}
                 </span>
               </div>
               <div>
@@ -421,12 +421,12 @@ const TestAudioEngineFeaturesPage = () => {
               </div>
               <div>
                 Downlink:{' '}
-                <span style={{ color: '#a78bfa' }}>{formattedStats.buffer.downlink || 0} Mbps</span>
+                <span style={{ color: '#a78bfa' }}>{formattedStats?.buffer?.downlink || 0} Mbps</span>
               </div>
               <div>
                 Avg Health:{' '}
                 <span style={{ color: '#34d399' }}>
-                  {formattedStats.buffer.averageBufferHealth || 100}%
+                  {formattedStats?.buffer?.averageBufferHealth || 100}%
                 </span>
               </div>
             </div>
@@ -448,13 +448,13 @@ const TestAudioEngineFeaturesPage = () => {
               <div>
                 Session ID:{' '}
                 <span style={{ color: '#60a5fa' }}>
-                  {formattedStats.analytics.session?.sessionId?.slice(-8) || 'N/A'}
+                  {formattedStats?.analytics?.session?.sessionId?.slice(-8) || 'N/A'}
                 </span>
               </div>
               <div>
                 Events:{' '}
                 <span style={{ color: '#fbbf24' }}>
-                  {formattedStats.analytics.pendingEvents || 0}
+                  {formattedStats?.analytics?.pendingEvents || 0}
                 </span>
               </div>
               <div>
@@ -464,7 +464,7 @@ const TestAudioEngineFeaturesPage = () => {
               <div>
                 Retry Queue:{' '}
                 <span style={{ color: '#f87171' }}>
-                  {formattedStats.analytics.retryQueueSize || 0}
+                  {formattedStats?.analytics?.retryQueueSize || 0}
                 </span>
               </div>
             </div>
@@ -486,25 +486,25 @@ const TestAudioEngineFeaturesPage = () => {
               <div>
                 Active Sessions:{' '}
                 <span style={{ color: '#60a5fa' }}>
-                  {formattedStats.errorRecovery.activeSessions || 0}
+                  {formattedStats?.errorRecovery?.activeSessions || 0}
                 </span>
               </div>
               <div>
                 Success Rate:{' '}
                 <span style={{ color: '#34d399' }}>
-                  {formattedStats.errorRecovery.successRate || 100}%
+                  {formattedStats?.errorRecovery?.successRate || 100}%
                 </span>
               </div>
               <div>
                 Avg Attempts:{' '}
                 <span style={{ color: '#fbbf24' }}>
-                  {formattedStats.errorRecovery.averageAttempts || 0}
+                  {formattedStats?.errorRecovery?.averageAttempts || 0}
                 </span>
               </div>
               <div>
                 Total Sessions:{' '}
                 <span style={{ color: '#a78bfa' }}>
-                  {formattedStats.errorRecovery.totalSessions || 0}
+                  {formattedStats?.errorRecovery?.totalSessions || 0}
                 </span>
               </div>
             </div>

@@ -95,5 +95,15 @@ export function useVisuals(sectionId: number | null): UseVisualsReturn {
     fetchVisuals();
   }, [sectionId]);
 
-  return { data, loading, error, visualsMap };
+  return { 
+    data, 
+    visuals: data,
+    loading, 
+    isLoading: loading,
+    error, 
+    visualsMap,
+    refetch: () => {
+      // Refetch functionality can be implemented if needed
+    }
+  };
 }

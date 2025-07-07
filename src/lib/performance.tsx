@@ -84,35 +84,41 @@ class PerformanceMonitor {
       // Largest Contentful Paint (LCP)
       this.createObserver('largest-contentful-paint', (entries) => {
         const lastEntry = entries[entries.length - 1];
-        this.recordMetric({
-          name: 'LCP',
-          value: lastEntry.startTime,
-          unit: 'ms',
-          timestamp: Date.now(),
-          category: 'load',
-          details: { element: lastEntry.element?.tagName },
-        });
+        if (lastEntry) {
+          this.recordMetric({
+            name: 'LCP',
+            value: lastEntry.startTime,
+            unit: 'ms',
+            timestamp: Date.now(),
+            category: 'load',
+            details: { element: (lastEntry as any).element?.tagName },
+          });
+        }
       });
 
       // First Input Delay (FID)
       this.createObserver('first-input', (entries) => {
         const firstEntry = entries[0];
-        this.recordMetric({
-          name: 'FID',
-          value: firstEntry.processingStart - firstEntry.startTime,
-          unit: 'ms',
-          timestamp: Date.now(),
-          category: 'interaction',
-          details: { eventType: firstEntry.name },
-        });
+        if (firstEntry) {
+          const entry = firstEntry as any;
+          this.recordMetric({
+            name: 'FID',
+            value: entry.processingStart - firstEntry.startTime,
+            unit: 'ms',
+            timestamp: Date.now(),
+            category: 'interaction',
+            details: { eventType: firstEntry.name },
+          });
+        }
       });
 
       // Cumulative Layout Shift (CLS)
       this.createObserver('layout-shift', (entries) => {
         let clsValue = 0;
         for (const entry of entries) {
-          if (!entry.hadRecentInput) {
-            clsValue += entry.value;
+          const layoutShiftEntry = entry as any;
+          if (!layoutShiftEntry.hadRecentInput) {
+            clsValue += layoutShiftEntry.value;
           }
         }
         if (clsValue > 0) {
@@ -421,7 +427,7 @@ export function usePerformanceMonitor(componentName: string) {
  * Higher-order component for automatic performance monitoring
  */
 export function withPerformanceMonitoring<P extends object>(Component: React.ComponentType<P>) {
-  const WrappedComponent = React.forwardRef<any, P>((props, ref) => {
+  const WrappedComponent = React.forwardRef<any, any>((props: any, ref: any) => {
     const componentName = Component.displayName || Component.name || 'Unknown';
     usePerformanceMonitor(componentName);
 
@@ -498,15 +504,17 @@ export const performanceUtils = {
         const entries = performance.getEntriesByName(name, 'measure');
         const lastEntry = entries[entries.length - 1];
 
-        performanceMonitor.recordMetric({
-          name,
-          value: lastEntry.duration,
-          unit: 'ms',
-          timestamp: Date.now(),
-          category: 'render',
-        });
+        if (lastEntry) {
+          performanceMonitor.recordMetric({
+            name,
+            value: lastEntry.duration,
+            unit: 'ms',
+            timestamp: Date.now(),
+            category: 'render',
+          });
 
-        return lastEntry.duration;
+          return lastEntry.duration;
+        }
       }
     } catch (error) {
       console.warn('Failed to measure performance:', error);

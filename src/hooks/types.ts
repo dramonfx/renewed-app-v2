@@ -8,46 +8,52 @@
  * including all Phase 2 Core Audio Engine components.
  */
 
-// Re-export core engine types
-export type {
-  AudioEngineConfig,
-  AudioEngineStats,
-  AudioSource,
-  EnhancedTrack
-} from '../lib/audio/CoreAudioEngine';
+// Basic types for the audio player system
+export interface AudioEngineConfig {
+  bufferAhead?: number;
+  preloadNextTrack?: boolean;
+  adaptiveBuffering?: boolean;
+  memoryManagement?: boolean;
+  performanceMonitoring?: boolean;
+  errorRetryAttempts?: number;
+}
 
-export type {
-  BufferStrategy,
-  NetworkCondition,
-  BufferState
-} from '../lib/audio/AudioBufferManager';
+export interface AudioError {
+  code: string;
+  message: string;
+  timestamp: number;
+  recoverable: boolean;
+}
 
-export type {
-  AnalyticsConfig,
-  PerformanceMetric,
-  UserBehaviorEvent,
-  AudioErrorEvent,
-  AnalyticsSession
-} from '../lib/audio/AudioAnalytics';
+export interface EnhancedTrack {
+  id: string;
+  title: string;
+  slug?: string;
+  audioUrl?: string;
+  duration?: number;
+  metadata?: Record<string, any>;
+}
 
-export type {
-  ErrorRecoveryConfig,
-  AudioError,
-  RecoveryAttempt,
-  RecoverySession
-} from '../lib/audio/AudioErrorRecovery';
+export interface EnhancedAudioPlayerState {
+  isPlaying: boolean;
+  isPaused: boolean;
+  isLoading: boolean;
+  currentTime: number;
+  duration: number;
+  volume: number;
+  muted: boolean;
+  error?: string;
+}
 
-export type {
-  KeyboardShortcut,
-  KeyboardShortcutsConfig,
-  AudioPlayerControls
-} from '../lib/audio/AudioKeyboardShortcuts';
-
-export type {
-  UseEnhancedAudioPlayerConfig,
-  EnhancedAudioPlayerState,
-  EnhancedAudioPlayerControls
-} from './useEnhancedAudioPlayer';
+export interface EnhancedAudioPlayerControls {
+  play: () => Promise<void>;
+  pause: () => void;
+  stop: () => void;
+  seek: (time: number) => void;
+  setVolume: (volume: number) => void;
+  setMuted: (muted: boolean) => void;
+  loadTrack: (track: EnhancedTrack) => Promise<void>;
+}
 
 // Additional utility types
 export interface AudioPlayerTheme {
@@ -324,6 +330,73 @@ export interface AudioPlayerAPI {
   
   // Cleanup
   destroy: () => void;
+}
+
+// Hook return types
+export interface UseLoginReturn {
+  isLoading: boolean;
+  error: string | null;
+  validationErrors?: LoginValidationErrors;
+  login: (email: string, password: string) => Promise<LoginResult>;
+  handleLogin: (email: string, password: string) => Promise<LoginResult>;
+  clearError: () => void;
+  validateEmail: (email: string) => boolean;
+}
+
+export interface LoginValidationErrors {
+  email?: string;
+  password?: string;
+  general?: string;
+}
+
+export interface LoginResult {
+  success: boolean;
+  error?: string;
+  errors?: any;
+  user?: any;
+  session?: any;
+}
+
+export interface UseSectionReturn {
+  section: SectionWithContent | null;
+  data: SectionWithContent | null;
+  isLoading: boolean;
+  loading: boolean;
+  error: string | null;
+  refetch: () => void;
+}
+
+export interface SectionWithContent {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  audio_url?: string;
+  order: number;
+  metadata?: Record<string, any>;
+}
+
+export interface UseVisualsReturn {
+  visuals: Visual[];
+  data: Visual[];
+  isLoading: boolean;
+  loading: boolean;
+  error: string | null;
+  refetch: () => void;
+  visualsMap: Map<string, Visual>;
+}
+
+export interface Visual {
+  id: string;
+  section_id: string;
+  type: 'image' | 'video' | 'graphic';
+  url: string;
+  title?: string;
+  description?: string;
+  order: number;
+  metadata?: Record<string, any>;
+  markdown_tag?: string;
+  displayUrl?: string;
 }
 
 

@@ -102,5 +102,14 @@ export function useSection(slug: string | null): UseSectionReturn {
     fetchSection();
   }, [slug]);
 
-  return { data, loading, error };
+  return { 
+    data, 
+    section: data,
+    loading, 
+    isLoading: loading,
+    error,
+    refetch: () => {
+      // Refetch functionality can be implemented if needed
+    }
+  };
 }

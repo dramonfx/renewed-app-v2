@@ -189,10 +189,9 @@ const TrackNavigation: React.FC<TrackNavigationProps> = ({
             
             return (
               <div key={track.id} className="space-y-1">
-                {/* Main track button */}
-                <button
-                  onClick={() => onTrackSelect(index)}
-                  className={`w-full rounded p-2 text-left text-xs transition-colors ${
+                {/* Main track container with clickable areas */}
+                <div
+                  className={`w-full rounded p-2 text-xs transition-colors ${
                     index === currentTrackIndex
                       ? 'bg-sacred-blue-200 text-sacred-blue-900'
                       : 'bg-white/10 text-sacred-blue-700 hover:bg-white/20'
@@ -200,7 +199,10 @@ const TrackNavigation: React.FC<TrackNavigationProps> = ({
                 >
                   <div className="space-y-1">
                     {/* Track title with bookmarks inline */}
-                    <div className="font-medium">
+                    <div 
+                      className="font-medium cursor-pointer"
+                      onClick={() => onTrackSelect(index)}
+                    >
                       {index + 1}. {track.title}
                       {trackBookmarks.length > 0 && (
                         <span className="text-sacred-blue-500">
@@ -212,7 +214,7 @@ const TrackNavigation: React.FC<TrackNavigationProps> = ({
                                   e.stopPropagation();
                                   onBookmarkJump(bookmark);
                                 }}
-                                className="hover:text-sacred-blue-700 hover:underline"
+                                className="hover:text-sacred-blue-700 hover:underline focus:outline-none focus:ring-1 focus:ring-sacred-blue-400 rounded"
                                 title={`Jump to ${bookmark.label || 'bookmark'}`}
                               >
                                 Bookmark {bmIndex + 1} – {formatTime(bookmark.time)}
@@ -233,7 +235,7 @@ const TrackNavigation: React.FC<TrackNavigationProps> = ({
                               e.stopPropagation();
                               onBookmarkDelete(bookmark.id);
                             }}
-                            className="text-red-400 hover:text-red-600 opacity-70 hover:opacity-100"
+                            className="text-red-400 hover:text-red-600 opacity-70 hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-red-400 rounded p-1"
                             title={`Delete ${bookmark.label || 'bookmark'}`}
                           >
                             <Trash2 className="h-3 w-3" />
@@ -242,7 +244,7 @@ const TrackNavigation: React.FC<TrackNavigationProps> = ({
                       </div>
                     )}
                   </div>
-                </button>
+                </div>
               </div>
             );
           })}

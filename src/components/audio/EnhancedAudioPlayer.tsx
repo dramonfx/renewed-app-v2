@@ -59,8 +59,25 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
   useEffect(() => {
     if (tracks.length > 0 && currentIndex < tracks.length) {
       const track = tracks[currentIndex];
-      controls.loadTrack(track);
-      onTrackChange?.(track, currentIndex);
+      if (track) {
+        // Convert track to CoreAudioEngine format
+        const trackAny = track as any;
+        const enhancedTrack = {
+          ...track,
+          slug: trackAny.slug || track.id,
+          sources: trackAny.audioUrl ? [{
+            url: trackAny.audioUrl,
+            format: 'audio/mpeg',
+            quality: 'medium' as const,
+            size: 0,
+            duration: trackAny.duration || 0
+          }] : [],
+          preloaded: false,
+          bufferProgress: 0
+        };
+        controls.loadTrack(enhancedTrack);
+        onTrackChange?.(track, currentIndex);
+      }
     }
   }, [currentIndex, tracks]);
 
@@ -448,7 +465,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
       {currentTrack && (
         <div className="track-info">
           <div className="track-title">{currentTrack.title}</div>
-          <div className="track-artist">{currentTrack.metadata?.artist || 'Unknown Artist'}</div>
+          <div className="track-artist">Audio Track</div>
           <div className="track-status">
             <div className="status-indicator">
               <div
@@ -602,7 +619,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
               <div className="playlist-item-info">
                 <div className="playlist-item-title">{track.title}</div>
                 <div className="playlist-item-artist">
-                  {track.metadata?.artist || 'Unknown Artist'}
+                  Audio Track
                 </div>
               </div>
               {index === currentIndex && (
