@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Heart, Sparkles, Clock, BookOpen, Send } from 'lucide-react';
 import { useDeepReflection } from '@/hooks/useDeepReflection';
@@ -33,9 +34,15 @@ export default function DeepReflectionModal({
   const [reflectionText, setReflectionText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   const { createReflection } = useDeepReflection();
+
+  // Handle client-side mounting for portal
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Format timestamp for display
   const formatTimestamp = (seconds: number): string => {
@@ -105,11 +112,16 @@ export default function DeepReflectionModal({
     }
   };
 
-  return (
+  // Don't render on server or if not mounted
+  if (!isMounted || typeof window === 'undefined') {
+    return null;
+  }
+
+  const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -299,6 +311,9 @@ export default function DeepReflectionModal({
       )}
     </AnimatePresence>
   );
+
+  // Render modal using React Portal to escape container constraints
+  return createPortal(modalContent, document.body);
 }
 
 export type { DeepReflectionModalProps };

@@ -10,46 +10,7 @@ import type {
   UseDeepReflectionReturn 
 } from '@/types';
 
-// Mock deep reflections for development
-const mockDeepReflections: DeepReflection[] = [
-  {
-    id: '1',
-    user_id: 'mock-user-1',
-    section_id: 'prologue',
-    section_title: 'Prologue',
-    audio_title: 'Prologue Audio',
-    audio_timestamp: 125.5,
-    answer_text: 'This moment really spoke to me about the importance of understanding our spiritual identity. The way this was explained helped me see how I can move from natural thinking to spiritual understanding.',
-    tags: ['identity', 'spiritual growth'],
-    created_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-    updated_at: new Date(Date.now() - 86400000).toISOString(),
-    formatted_timestamp: '02:05'
-  },
-  {
-    id: '2', 
-    user_id: 'mock-user-1',
-    section_id: 'prologue',
-    section_title: 'Prologue',
-    audio_title: 'Prologue Audio',
-    audio_timestamp: 312.8,
-    answer_text: 'I had never thought about spiritual principles this way before. This insight about navigating through spiritual principles to unlock understanding really resonated with me.',
-    tags: ['spiritual principles', 'understanding'],
-    created_at: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-    updated_at: new Date(Date.now() - 3600000).toISOString(),
-    formatted_timestamp: '05:12'
-  }
-];
-
-// Mock stats
-const mockStats: DeepReflectionStats = {
-  total_reflections: 2,
-  reflections_this_week: 2,
-  reflections_this_month: 2,
-  sections_with_reflections: 1,
-  average_reflection_length: 150,
-  first_reflection: mockDeepReflections[0]?.created_at,
-  latest_reflection: mockDeepReflections[1]?.created_at
-};
+// No more mock data - using real database only
 
 /**
  * Hook for managing Deep Reflections
@@ -74,7 +35,7 @@ export function useDeepReflection(): UseDeepReflectionReturn {
       setLoading(true);
       setError(null);
 
-      // Try real Supabase query first
+      // Query Supabase for deep reflections
       const { data, error: supabaseError } = await (supabase as any)
         .from('reflections')
         .select('*')
@@ -82,53 +43,53 @@ export function useDeepReflection(): UseDeepReflectionReturn {
         .order('created_at', { ascending: false });
 
       if (supabaseError) {
-        console.warn('Supabase error, using mock data:', supabaseError);
-        // Use mock data as fallback
-        setReflections(mockDeepReflections);
-        setStats(mockStats);
-      } else if (data) {
-        // Process real data and add formatted timestamps
-        const processedReflections = data.map((reflection: any) => ({
-          ...reflection,
-          formatted_timestamp: reflection.audio_timestamp 
-            ? formatTimestamp(reflection.audio_timestamp) 
-            : undefined
-        })) as DeepReflection[];
-        
-        setReflections(processedReflections);
-        
-        // Calculate real stats
-        const now = new Date();
-        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        
-        const realStats: DeepReflectionStats = {
-          total_reflections: processedReflections.length,
-          reflections_this_week: processedReflections.filter(r => 
-            new Date(r.created_at) >= weekAgo).length,
-          reflections_this_month: processedReflections.filter(r => 
-            new Date(r.created_at) >= monthAgo).length,
-          sections_with_reflections: new Set(processedReflections.map(r => r.section_id)).size,
-          average_reflection_length: Math.round(
-            processedReflections.reduce((sum, r) => sum + r.answer_text.length, 0) / 
-            Math.max(processedReflections.length, 1)
-          ),
-          first_reflection: processedReflections.length > 0 
-            ? processedReflections[processedReflections.length - 1]?.created_at 
-            : undefined,
-          latest_reflection: processedReflections.length > 0 
-            ? processedReflections[0]?.created_at 
-            : undefined
-        };
-        
-        setStats(realStats);
+        console.error('Supabase error loading reflections:', supabaseError);
+        setError(`Failed to load reflections: ${supabaseError.message}`);
+        setReflections([]);
+        setStats(null);
+        return;
       }
+
+      // Process data and add formatted timestamps
+      const processedReflections = (data || []).map((reflection: any) => ({
+        ...reflection,
+        formatted_timestamp: reflection.audio_timestamp 
+          ? formatTimestamp(reflection.audio_timestamp) 
+          : undefined
+      })) as DeepReflection[];
+      
+      setReflections(processedReflections);
+      
+      // Calculate stats
+      const now = new Date();
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      
+      const stats: DeepReflectionStats = {
+        total_reflections: processedReflections.length,
+        reflections_this_week: processedReflections.filter(r => 
+          new Date(r.created_at) >= weekAgo).length,
+        reflections_this_month: processedReflections.filter(r => 
+          new Date(r.created_at) >= monthAgo).length,
+        sections_with_reflections: new Set(processedReflections.map(r => r.section_id)).size,
+        average_reflection_length: processedReflections.length > 0 ? Math.round(
+          processedReflections.reduce((sum, r) => sum + r.answer_text.length, 0) / 
+          processedReflections.length
+        ) : 0,
+        first_reflection: processedReflections.length > 0 
+          ? processedReflections[processedReflections.length - 1]?.created_at 
+          : undefined,
+        latest_reflection: processedReflections.length > 0 
+          ? processedReflections[0]?.created_at 
+          : undefined
+      };
+      
+      setStats(stats);
     } catch (err) {
       console.error('Error loading reflections:', err);
-      setError('Failed to load reflections');
-      // Fallback to mock data on error
-      setReflections(mockDeepReflections);
-      setStats(mockStats);
+      setError('Failed to load reflections. Please check your connection.');
+      setReflections([]);
+      setStats(null);
     } finally {
       setLoading(false);
     }
@@ -161,22 +122,8 @@ export function useDeepReflection(): UseDeepReflectionReturn {
         .single();
 
       if (supabaseError) {
-        console.warn('Supabase error creating reflection, using mock:', supabaseError);
-        
-        // Mock creation for development
-        const mockReflection: DeepReflection = {
-          id: `mock-${Date.now()}`,
-          user_id: 'mock-user-1',
-          ...data,
-          answer_text: data.answer_text,
-          tags: data.tags || [],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          formatted_timestamp: formatTimestamp(data.audio_timestamp)
-        };
-
-        setReflections(prev => [mockReflection, ...prev]);
-        return { success: true };
+        console.error('Supabase error creating reflection:', supabaseError);
+        return { success: false, error: `Failed to save reflection: ${supabaseError.message}` };
       }
 
       if (result) {
@@ -185,10 +132,26 @@ export function useDeepReflection(): UseDeepReflectionReturn {
           formatted_timestamp: formatTimestamp(result.audio_timestamp)
         } as DeepReflection;
 
+        // Update local state immediately (optimistic update)
         setReflections(prev => [newReflection, ...prev]);
         
-        // Refresh stats
-        await loadReflections();
+        // Update stats without full reload
+        setStats(prevStats => {
+          if (!prevStats) return null;
+          
+          const now = new Date();
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          const reflectionDate = new Date(newReflection.created_at);
+          
+          return {
+            ...prevStats,
+            total_reflections: prevStats.total_reflections + 1,
+            reflections_this_week: reflectionDate >= weekAgo ? prevStats.reflections_this_week + 1 : prevStats.reflections_this_week,
+            reflections_this_month: reflectionDate >= monthAgo ? prevStats.reflections_this_month + 1 : prevStats.reflections_this_month,
+            latest_reflection: newReflection.created_at
+          };
+        });
         
         return { success: true };
       }
@@ -198,7 +161,7 @@ export function useDeepReflection(): UseDeepReflectionReturn {
       console.error('Error creating reflection:', err);
       return { success: false, error: 'Failed to create reflection' };
     }
-  }, [loadReflections]);
+  }, []);
 
   // Delete a reflection
   const deleteReflection = useCallback(async (
@@ -207,27 +170,60 @@ export function useDeepReflection(): UseDeepReflectionReturn {
     try {
       setError(null);
 
+      // Find the reflection to delete for stats calculation
+      const reflectionToDelete = reflections.find(r => r.id === id);
+
       const { error: supabaseError } = await (supabase as any)
         .from('reflections')
         .delete()
         .eq('id', id);
 
       if (supabaseError) {
-        console.warn('Supabase error deleting reflection, using mock:', supabaseError);
+        console.error('Supabase error deleting reflection:', supabaseError);
+        return { success: false, error: `Failed to delete reflection: ${supabaseError.message}` };
       }
 
-      // Update local state regardless (works for both real and mock)
+      // Update local state immediately (optimistic update)
       setReflections(prev => prev.filter(r => r.id !== id));
       
-      // Refresh stats
-      await loadReflections();
+      // Update stats without full reload
+      if (reflectionToDelete) {
+        setStats(prevStats => {
+          if (!prevStats) return null;
+          
+          const now = new Date();
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          const reflectionDate = new Date(reflectionToDelete.created_at);
+          
+          const updatedReflections = reflections.filter(r => r.id !== id);
+          
+          return {
+            ...prevStats,
+            total_reflections: Math.max(0, prevStats.total_reflections - 1),
+            reflections_this_week: reflectionDate >= weekAgo ? Math.max(0, prevStats.reflections_this_week - 1) : prevStats.reflections_this_week,
+            reflections_this_month: reflectionDate >= monthAgo ? Math.max(0, prevStats.reflections_this_month - 1) : prevStats.reflections_this_month,
+            sections_with_reflections: new Set(updatedReflections.map(r => r.section_id)).size,
+            average_reflection_length: updatedReflections.length > 0 ? Math.round(
+              updatedReflections.reduce((sum, r) => sum + r.answer_text.length, 0) / 
+              updatedReflections.length
+            ) : 0,
+            first_reflection: updatedReflections.length > 0 
+              ? updatedReflections[updatedReflections.length - 1]?.created_at 
+              : undefined,
+            latest_reflection: updatedReflections.length > 0 
+              ? updatedReflections[0]?.created_at 
+              : undefined
+          };
+        });
+      }
       
       return { success: true };
     } catch (err) {
       console.error('Error deleting reflection:', err);
       return { success: false, error: 'Failed to delete reflection' };
     }
-  }, [loadReflections]);
+  }, [reflections]);
 
   // Get reflections for a specific section
   const getReflectionsBySection = useCallback(async (
@@ -241,12 +237,12 @@ export function useDeepReflection(): UseDeepReflectionReturn {
         .eq('reflection_type', 'deep_reflection')
         .order('audio_timestamp', { ascending: true });
 
-      if (supabaseError || !data) {
-        console.warn('Supabase error, using mock data:', supabaseError);
-        return mockDeepReflections.filter(r => r.section_id === sectionId);
+      if (supabaseError) {
+        console.error('Supabase error fetching section reflections:', supabaseError);
+        return [];
       }
 
-      return data.map((reflection: any) => ({
+      return (data || []).map((reflection: any) => ({
         ...reflection,
         formatted_timestamp: reflection.audio_timestamp 
           ? formatTimestamp(reflection.audio_timestamp) 
@@ -254,7 +250,7 @@ export function useDeepReflection(): UseDeepReflectionReturn {
       })) as DeepReflection[];
     } catch (err) {
       console.error('Error fetching section reflections:', err);
-      return mockDeepReflections.filter(r => r.section_id === sectionId);
+      return [];
     }
   }, []);
 
