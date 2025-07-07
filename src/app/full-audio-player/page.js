@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import SacredCard from '@/components/ui/sacred-card';
-import UnifiedAudioPlayer from '@/components/UnifiedAudioPlayer';
+import UnifiedAudioPlayerFixed from '@/components/UnifiedAudioPlayerFixed';
 
 export default function FullAudioPlayerPageNew() {
   const [chartVisual, setChartVisual] = useState(null);
@@ -81,7 +81,7 @@ export default function FullAudioPlayerPageNew() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="mb-12"
         >
-          <UnifiedAudioPlayer mode="full" />
+          <UnifiedAudioPlayerFixed mode="full" />
         </motion.div>
 
         {/* Mind Transformation Chart */}
