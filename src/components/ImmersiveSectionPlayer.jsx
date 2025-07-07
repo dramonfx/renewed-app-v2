@@ -8,7 +8,7 @@ import { BookOpen, Headphones, Star, ExternalLink } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import SacredCard from '@/components/ui/sacred-card';
 import SacredButton from '@/components/ui/sacred-button';
-import UnifiedAudioPlayer from '@/components/UnifiedAudioPlayer';
+import UnifiedAudioPlayerFixed from '@/components/UnifiedAudioPlayerFixed';
 
 // Lazy load ReactMarkdown for better performance
 const ReactMarkdown = dynamic(() => import('react-markdown'), {
@@ -265,7 +265,7 @@ export default function ImmersiveSectionPlayer({ section, visuals, visualsMap, p
                   </SacredCard>
                 }
               >
-                <UnifiedAudioPlayer
+                <UnifiedAudioPlayerFixed
                   mode="single"
                   singleTrackSlug={params?.sectionSlug || section.slug}
                 />

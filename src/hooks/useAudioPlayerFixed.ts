@@ -65,6 +65,11 @@ export interface UseAudioPlayerReturn {
   loadTracks: () => Promise<AudioTrack[]>;
   formatTime: (time: number) => string;
 
+  // Progress management
+  saveProgress: () => void;
+  getAllProgress: () => Record<string, any>;
+  clearAllProgress: () => void;
+
   // Progress key for external access
   progressKey: string | null;
 }
@@ -183,28 +188,87 @@ export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAud
     }
   }, [singleTrackSlug]);
 
-  // === PROGRESS PERSISTENCE ===
+  // === ENHANCED PROGRESS PERSISTENCE ===
   const saveProgress = useCallback((): void => {
     if (!audioRef.current || !progressKey) return;
 
     const { currentTime: time, duration: dur } = audioRef.current;
-    if (time > 0 && dur > 0 && time < dur - 5 && !isNaN(dur)) {
-      localStorage.setItem(progressKey, time.toString());
+    
+    // Enhanced save conditions: save if we have meaningful progress
+    if (time > 5 && dur > 0 && time < dur - 10 && !isNaN(dur)) {
+      const progressData = {
+        time: time,
+        duration: dur,
+        trackId: currentTrack?.id,
+        trackSlug: currentTrack?.slug,
+        timestamp: Date.now(),
+        mode: mode
+      };
+      
+      try {
+        localStorage.setItem(progressKey, JSON.stringify(progressData));
+        console.log(`💾 Progress saved: ${formatTime(time)} for ${currentTrack?.title}`);
+      } catch (error) {
+        console.error('Failed to save progress:', error);
+      }
     }
-  }, [progressKey]);
+  }, [progressKey, currentTrack, mode, formatTime]);
 
   const restoreProgress = useCallback((): void => {
     if (!audioRef.current || !progressKey) return;
 
-    const savedTime = localStorage.getItem(progressKey);
-    if (savedTime && !isNaN(parseFloat(savedTime))) {
-      const timeToSet = parseFloat(savedTime);
-      if (timeToSet < (audioRef.current.duration || Infinity) && timeToSet > 0.1) {
-        audioRef.current.currentTime = timeToSet;
-        setCurrentTime(timeToSet);
+    try {
+      const savedData = localStorage.getItem(progressKey);
+      if (!savedData) return;
+
+      // Support both old string format and new object format
+      let progressData;
+      try {
+        progressData = JSON.parse(savedData);
+        if (typeof progressData === 'number') {
+          // Handle old format
+          progressData = { time: progressData };
+        }
+      } catch {
+        // Handle very old string format
+        const time = parseFloat(savedData);
+        if (!isNaN(time)) {
+          progressData = { time };
+        } else {
+          return;
+        }
       }
+
+      const { time, trackId, trackSlug, timestamp, mode: savedMode } = progressData;
+      
+      if (!time || isNaN(time) || time <= 0.1) return;
+
+      // Enhanced validation
+      const currentDuration = audioRef.current.duration;
+      if (currentDuration && time >= currentDuration - 5) return;
+
+      // Verify we're restoring to the correct track
+      if (trackId && currentTrack?.id && trackId !== currentTrack.id) {
+        console.log(`⚠️ Track mismatch: saved ${trackId}, current ${currentTrack.id}`);
+        return;
+      }
+
+      // Check if saved data is too old (more than 30 days)
+      if (timestamp && Date.now() - timestamp > 30 * 24 * 60 * 60 * 1000) {
+        localStorage.removeItem(progressKey);
+        return;
+      }
+
+      audioRef.current.currentTime = time;
+      setCurrentTime(time);
+      console.log(`⏰ Progress restored: ${formatTime(time)} for ${currentTrack?.title}`);
+      
+    } catch (error) {
+      console.error('Failed to restore progress:', error);
+      // Clear corrupted data
+      localStorage.removeItem(progressKey);
     }
-  }, [progressKey]);
+  }, [progressKey, currentTrack, formatTime]);
 
   // === PLAYBACK CONTROLS ===
   const playPause = useCallback((): void => {
@@ -249,38 +313,41 @@ export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAud
     seek(0);
   }, [seek]);
 
-  // === TRACK NAVIGATION ===
+  // === ENHANCED TRACK NAVIGATION ===
   const nextTrack = useCallback((): void => {
     if (currentTrackIndex < tracks.length - 1) {
-      if (currentTrack && progressKey) {
-        localStorage.removeItem(progressKey);
-      }
+      // Save current progress before switching
+      saveProgress();
+      
       setCurrentTrackIndex((prev) => prev + 1);
       setIsPlaying(true);
+      console.log(`⏭️ Moving to next track: ${tracks[currentTrackIndex + 1]?.title}`);
     }
-  }, [currentTrackIndex, tracks.length, currentTrack, progressKey]);
+  }, [currentTrackIndex, tracks.length, tracks, saveProgress]);
 
   const previousTrack = useCallback((): void => {
     if (currentTrackIndex > 0) {
-      if (currentTrack && progressKey) {
-        localStorage.removeItem(progressKey);
-      }
+      // Save current progress before switching
+      saveProgress();
+      
       setCurrentTrackIndex((prev) => prev - 1);
       setIsPlaying(true);
+      console.log(`⏮️ Moving to previous track: ${tracks[currentTrackIndex - 1]?.title}`);
     }
-  }, [currentTrackIndex, currentTrack, progressKey]);
+  }, [currentTrackIndex, tracks, saveProgress]);
 
   const playTrackAtIndex = useCallback(
     (index: number): void => {
-      if (index >= 0 && index < tracks.length) {
-        if (currentTrack && progressKey) {
-          localStorage.removeItem(progressKey);
-        }
+      if (index >= 0 && index < tracks.length && index !== currentTrackIndex) {
+        // Save current progress before switching
+        saveProgress();
+        
         setCurrentTrackIndex(index);
         setIsPlaying(true);
+        console.log(`🎯 Jumping to track ${index + 1}: ${tracks[index]?.title}`);
       }
     },
-    [tracks.length, currentTrack, progressKey]
+    [tracks.length, tracks, currentTrackIndex, saveProgress]
   );
 
   // === SPEED CONTROL ===
@@ -316,17 +383,61 @@ export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAud
     }
   }, [isMuted, volume]);
 
-  // === BOOKMARK FUNCTIONS ===
+  // === ENHANCED BOOKMARK FUNCTIONS ===
   const saveBookmark = useCallback((time?: number, label?: string): void => {
     const bookmarkTime = time ?? currentTime;
     if (bookmarkTime > 0) {
-      saveBookmarkInternal(bookmarkTime, label);
+      const customLabel = label || `Bookmark at ${formatTime(bookmarkTime)}`;
+      saveBookmarkInternal(bookmarkTime, customLabel);
+      console.log(`🔖 Bookmark saved: ${customLabel} for ${currentTrack?.title}`);
     }
-  }, [currentTime, saveBookmarkInternal]);
+  }, [currentTime, saveBookmarkInternal, formatTime, currentTrack]);
 
   const jumpToBookmark = useCallback((bookmark: SimpleBookmark): void => {
+    // For full player mode, check if bookmark is for current track
+    if (mode === 'full' && bookmark.trackId && currentTrack?.id !== bookmark.trackId) {
+      // Find the track index for this bookmark
+      const targetTrackIndex = tracks.findIndex(track => track.id === bookmark.trackId);
+      if (targetTrackIndex >= 0) {
+        console.log(`🎯 Bookmark navigation: switching to track ${targetTrackIndex + 1}`);
+        // Save current progress first
+        saveProgress();
+        // Switch to the target track
+        setCurrentTrackIndex(targetTrackIndex);
+        // Set a flag to jump to bookmark time once track loads
+        setTimeout(() => {
+          jumpToBookmarkInternal(bookmark);
+        }, 500);
+        return;
+      }
+    }
+    
     jumpToBookmarkInternal(bookmark);
-  }, [jumpToBookmarkInternal]);
+    console.log(`⏰ Jumped to bookmark: ${bookmark.label || formatTime(bookmark.time)}`);
+  }, [jumpToBookmarkInternal, mode, currentTrack, tracks, saveProgress, formatTime]);
+
+  // === DEBUGGING HELPERS ===
+  const getAllProgress = useCallback((): Record<string, any> => {
+    const allProgress: Record<string, any> = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('audio-progress-')) {
+        try {
+          const value = localStorage.getItem(key);
+          allProgress[key] = value ? JSON.parse(value) : null;
+        } catch {
+          allProgress[key] = localStorage.getItem(key);
+        }
+      }
+    }
+    return allProgress;
+  }, []);
+
+  const clearAllProgress = useCallback((): void => {
+    const keys = Object.keys(localStorage).filter(key => key.startsWith('audio-progress-'));
+    keys.forEach(key => localStorage.removeItem(key));
+    console.log(`🧹 Cleared ${keys.length} progress entries`);
+  }, []);
 
   // === AUDIO ELEMENT LIFECYCLE ===
   useEffect(() => {
@@ -497,6 +608,11 @@ export function useAudioPlayerFixed(options: UseAudioPlayerOptions = {}): UseAud
     // Utility functions
     loadTracks,
     formatTime,
+
+    // Progress management
+    saveProgress,
+    getAllProgress,
+    clearAllProgress,
 
     // Progress key for external access
     progressKey,
