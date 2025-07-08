@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import type { 
   DeepReflection, 
@@ -21,6 +22,19 @@ export function useDeepReflection(): UseDeepReflectionReturn {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<DeepReflectionStats | null>(null);
+  const pathname = usePathname();
+
+  // Helper function to extract section slug from pathname
+  const extractSectionSlug = (path: string): string => {
+    // Extract slug from /book/[sectionSlug] pattern
+    const match = path.match(/\/book\/([^\/]+)/);
+    return match && match[1] ? match[1] : 'unknown';
+  };
+
+  // Helper function to generate question_id from section slug
+  const generateQuestionId = (sectionSlug: string): string => {
+    return `section_${sectionSlug}_reflection`;
+  };
 
   // Helper function to format timestamp
   const formatTimestamp = (seconds: number): string => {
@@ -134,6 +148,10 @@ export function useDeepReflection(): UseDeepReflectionReturn {
         return { success: false, error: 'You must be logged in to save reflections' };
       }
 
+      // Extract section slug from current pathname and generate question_id
+      const sectionSlug = extractSectionSlug(pathname);
+      const questionId = generateQuestionId(sectionSlug);
+
       const reflectionData = {
         user_id: sessionData.session.user.id, // ✅ CRITICAL FIX: Add missing user_id
         section_id: data.section_id,
@@ -142,6 +160,7 @@ export function useDeepReflection(): UseDeepReflectionReturn {
         audio_timestamp: data.audio_timestamp,
         question_text: 'Deep Reflection', // Standard question for deep reflections
         answer_text: data.answer_text,
+        question_id: questionId, // ✅ CRITICAL FIX: Add missing question_id
         reflection_type: 'deep_reflection',
         tags: data.tags || []
         // ✅ REMOVED: created_at and updated_at - let database handle these with defaults
@@ -193,7 +212,7 @@ export function useDeepReflection(): UseDeepReflectionReturn {
       console.error('Error creating reflection:', err);
       return { success: false, error: 'Failed to create reflection' };
     }
-  }, []);
+  }, [pathname]);
 
   // Delete a reflection
   const deleteReflection = useCallback(async (
