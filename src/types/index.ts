@@ -92,9 +92,8 @@ export type MindsetType = 'natural' | 'transition' | 'spiritual';
 export interface JournalEntry {
   id: string;
   user_id: string;
-  title?: string;
-  content: string;
-  mindset: MindsetType;
+  question_text: string;
+  answer_text: string;
   tags: string[];
   reflection_type: string;
   created_at: string;
@@ -377,9 +376,8 @@ export interface ApiResponse<T = any> {
 }
 
 export interface CreateJournalEntryRequest {
-  title?: string;
-  content: string;
-  mindset: MindsetType;
+  question_text: string;
+  answer_text: string;
   tags?: string[];
   reflection_type: string;
 }
