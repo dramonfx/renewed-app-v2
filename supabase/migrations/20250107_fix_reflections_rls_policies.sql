@@ -16,14 +16,22 @@ BEGIN;
 -- STEP 1: Ensure RLS is enabled on reflections table
 ALTER TABLE public.reflections ENABLE ROW LEVEL SECURITY;
 
--- STEP 2: Recreate RLS policies (drop and recreate to ensure they're correct)
--- This ensures the policies exist even if previous migrations had issues
-
--- Drop existing policies if they exist (safe to ignore errors)
+-- STEP 2: Clean up any duplicate or conflicting RLS policies
+-- Drop ALL existing policies to ensure clean state (safe to ignore errors)
 DROP POLICY IF EXISTS "Users can view their own reflections" ON public.reflections;
 DROP POLICY IF EXISTS "Users can insert their own reflections" ON public.reflections;
 DROP POLICY IF EXISTS "Users can update their own reflections" ON public.reflections;
 DROP POLICY IF EXISTS "Users can delete their own reflections" ON public.reflections;
+
+-- Drop any other potential policy variations that might exist
+DROP POLICY IF EXISTS "reflections_select_policy" ON public.reflections;
+DROP POLICY IF EXISTS "reflections_insert_policy" ON public.reflections;
+DROP POLICY IF EXISTS "reflections_update_policy" ON public.reflections;
+DROP POLICY IF EXISTS "reflections_delete_policy" ON public.reflections;
+DROP POLICY IF EXISTS "allow_select_own_reflections" ON public.reflections;
+DROP POLICY IF EXISTS "allow_insert_own_reflections" ON public.reflections;
+DROP POLICY IF EXISTS "allow_update_own_reflections" ON public.reflections;
+DROP POLICY IF EXISTS "allow_delete_own_reflections" ON public.reflections;
 
 -- Create comprehensive RLS policies for all CRUD operations
 

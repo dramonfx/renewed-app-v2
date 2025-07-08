@@ -35,7 +35,27 @@ export function useDeepReflection(): UseDeepReflectionReturn {
       setLoading(true);
       setError(null);
 
-      // Query Supabase for deep reflections
+      // Get current user session
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        console.error('Session error during reflection loading:', sessionError);
+        setError(`Authentication error: ${sessionError.message}`);
+        setReflections([]);
+        setStats(null);
+        setLoading(false);
+        return;
+      }
+
+      if (!sessionData?.session?.user) {
+        // No user logged in - return empty state
+        setReflections([]);
+        setStats(null);
+        setLoading(false);
+        return;
+      }
+
+      // Query Supabase for deep reflections (RLS will automatically filter by user_id)
       const { data, error: supabaseError } = await (supabase as any)
         .from('reflections')
         .select('*')
@@ -102,7 +122,20 @@ export function useDeepReflection(): UseDeepReflectionReturn {
     try {
       setError(null);
 
+      // Get current user session
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        console.error('Session error during reflection creation:', sessionError);
+        return { success: false, error: `Authentication error: ${sessionError.message}` };
+      }
+
+      if (!sessionData?.session?.user) {
+        return { success: false, error: 'You must be logged in to save reflections' };
+      }
+
       const reflectionData = {
+        user_id: sessionData.session.user.id, // ✅ CRITICAL FIX: Add missing user_id
         section_id: data.section_id,
         section_title: data.section_title,
         audio_title: data.audio_title,
@@ -110,9 +143,8 @@ export function useDeepReflection(): UseDeepReflectionReturn {
         question_text: 'Deep Reflection', // Standard question for deep reflections
         answer_text: data.answer_text,
         reflection_type: 'deep_reflection',
-        tags: data.tags || [],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        tags: data.tags || []
+        // ✅ REMOVED: created_at and updated_at - let database handle these with defaults
       };
 
       const { data: result, error: supabaseError } = await (supabase as any)
@@ -170,9 +202,22 @@ export function useDeepReflection(): UseDeepReflectionReturn {
     try {
       setError(null);
 
+      // Get current user session
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        console.error('Session error during reflection deletion:', sessionError);
+        return { success: false, error: `Authentication error: ${sessionError.message}` };
+      }
+
+      if (!sessionData?.session?.user) {
+        return { success: false, error: 'You must be logged in to delete reflections' };
+      }
+
       // Find the reflection to delete for stats calculation
       const reflectionToDelete = reflections.find(r => r.id === id);
 
+      // Delete reflection (RLS will ensure user can only delete their own)
       const { error: supabaseError } = await (supabase as any)
         .from('reflections')
         .delete()
@@ -230,6 +275,18 @@ export function useDeepReflection(): UseDeepReflectionReturn {
     sectionId: string
   ): Promise<DeepReflection[]> => {
     try {
+      // Get current user session
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        console.error('Session error during section reflections fetch:', sessionError);
+        return [];
+      }
+
+      if (!sessionData?.session?.user) {
+        return []; // No user logged in
+      }
+
       const { data, error: supabaseError } = await (supabase as any)
         .from('reflections')
         .select('*')
