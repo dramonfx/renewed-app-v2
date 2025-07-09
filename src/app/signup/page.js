@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
@@ -17,9 +18,32 @@ export default function SignupPage() {
   const [validationErrors, setValidationErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [spiritualStep, setSpiritualStep] = useState(0); // Track spiritual preparation steps
 
-  const { signUp, user, loading: authLoading } = useAuth(); // Fixed: Added loading state
+  const { signUp, user, loading: authLoading } = useAuth();
   const router = useRouter();
+
+  // Sacred preparation steps for spiritual context
+  const spiritualPreparation = [
+    {
+      title: "Sacred Intention",
+      description: "Set your heart toward transformation",
+      icon: "🕊️",
+      message: "Every spiritual journey begins with a sacred intention. You are about to embark on a path of profound inner transformation."
+    },
+    {
+      title: "Open Heart",
+      description: "Approach with humility and readiness",
+      icon: "💎",
+      message: "True spiritual growth requires an open heart, ready to receive wisdom and willing to be transformed by divine truth."
+    },
+    {
+      title: "Sacred Commitment",
+      description: "Commit to the journey of renewal",
+      icon: "✨",
+      message: "This is more than creating an account—it's beginning a sacred journey toward spiritual renewal and authentic transformation."
+    }
+  ];
 
   // ENHANCED REDIRECT LOGIC - Fixed to check loading state
   useEffect(() => {
@@ -107,16 +131,22 @@ export default function SignupPage() {
         const friendlyError = getErrorMessage(signUpError);
         setError(friendlyError);
       } else if (user) {
-        setSuccessMessage('Account created successfully! You will be redirected shortly.');
+        setSuccessMessage('🕊️ Sacred account created! Preparing your spiritual journey...');
         setEmail('');
         setPassword('');
         setConfirmPassword('');
+        
+        // Clear any existing onboarding completion to ensure fresh start
+        localStorage.removeItem('renewedOnboardingCompleted');
+        localStorage.removeItem('renewedOnboardingData');
+        
+        // Redirect to onboarding for spiritual preparation
         setTimeout(() => {
-          router.push('/book');
+          router.push('/onboarding');
         }, 2000);
       } else {
         setSuccessMessage(
-          'Account creation initiated. Please check your email for confirmation instructions.'
+          '🙏 Sacred journey initiated. Please check your email for confirmation instructions.'
         );
       }
     } catch (err) {
@@ -125,6 +155,82 @@ export default function SignupPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Enhanced spiritual preparation display
+  const showSpiritualPreparation = () => {
+    const currentStep = spiritualPreparation[spiritualStep];
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="mb-8"
+      >
+        <SacredCard variant="glass" className="p-6 text-center">
+          <motion.div
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sacred-gradient shadow-lg"
+          >
+            <span className="text-2xl">{currentStep.icon}</span>
+          </motion.div>
+          <h3 className="mb-2 font-serif text-xl text-sacred-blue-900">{currentStep.title}</h3>
+          <p className="mb-4 text-sm text-sacred-blue-600">{currentStep.description}</p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="text-sm leading-relaxed text-sacred-blue-700"
+          >
+            {currentStep.message}
+          </motion.p>
+          
+          <div className="mt-6 flex justify-center space-x-2">
+            {spiritualPreparation.map((_, index) => (
+              <motion.div
+                key={index}
+                initial={{ scale: 0.8 }}
+                animate={{ scale: index === spiritualStep ? 1.2 : 1 }}
+                className={`h-3 w-3 rounded-full ${
+                  index === spiritualStep ? 'bg-sacred-gold-500' : 'bg-sacred-blue-200'
+                }`}
+              />
+            ))}
+          </div>
+          
+          <div className="mt-6 flex justify-center space-x-4">
+            {spiritualStep > 0 && (
+              <SacredButton
+                variant="ghost"
+                size="sm"
+                onClick={() => setSpiritualStep(spiritualStep - 1)}
+              >
+                Previous
+              </SacredButton>
+            )}
+            {spiritualStep < spiritualPreparation.length - 1 ? (
+              <SacredButton
+                variant="primary"
+                size="sm"
+                onClick={() => setSpiritualStep(spiritualStep + 1)}
+              >
+                Continue
+              </SacredButton>
+            ) : (
+              <SacredButton
+                variant="gold"
+                size="sm"
+                onClick={() => setSpiritualStep(-1)} // Hide spiritual preparation
+              >
+                Begin Sacred Registration
+              </SacredButton>
+            )}
+          </div>
+        </SacredCard>
+      </motion.div>
+    );
   };
 
   // ENHANCED input change handlers with better error clearing
@@ -181,17 +287,25 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <div
-            className="sacred-icon-bg-gold mx-auto mb-6 h-16 w-16"
+    <div className="bg-sacred-journey-gradient min-h-screen px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-md space-y-8">
+        {/* Enhanced Spiritual Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center"
+        >
+          <motion.div
+            initial={{ scale: 0.8, rotate: -10 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="sacred-icon-bg-gold mx-auto mb-6 h-20 w-20"
             role="img"
-            aria-label="Sacred icon"
+            aria-label="Sacred transformation icon"
           >
             <svg
-              className="h-8 w-8"
+              className="h-10 w-10"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -204,15 +318,55 @@ export default function SignupPage() {
                 d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
               />
             </svg>
-          </div>
-          <h1 className="text-sacred mb-2 font-serif text-3xl font-bold">Begin Your Journey</h1>
-          <p className="text-sacred-muted">
-            Create your account to start your spiritual transformation
-          </p>
-        </div>
+          </motion.div>
+          <motion.h1
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="text-sacred mb-3 font-serif text-4xl font-bold"
+          >
+            Sacred Journey Begins
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="text-sacred-muted text-lg"
+          >
+            Welcome to your spiritual transformation portal
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, width: 0 }}
+            animate={{ opacity: 1, width: '100%' }}
+            transition={{ delay: 0.8, duration: 0.8 }}
+            className="mx-auto mt-4 h-px bg-sacred-gradient"
+          />
+        </motion.div>
 
-        {/* Signup Form */}
-        <SacredCard variant="heavy" className="relative p-8">
+        {/* Show Spiritual Preparation or Registration Form */}
+        {spiritualStep >= 0 && spiritualStep < spiritualPreparation.length ? (
+          showSpiritualPreparation()
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <SacredCard variant="heavy" className="relative p-8">
+              <div className="mb-6 text-center">
+                <motion.div
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-sacred-gradient shadow-lg"
+                >
+                  <span className="text-xl text-white">🕊️</span>
+                </motion.div>
+                <h2 className="mb-2 font-serif text-2xl text-sacred-blue-900">Sacred Registration</h2>
+                <p className="text-sm text-sacred-blue-600">
+                  Complete your sacred account creation to begin your journey
+                </p>
+              </div>
           {/* ENHANCED Loading Overlay with better accessibility */}
           {isLoading && (
             <div
@@ -364,7 +518,7 @@ export default function SignupPage() {
             )}
           </form>
 
-          {/* Footer with enhanced accessibility */}
+          {/* Footer with enhanced spiritual context */}
           <div className="mt-8 text-center">
             <p className="text-sm text-sacred-blue-600">
               Already have an account?{' '}
@@ -373,18 +527,25 @@ export default function SignupPage() {
                 className="rounded font-semibold text-sacred-blue-700 underline transition-colors duration-200 hover:text-sacred-blue-800 focus:outline-none focus:ring-2 focus:ring-sacred-blue-500 focus:ring-offset-2"
                 tabIndex={isLoading || !!successMessage ? -1 : 0}
               >
-                Sign in
+                Continue your journey
               </Link>
             </p>
           </div>
         </SacredCard>
+      </motion.div>
+    )}
 
-        {/* Additional Help */}
-        <div className="text-center">
+        {/* Additional Spiritual Guidance */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 0.8 }}
+          className="text-center"
+        >
           <p className="text-sacred-muted text-xs">
-            By creating an account, you agree to our terms of service and privacy policy.
+            🙏 By creating an account, you enter into a sacred covenant of transformation and growth.
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

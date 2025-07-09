@@ -5,6 +5,7 @@ import { useLogin } from '@/hooks/useLogin';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
@@ -78,17 +79,25 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <div
-            className="sacred-icon-bg mx-auto mb-6 h-16 w-16"
+    <div className="bg-sacred-journey-gradient min-h-screen px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-md space-y-8">
+        {/* Enhanced Spiritual Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center"
+        >
+          <motion.div
+            initial={{ scale: 0.8, rotate: -5 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="sacred-icon-bg mx-auto mb-6 h-20 w-20"
             role="img"
-            aria-label="Sacred icon"
+            aria-label="Sacred return icon"
           >
             <svg
-              className="h-8 w-8"
+              className="h-10 w-10"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -101,47 +110,94 @@ function LoginForm() {
                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
               />
             </svg>
-          </div>
-          <h1 className="text-sacred mb-2 font-serif text-3xl font-bold">Welcome Back</h1>
-          <p className="text-sacred-muted">Continue your journey of spiritual transformation</p>
-        </div>
+          </motion.div>
+          <motion.h1
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="text-sacred mb-3 font-serif text-4xl font-bold"
+          >
+            Sacred Return
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="text-sacred-muted text-lg"
+          >
+            Welcome back to your journey of spiritual transformation
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, width: 0 }}
+            animate={{ opacity: 1, width: '100%' }}
+            transition={{ delay: 0.8, duration: 0.8 }}
+            className="mx-auto mt-4 h-px bg-sacred-gradient"
+          />
+        </motion.div>
 
-        {/* Login Form */}
-        <SacredCard variant="heavy" className="relative p-8">
-          {/* ENHANCED Loading Overlay with better accessibility */}
-          {isLoading && (
-            <div
-              className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-sm"
-              role="status"
-              aria-label="Signing you in"
-            >
-              <div className="flex flex-col items-center space-y-3">
-                <LoadingSpinner size="lg" className="text-sacred-blue-500" />
-                <p className="text-sm font-medium text-sacred-blue-600">Signing you in...</p>
-              </div>
+        {/* Enhanced Login Form */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <SacredCard variant="heavy" className="relative p-8">
+            {/* Spiritual Form Header */}
+            <div className="mb-6 text-center">
+              <motion.div
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-sacred-gradient shadow-lg"
+              >
+                <span className="text-xl text-white">🔑</span>
+              </motion.div>
+              <h2 className="mb-2 font-serif text-2xl text-sacred-blue-900">Sacred Access</h2>
+              <p className="text-sm text-sacred-blue-600">
+                Enter your credentials to continue your spiritual journey
+              </p>
             </div>
-          )}
 
-          {/* ENHANCED Success Message with better accessibility */}
-          {loginSuccess && (
-            <div className="sacred-success mb-6" role="alert" aria-live="polite">
-              <div className="flex items-center">
-                <svg
-                  className="mr-2 h-5 w-5 text-green-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <p className="font-medium">Welcome back! Redirecting you now...</p>
+            {/* ENHANCED Loading Overlay with better accessibility */}
+            {isLoading && (
+              <div
+                className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-sm"
+                role="status"
+                aria-label="Signing you in"
+              >
+                <div className="flex flex-col items-center space-y-3">
+                  <LoadingSpinner size="lg" className="text-sacred-blue-500" />
+                  <p className="text-sm font-medium text-sacred-blue-600">🕊️ Preparing your sacred space...</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* ENHANCED Success Message with spiritual context */}
+            {loginSuccess && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className="sacred-success mb-6"
+                role="alert"
+                aria-live="polite"
+              >
+                <div className="flex items-center">
+                  <motion.div
+                    initial={{ rotate: 0 }}
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1 }}
+                    className="mr-3"
+                  >
+                    <span className="text-2xl">🕊️</span>
+                  </motion.div>
+                  <div>
+                    <p className="font-medium text-sacred-blue-900">Sacred access granted!</p>
+                    <p className="text-sm text-sacred-blue-600">Preparing your spiritual sanctuary...</p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
           <form onSubmit={onSubmit} className="space-y-6" noValidate>
             {/* ENHANCED Email Field with better accessibility */}
@@ -244,27 +300,33 @@ function LoginForm() {
             )}
           </form>
 
-          {/* Footer with enhanced accessibility */}
-          <div className="mt-8 text-center">
-            <p className="text-sm text-sacred-blue-600">
-              New to your spiritual journey?{' '}
-              <Link
-                href="/signup"
-                className="rounded font-semibold text-sacred-blue-700 underline transition-colors duration-200 hover:text-sacred-blue-800 focus:outline-none focus:ring-2 focus:ring-sacred-blue-500 focus:ring-offset-2"
-                tabIndex={isLoading || loginSuccess ? -1 : 0}
-              >
-                Create an account
-              </Link>
-            </p>
-          </div>
-        </SacredCard>
+            {/* Footer with enhanced spiritual context */}
+            <div className="mt-8 text-center">
+              <p className="text-sm text-sacred-blue-600">
+                New to your spiritual journey?{' '}
+                <Link
+                  href="/signup"
+                  className="rounded font-semibold text-sacred-blue-700 underline transition-colors duration-200 hover:text-sacred-blue-800 focus:outline-none focus:ring-2 focus:ring-sacred-blue-500 focus:ring-offset-2"
+                  tabIndex={isLoading || loginSuccess ? -1 : 0}
+                >
+                  Begin your sacred transformation
+                </Link>
+              </p>
+            </div>
+          </SacredCard>
+        </motion.div>
 
-        {/* Additional Help */}
-        <div className="text-center">
+        {/* Additional Spiritual Guidance */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 0.8 }}
+          className="text-center"
+        >
           <p className="text-sacred-muted text-xs">
-            Having trouble? Contact our support team for assistance.
+            🙏 Every return to the sacred path is a homecoming of the soul.
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
