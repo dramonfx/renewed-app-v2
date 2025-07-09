@@ -7,8 +7,160 @@ import JournalEntryList from '@/components/journal/JournalEntryList';
 import SacredJournalEntry from '@/components/journal/SacredJournalEntry';
 import JournalEntryModal from '@/components/journal/JournalEntryModal';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { SparklesIcon } from '@heroicons/react/24/outline';
+import { SparklesIcon, BookOpenIcon, HeartIcon } from '@heroicons/react/24/outline';
+import { useDeepReflection } from '@/hooks/useDeepReflection';
 import journalStorage from '@/lib/journalStorage';
+
+// Deep Reflections List Component
+function DeepReflectionsList({ reflections, loading, onDeleteReflection }) {
+  const [isDeleting, setIsDeleting] = useState(null);
+
+  const handleDelete = async (id) => {
+    if (!confirm('Are you sure you want to delete this reflection? This action cannot be undone.')) {
+      return;
+    }
+
+    setIsDeleting(id);
+    const result = await onDeleteReflection(id);
+    
+    if (!result.success) {
+      console.error('Failed to delete reflection:', result.error);
+    }
+    
+    setIsDeleting(null);
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined 
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <div
+            key={i}
+            className="animate-pulse rounded-lg border border-gray-100 bg-white p-6 shadow-sm"
+          >
+            <div className="mb-4 flex items-start justify-between">
+              <div className="flex-1">
+                <div className="mb-3 h-4 w-3/4 rounded bg-gray-200"></div>
+                <div className="mb-2 h-3 w-1/2 rounded bg-gray-200"></div>
+                <div className="h-3 w-1/3 rounded bg-gray-200"></div>
+              </div>
+              <div className="ml-4 h-6 w-16 rounded-full bg-gray-200"></div>
+            </div>
+            <div className="space-y-2">
+              <div className="h-3 rounded bg-gray-200"></div>
+              <div className="h-3 w-5/6 rounded bg-gray-200"></div>
+              <div className="h-3 w-4/6 rounded bg-gray-200"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (reflections.length === 0) {
+    return (
+      <div className="py-12 text-center">
+        <SparklesIcon className="mx-auto mb-4 h-16 w-16 text-blue-300" />
+        <h3 className="mb-2 text-lg font-medium text-gray-900">No Sacred Reflections Yet</h3>
+        <p className="mb-6 text-gray-600">
+          Listen to audio sections and capture your spiritual insights as they arise.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {reflections.map((reflection, index) => (
+        <motion.div
+          key={reflection.id}
+          className="bg-white/70 backdrop-blur-sm rounded-2xl border border-blue-100 overflow-hidden hover:shadow-lg transition-all duration-300"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 * index }}
+        >
+          <div className="p-6">
+            {/* Header */}
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+                  <SparklesIcon className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-blue-900">
+                    {reflection.section_title}
+                  </h3>
+                  <div className="flex items-center gap-4 text-sm text-blue-600">
+                    <div className="flex items-center gap-1">
+                      <SparklesIcon className="w-3 h-3" />
+                      <span className="font-mono">{reflection.formatted_timestamp}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <BookOpenIcon className="w-3 h-3" />
+                      <span>{formatDate(reflection.created_at)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Delete Button */}
+              <button
+                onClick={() => handleDelete(reflection.id)}
+                disabled={isDeleting === reflection.id}
+                className="p-2 text-blue-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50"
+                aria-label="Delete reflection"
+                title="Delete this reflection"
+              >
+                {isDeleting === reflection.id ? (
+                  <div className="w-4 h-4 border-2 border-red-300 border-t-red-500 rounded-full animate-spin" />
+                ) : (
+                  <HeartIcon className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+
+            {/* Reflection Content */}
+            <div className="prose prose-blue max-w-none">
+              <p className="text-blue-800 leading-relaxed italic">
+                &ldquo;{reflection.answer_text}&rdquo;
+              </p>
+            </div>
+
+            {/* Tags */}
+            {reflection.tags && reflection.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                {reflection.tags.map((tag, tagIndex) => (
+                  <span
+                    key={tagIndex}
+                    className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
 
 export default function JournalPage() {
   const [entries, setEntries] = useState([]);
@@ -23,6 +175,17 @@ export default function JournalPage() {
     search: '',
   });
   const [storageAvailable, setStorageAvailable] = useState(true);
+  const [activeTab, setActiveTab] = useState('journal');
+
+  // Deep Reflections integration
+  const { 
+    reflections: deepReflections, 
+    loading: deepReflectionsLoading, 
+    error: deepReflectionsError,
+    hasReflections,
+    stats: deepReflectionStats,
+    deleteReflection
+  } = useDeepReflection();
 
   // Load journal entries from localStorage
   const loadEntries = () => {
@@ -236,8 +399,43 @@ export default function JournalPage() {
             />
           </motion.div>
 
+          {/* Tab Navigation */}
+          <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="mb-6"
+          >
+            <div className="flex space-x-1 rounded-xl bg-white/50 p-1 backdrop-blur-sm border border-blue-100">
+              <button
+                onClick={() => setActiveTab('journal')}
+                className={`flex-1 flex items-center justify-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
+                  activeTab === 'journal'
+                    ? 'bg-blue-500 text-white shadow-md'
+                    : 'text-blue-600 hover:bg-blue-50'
+                }`}
+              >
+                <BookOpenIcon className="w-4 h-4 mr-2" />
+                Journal Entries ({entries.length})
+              </button>
+              {hasReflections && (
+                <button
+                  onClick={() => setActiveTab('reflections')}
+                  className={`flex-1 flex items-center justify-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
+                    activeTab === 'reflections'
+                      ? 'bg-blue-500 text-white shadow-md'
+                      : 'text-blue-600 hover:bg-blue-50'
+                  }`}
+                >
+                  <SparklesIcon className="w-4 h-4 mr-2" />
+                  Sacred Reflections ({deepReflections.length})
+                </button>
+              )}
+            </div>
+          </motion.div>
+
           {/* Enhanced Error Display */}
-          {error && (
+          {(error || deepReflectionsError) && (
             <motion.div
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
@@ -251,7 +449,7 @@ export default function JournalPage() {
                   <p className="font-medium text-red-800">
                     Something went amiss in your sacred space
                   </p>
-                  <p className="mt-1 text-sm text-red-600">{error}</p>
+                  <p className="mt-1 text-sm text-red-600">{error || deepReflectionsError}</p>
                 </div>
               </div>
               <button
@@ -263,17 +461,27 @@ export default function JournalPage() {
             </motion.div>
           )}
 
-          {/* Sacred Journal Entries */}
+          {/* Tab Content */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.5 }}
           >
-            <JournalEntryList
-              entries={entries}
-              loading={entriesLoading}
-              onEntryClick={setSelectedEntry}
-            />
+            {activeTab === 'journal' && (
+              <JournalEntryList
+                entries={entries}
+                loading={entriesLoading}
+                onEntryClick={setSelectedEntry}
+              />
+            )}
+            
+            {activeTab === 'reflections' && (
+              <DeepReflectionsList
+                reflections={deepReflections}
+                loading={deepReflectionsLoading}
+                onDeleteReflection={deleteReflection}
+              />
+            )}
           </motion.div>
         </div>
       </motion.div>

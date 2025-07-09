@@ -5,17 +5,15 @@ import type { JournalEntry, MindsetType, ApiResponse } from '@/types';
 // Reflection database interfaces
 interface ReflectionInsert {
   user_id: string;
-  title?: string;
-  content: string;
-  mindset: MindsetType;
+  question_text: string;
+  answer_text: string;
   tags: string[];
   reflection_type: string;
 }
 
 interface ReflectionUpdate {
-  title?: string;
-  content?: string;
-  mindset?: MindsetType;
+  question_text?: string;
+  answer_text?: string;
   tags?: string[];
   reflection_type?: string;
   updated_at?: string;
@@ -51,9 +49,8 @@ interface DateRangeOptions {
  * Save a reflection (journal entry) to the database
  */
 export async function saveReflection(
-  title: string = '',
-  content: string,
-  mindset: MindsetType,
+  questionText: string,
+  answerText: string,
   tags: string[] = [],
   reflectionType: string = 'daily_reflection'
 ): Promise<ApiResponse<JournalEntry>> {
@@ -75,9 +72,8 @@ export async function saveReflection(
         data: {
           id: 'mock-' + Date.now(),
           user_id: mockUserId,
-          title,
-          content,
-          mindset,
+          question_text: questionText,
+          answer_text: answerText,
           tags,
           reflection_type: reflectionType,
           created_at: new Date().toISOString(),
@@ -89,9 +85,8 @@ export async function saveReflection(
 
     const insertData: ReflectionInsert = {
       user_id: sessionData.session.user.id,
-      title: title || undefined,
-      content,
-      mindset,
+      question_text: questionText,
+      answer_text: answerText,
       tags,
       reflection_type: reflectionType,
     };
@@ -271,7 +266,7 @@ export async function searchReflections(
       .from('reflections')
       .select('*')
       .eq('user_id', sessionData.session.user.id)
-      .or(`title.ilike.%${searchTerm}%,content.ilike.%${searchTerm}%`)
+      .or(`question_text.ilike.%${searchTerm}%,answer_text.ilike.%${searchTerm}%`)
       .order('created_at', { ascending: false })
       .limit(limit);
 
@@ -338,15 +333,10 @@ export async function getReflectionStats(): Promise<ApiResponse<ReflectionStats>
     const thisWeek = reflections.filter((r) => new Date(r.created_at) >= oneWeekAgo).length;
     const thisMonth = reflections.filter((r) => new Date(r.created_at) >= oneMonthAgo).length;
 
-    // Calculate mindset distribution
-    const naturalMindEntries = reflections.filter((r) => r.mindset === 'natural').length;
-    const transitionEntries = reflections.filter((r) => r.mindset === 'transition').length;
-    const spiritualMindEntries = reflections.filter((r) => r.mindset === 'spiritual').length;
-
-    // Calculate average content length
+    // Calculate average content length using answer_text
     const averageLength =
       total > 0
-        ? Math.round(reflections.reduce((sum, r) => sum + (r.content?.length || 0), 0) / total)
+        ? Math.round(reflections.reduce((sum, r) => sum + (r.answer_text?.length || 0), 0) / total)
         : 0;
 
     return {
@@ -355,9 +345,9 @@ export async function getReflectionStats(): Promise<ApiResponse<ReflectionStats>
         thisWeek,
         thisMonth,
         averageLength,
-        naturalMindEntries,
-        transitionEntries,
-        spiritualMindEntries,
+        naturalMindEntries: 0,
+        transitionEntries: 0,
+        spiritualMindEntries: 0,
       },
       status: 200,
     };
@@ -426,10 +416,10 @@ export async function getReflectionsByDateRange(
 }
 
 /**
- * Get reflections by mindset type
+ * Get reflections by reflection type
  */
-export async function getReflectionsByMindset(
-  mindset: MindsetType,
+export async function getReflectionsByType(
+  reflectionType: string,
   options: ReflectionQueryOptions = {}
 ): Promise<ApiResponse<JournalEntry[]>> {
   const { limit = 50, orderBy = 'created_at', ascending = false } = options;
@@ -450,7 +440,7 @@ export async function getReflectionsByMindset(
       .from('reflections')
       .select('*')
       .eq('user_id', sessionData.session.user.id)
-      .eq('mindset', mindset)
+      .eq('reflection_type', reflectionType)
       .order(orderBy, { ascending })
       .limit(limit);
 
@@ -460,7 +450,7 @@ export async function getReflectionsByMindset(
 
     return { data: (data as JournalEntry[]) || [], status: 200 };
   } catch (error) {
-    console.error('Error fetching reflections by mindset:', error);
+    console.error('Error fetching reflections by type:', error);
     return {
       data: [],
       error: error instanceof Error ? error.message : 'Unknown error occurred',

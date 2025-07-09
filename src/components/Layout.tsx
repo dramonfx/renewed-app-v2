@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState, ReactNode } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { useDeepReflection } from '@/hooks/useDeepReflection';
 
 // Define interfaces
 interface LayoutProps {
@@ -22,6 +23,9 @@ export default function Layout({ children }: LayoutProps): React.ReactElement {
   const [sections, setSections] = useState<Section[]>([]);
   const { user, logout, loading } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  
+  // Get reflections status for conditional navigation
+  const { hasReflections } = useDeepReflection();
 
   // Check if current page should have full-screen layout (no sidebar)
   const isFullScreenPage =
@@ -125,6 +129,17 @@ export default function Layout({ children }: LayoutProps): React.ReactElement {
                     📖 Sacred Journal
                   </Link>
                 </li>
+                {/* Conditional Reflections Link - Only shown when user has reflections */}
+                {hasReflections && (
+                  <li>
+                    <Link
+                      href="/reflections"
+                      className="block rounded-lg border border-transparent px-4 py-3 font-sans text-base font-semibold text-sacred-blue-900 transition-all duration-300 hover:border-sacred-blue-300 hover:bg-white/50 hover:text-sacred-blue-900 hover:shadow-lg"
+                    >
+                      ✨ Sacred Reflections
+                    </Link>
+                  </li>
+                )}
                 <li>
                   <Link
                     href="/book"

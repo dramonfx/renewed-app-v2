@@ -92,13 +92,49 @@ export type MindsetType = 'natural' | 'transition' | 'spiritual';
 export interface JournalEntry {
   id: string;
   user_id: string;
-  title?: string;
-  content: string;
-  mindset: MindsetType;
+  question_text: string;
+  answer_text: string;
   tags: string[];
   reflection_type: string;
   created_at: string;
   updated_at: string;
+}
+
+// =============================================================================
+// DEEP REFLECTION TYPES
+// =============================================================================
+
+export interface DeepReflection {
+  id: string;
+  user_id: string;
+  section_id: string;
+  section_title: string;
+  audio_title?: string;
+  audio_timestamp: number;
+  answer_text: string;
+  tags: string[];
+  created_at: string;
+  updated_at: string;
+  formatted_timestamp?: string;
+}
+
+export interface CreateDeepReflectionRequest {
+  section_id: string;
+  section_title: string;
+  audio_title?: string;
+  audio_timestamp: number;
+  answer_text: string;
+  tags?: string[];
+}
+
+export interface DeepReflectionStats {
+  total_reflections: number;
+  reflections_this_week: number;
+  reflections_this_month: number;
+  sections_with_reflections: number;
+  average_reflection_length: number;
+  first_reflection?: string;
+  latest_reflection?: string;
 }
 
 export interface JournalStats {
@@ -316,6 +352,18 @@ export interface UseSectionReturn {
   markComplete: () => Promise<void>;
 }
 
+export interface UseDeepReflectionReturn {
+  reflections: DeepReflection[];
+  loading: boolean;
+  error: string | null;
+  createReflection: (data: CreateDeepReflectionRequest) => Promise<{ success: boolean; error?: string }>;
+  deleteReflection: (id: string) => Promise<{ success: boolean; error?: string }>;
+  getReflectionsBySection: (sectionId: string) => Promise<DeepReflection[]>;
+  hasReflections: boolean;
+  stats: DeepReflectionStats | null;
+  refreshReflections: () => Promise<void>;
+}
+
 // =============================================================================
 // API REQUEST/RESPONSE TYPES
 // =============================================================================
@@ -328,9 +376,8 @@ export interface ApiResponse<T = any> {
 }
 
 export interface CreateJournalEntryRequest {
-  title?: string;
-  content: string;
-  mindset: MindsetType;
+  question_text: string;
+  answer_text: string;
   tags?: string[];
   reflection_type: string;
 }

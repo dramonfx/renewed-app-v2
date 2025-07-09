@@ -17,11 +17,15 @@ import {
   Trash2,
   Volume2,
   VolumeX,
+  RotateCw as Reset,
+  Sparkles,
+  Heart,
 } from 'lucide-react';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
 import { useAudioPlayerFixed } from '@/hooks/useAudioPlayerFixed';
 import type { SimpleBookmark } from '@/hooks/useSimpleBookmarks';
+import DeepReflectionModal from '@/components/DeepReflectionModal';
 
 export type AudioPlayerMode = 'full' | 'single';
 
@@ -275,6 +279,9 @@ export default function UnifiedAudioPlayerFixed({
     console.warn('UnifiedAudioPlayerFixed: singleTrackSlug is required when mode is "single"');
   }
 
+  // Deep Reflection Modal State
+  const [isReflectionModalOpen, setIsReflectionModalOpen] = React.useState(false);
+
   // Initialize fixed audio player
   const {
     // State values
@@ -331,6 +338,52 @@ export default function UnifiedAudioPlayerFixed({
   React.useEffect(() => {
     onPlayStateChange?.(isPlaying);
   }, [isPlaying, onPlayStateChange]);
+
+  // Reset functionality - reset to beginning of current track and pause
+  const handleReset = React.useCallback(() => {
+    if (currentTrack && audioRef.current) {
+      seek(0);
+      if (isPlaying) {
+        playPause(); // Pause if currently playing
+      }
+    }
+  }, [currentTrack, audioRef, seek, isPlaying, playPause]);
+
+  // Keyboard shortcuts
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Only handle if not typing in an input
+      if (event.target instanceof HTMLInputElement || 
+          event.target instanceof HTMLTextAreaElement ||
+          event.target instanceof HTMLSelectElement) {
+        return;
+      }
+
+      switch (event.key.toLowerCase()) {
+        case 'r':
+          event.preventDefault();
+          handleReset();
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleReset]);
+
+  // Deep Reflection Modal handlers
+  const handleOpenReflection = () => {
+    setIsReflectionModalOpen(true);
+  };
+
+  const handleCloseReflection = () => {
+    setIsReflectionModalOpen(false);
+  };
+
+  const handleReflectionSaved = () => {
+    // Could add toast notification or other feedback here
+    console.log('Deep reflection saved successfully');
+  };
 
   // Handle progress bar click for seeking
   const handleProgressClick = (e: MouseEvent<HTMLDivElement>): void => {
@@ -496,21 +549,55 @@ export default function UnifiedAudioPlayerFixed({
 
           <SpeedControl speed={speed} onSpeedChange={changeSpeed} />
 
-          <SacredButton
-            variant="ghost"
-            size="sm"
-            onClick={handleSaveBookmark}
-            disabled={!currentTrack || !currentTime || !canSaveBookmark}
-            className="opacity-80 hover:opacity-100"
-            aria-label="Save bookmark"
-            title={
-              !canSaveBookmark 
-                ? `Maximum ${mode === 'single' ? '1' : '2'} bookmark${mode === 'single' ? '' : 's'} reached`
-                : 'Save bookmark'
-            }
-          >
-            <Bookmark className="h-4 w-4" />
-          </SacredButton>
+          <div className="flex items-center space-x-2">
+            {/* Reset Button (both modes) */}
+            <SacredButton
+              variant="ghost"
+              size="sm"
+              onClick={handleReset}
+              disabled={!currentTrack}
+              className="opacity-80 hover:opacity-100"
+              aria-label="Reset to beginning (R)"
+              title="Reset to beginning (Press R)"
+            >
+              <Reset className="h-4 w-4" />
+            </SacredButton>
+
+            {/* Deep Reflection Button (single mode) or Bookmark Button (full mode) */}
+            {mode === 'single' ? (
+              <SacredButton
+                variant="ghost"
+                size="sm"
+                onClick={handleOpenReflection}
+                disabled={!currentTrack || !currentTime}
+                className={`opacity-80 hover:opacity-100 transition-all duration-300 ${
+                  !isPlaying && currentTrack && currentTime 
+                    ? 'animate-pulse shadow-lg shadow-sacred-blue-300/50' 
+                    : ''
+                }`}
+                aria-label="Capture deep reflection"
+                title="Capture a spiritual insight at this moment"
+              >
+                <Sparkles className="h-4 w-4" />
+              </SacredButton>
+            ) : (
+              <SacredButton
+                variant="ghost"
+                size="sm"
+                onClick={handleSaveBookmark}
+                disabled={!currentTrack || !currentTime || !canSaveBookmark}
+                className="opacity-80 hover:opacity-100"
+                aria-label="Save bookmark"
+                title={
+                  !canSaveBookmark 
+                    ? `Maximum 2 bookmarks reached`
+                    : 'Save bookmark'
+                }
+              >
+                <Bookmark className="h-4 w-4" />
+              </SacredButton>
+            )}
+          </div>
         </div>
 
         {/* Track Navigation with Inline Bookmarks */}
@@ -550,6 +637,17 @@ export default function UnifiedAudioPlayerFixed({
           </div>
         )}
       </div>
+
+      {/* Deep Reflection Modal */}
+      <DeepReflectionModal
+        isOpen={isReflectionModalOpen}
+        onClose={handleCloseReflection}
+        sectionId={singleTrackSlug || currentTrack?.id || 'unknown'}
+        sectionTitle={currentTrack?.title || 'Unknown Section'}
+        audioTitle={currentTrack?.title}
+        currentTimestamp={currentTime}
+        onReflectionSaved={handleReflectionSaved}
+      />
     </SacredCard>
   );
 }
