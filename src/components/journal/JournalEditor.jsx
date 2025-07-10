@@ -21,6 +21,9 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
+  Sparkles,
+  Heart,
+  Leaf,
 } from 'lucide-react';
 
 export default function JournalEditor({
@@ -68,6 +71,11 @@ export default function JournalEditor({
       </div>
     );
   }
+
+  // Insert spiritual symbol at cursor
+  const insertSpiritualSymbol = (symbol) => {
+    editor.chain().focus().insertContent(symbol).run();
+  };
 
   // Sacred toolbar buttons configuration
   const toolbarButtons = [
@@ -144,11 +152,22 @@ export default function JournalEditor({
     },
   ];
 
+  // Sacred spiritual symbols for authentic expression
+  const spiritualSymbols = [
+    { symbol: '🌿', title: 'Sacred Nature', icon: Leaf },
+    { symbol: '✨', title: 'Divine Sparkle', icon: Sparkles },
+    { symbol: '🙏', title: 'Prayer/Gratitude', icon: Heart },
+    { symbol: '🕊️', title: 'Peace/Spirit', icon: Heart },
+    { symbol: '💙', title: 'Sacred Heart', icon: Heart },
+    { symbol: '🌟', title: 'Divine Light', icon: Sparkles },
+  ];
+
   return (
     <div className="sacred-glass overflow-hidden rounded-lg border border-sacred-blue-200">
       {/* Sacred Toolbar */}
       <div className="border-b border-sacred-blue-200 bg-sacred-blue-50 p-3">
-        <div className="flex flex-wrap items-center gap-1">
+        {/* Main Formatting Toolbar */}
+        <div className="flex flex-wrap items-center gap-1 mb-3">
           {toolbarButtons.map((button, index) => {
             if (button.type === 'separator') {
               return <div key={index} className="mx-2 h-6 w-px bg-sacred-blue-300" />;
@@ -175,6 +194,27 @@ export default function JournalEditor({
               </button>
             );
           })}
+        </div>
+
+        {/* Sacred Spiritual Symbols */}
+        <div className="border-t border-sacred-blue-200 pt-3">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="h-4 w-4 text-sacred-blue-500" />
+            <span className="text-xs font-medium text-sacred-blue-700">Sacred Symbols</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-1">
+            {spiritualSymbols.map((symbol, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => insertSpiritualSymbol(symbol.symbol)}
+                title={symbol.title}
+                className="rounded-md p-2 text-lg transition-all duration-200 hover:bg-sacred-blue-100 hover:scale-110 active:scale-95"
+              >
+                {symbol.symbol}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

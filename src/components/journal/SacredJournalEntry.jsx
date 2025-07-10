@@ -7,6 +7,8 @@ import { XMarkIcon, CloudIcon, CheckCircleIcon, SparklesIcon } from '@heroicons/
 import SacredCard from '@/components/ui/sacred-card';
 import SacredButton from '@/components/ui/sacred-button';
 import MindsetDiscernmentCards from './MindsetDiscernmentCards';
+import JournalEditor from './JournalEditor';
+import { useAudioContext } from '@/hooks/useAudioContext';
 
 export default function SacredJournalEntry({ isOpen, onClose, onSave }) {
   const [formData, setFormData] = useState({
@@ -22,6 +24,10 @@ export default function SacredJournalEntry({ isOpen, onClose, onSave }) {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [currentPrompts, setCurrentPrompts] = useState([]);
   const [inspirationVisible, setInspirationVisible] = useState(true);
+  const [includeAudioContext, setIncludeAudioContext] = useState(true);
+
+  // Audio context detection
+  const audioContext = useAudioContext();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -97,7 +103,18 @@ export default function SacredJournalEntry({ isOpen, onClose, onSave }) {
     setError('');
 
     try {
-      await onSave(formData);
+      // Prepare entry data with optional audio context
+      const entryData = { ...formData };
+      
+      // Include audio context if available and user has chosen to include it
+      if (audioContext.isAudioContext && includeAudioContext) {
+        entryData.audio_title = audioContext.audioTitle;
+        entryData.audio_timestamp = audioContext.currentTimestamp;
+        entryData.section_id = audioContext.sectionId;
+        entryData.section_title = audioContext.sectionTitle;
+      }
+
+      await onSave(entryData);
       setSaveSuccess(true);
 
       setFormData({
@@ -152,6 +169,41 @@ export default function SacredJournalEntry({ isOpen, onClose, onSave }) {
                     <p className="text-sacred-medium text-sm">A workshop for the soul</p>
                   </div>
                 </div>
+
+                {/* Audio Context Indicator */}
+                {audioContext.isAudioContext && (
+                  <motion.div
+                    initial={{ y: 10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="mt-3 rounded-lg bg-blue-50 border border-blue-200 p-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 text-blue-700">
+                          <SparklesIcon className="h-4 w-4" />
+                          <span className="text-sm font-medium">Audio Context Detected</span>
+                        </div>
+                        <div className="text-xs text-blue-600">
+                          {audioContext.sectionTitle}
+                          {audioContext.formattedTimestamp && (
+                            <span className="ml-2 font-mono bg-blue-100 px-2 py-0.5 rounded">
+                              {audioContext.formattedTimestamp}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <label className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={includeAudioContext}
+                          onChange={(e) => setIncludeAudioContext(e.target.checked)}
+                          className="w-4 h-4 text-blue-600 border-blue-300 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-xs text-blue-700">Link to audio</span>
+                      </label>
+                    </div>
+                  </motion.div>
+                )}
 
                 {/* Success message */}
                 {saveSuccess && (
@@ -258,7 +310,7 @@ export default function SacredJournalEntry({ isOpen, onClose, onSave }) {
                   />
                 </div>
 
-                {/* Content - Takes remaining space */}
+                {/* Content - Enhanced Rich Text Editor */}
                 <div className="mb-6 flex-1">
                   <label
                     htmlFor="content"
@@ -266,14 +318,13 @@ export default function SacredJournalEntry({ isOpen, onClose, onSave }) {
                   >
                     Your Sacred Reflection
                   </label>
-                  <textarea
-                    id="content"
-                    name="content"
-                    value={formData.content}
-                    onChange={handleInputChange}
-                    placeholder="Share your thoughts, insights, and spiritual reflections..."
-                    className="h-full min-h-[300px] w-full resize-none rounded-xl border border-gray-300 bg-white/80 px-4 py-3 backdrop-blur-sm focus:border-transparent focus:ring-2 focus:ring-blue-500"
-                  />
+                  <div className="h-full min-h-[300px]">
+                    <JournalEditor
+                      content={formData.content}
+                      onChange={(html) => setFormData(prev => ({ ...prev, content: html }))}
+                      placeholder="Share your thoughts, insights, and spiritual reflections... ✨"
+                    />
+                  </div>
                 </div>
 
                 <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">

@@ -76,6 +76,14 @@ export const journalStorage = {
 
     validateEntry(entryData);
 
+    // Helper function to format timestamp
+    const formatTimestamp = (seconds) => {
+      if (!seconds || seconds <= 0) return null;
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = Math.floor(seconds % 60);
+      return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    };
+
     const newEntry = {
       id: generateId(),
       title: entryData.title?.trim() || '',
@@ -83,6 +91,13 @@ export const journalStorage = {
       mindset: entryData.mindset || '',
       reflection_type: entryData.reflection_type || 'general',
       tags: Array.isArray(entryData.tags) ? entryData.tags : [],
+      // Audio integration fields
+      audio_title: entryData.audio_title || null,
+      audio_timestamp: entryData.audio_timestamp || null,
+      section_id: entryData.section_id || null,
+      section_title: entryData.section_title || null,
+      formatted_timestamp: entryData.audio_timestamp ? formatTimestamp(entryData.audio_timestamp) : null,
+      // Standard fields
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       word_count: (entryData.content?.trim() || '').split(/\s+/).filter(Boolean).length,

@@ -70,22 +70,76 @@ export default function DashboardPage() {
     else if (hour < 20) setGreeting('Sacred evening');
     else setGreeting('Tranquil night');
 
+    // Calculate journal metrics from localStorage
+    const calculateJournalMetrics = () => {
+      try {
+        const entries = JSON.parse(localStorage.getItem('sacred_journal_entries') || '[]');
+        const now = new Date();
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        const entriesThisWeek = entries.filter(entry => 
+          new Date(entry.created_at) >= weekAgo).length;
+        const entriesThisMonth = entries.filter(entry => 
+          new Date(entry.created_at) >= monthAgo).length;
+        
+        const audioLinkedEntries = entries.filter(entry => 
+          entry.section_id || entry.audio_timestamp).length;
+        
+        const totalWordCount = entries.reduce((sum, entry) => 
+          sum + (entry.word_count || 0), 0);
+
+        // Calculate consistency score (entries per week over last month)
+        const weeksSinceFirstEntry = entries.length > 0 ? 
+          Math.max(1, Math.ceil((now - new Date(entries[entries.length - 1].created_at)) / (7 * 24 * 60 * 60 * 1000))) : 1;
+        const consistencyScore = Math.min(100, (entries.length / weeksSinceFirstEntry) * 25);
+
+        return {
+          totalEntries: entries.length,
+          entriesThisWeek,
+          entriesThisMonth,
+          audioLinkedEntries,
+          totalWordCount,
+          consistencyScore: Math.round(consistencyScore),
+          averageWordsPerEntry: entries.length > 0 ? Math.round(totalWordCount / entries.length) : 0
+        };
+      } catch (error) {
+        console.error('Error calculating journal metrics:', error);
+        return {
+          totalEntries: 0,
+          entriesThisWeek: 0,
+          entriesThisMonth: 0,
+          audioLinkedEntries: 0,
+          totalWordCount: 0,
+          consistencyScore: 0,
+          averageWordsPerEntry: 0
+        };
+      }
+    };
+
     // Load spiritual metrics from localStorage or calculate from progress
     const loadSpiritualMetrics = () => {
       try {
         const savedMetrics = localStorage.getItem('renewedSpiritualMetrics');
         const onboardingData = localStorage.getItem('renewedOnboardingData');
+        const journalMetrics = calculateJournalMetrics();
         
         if (savedMetrics) {
-          setSpiritualMetrics(JSON.parse(savedMetrics));
+          const existingMetrics = JSON.parse(savedMetrics);
+          // Enhance with journal metrics
+          setSpiritualMetrics({
+            ...existingMetrics,
+            ...journalMetrics
+          });
         } else {
-          // Calculate initial metrics based on mock progress
+          // Calculate initial metrics based on mock progress + journal data
           const calculatedMetrics = {
             totalReadingTime: 145, // minutes
             reflectionsCompleted: 8,
             sectionsCompleted: 2,
             spiritualGrowthScore: 25,
-            mindsetEvolution: 'transition' // Based on progress
+            mindsetEvolution: 'transition', // Based on progress
+            ...journalMetrics
           };
           setSpiritualMetrics(calculatedMetrics);
           localStorage.setItem('renewedSpiritualMetrics', JSON.stringify(calculatedMetrics));
@@ -273,6 +327,15 @@ export default function DashboardPage() {
         description: 'Sacred study time invested'
       },
       {
+        title: 'Journal Entries',
+        value: spiritualMetrics.totalEntries || 0,
+        unit: 'written',
+        icon: '📝',
+        color: 'text-indigo-600',
+        bgColor: 'bg-indigo-50',
+        description: 'Sacred reflections documented'
+      },
+      {
         title: 'Reflections',
         value: spiritualMetrics.reflectionsCompleted,
         unit: 'completed',
@@ -280,6 +343,33 @@ export default function DashboardPage() {
         color: 'text-purple-600',
         bgColor: 'bg-purple-50',
         description: 'Deep spiritual contemplations'
+      },
+      {
+        title: 'Audio Links',
+        value: spiritualMetrics.audioLinkedEntries || 0,
+        unit: 'connected',
+        icon: '🎧',
+        color: 'text-teal-600',
+        bgColor: 'bg-teal-50',
+        description: 'Entries linked to audio moments'
+      },
+      {
+        title: 'Consistency',
+        value: spiritualMetrics.consistencyScore || 0,
+        unit: '%',
+        icon: '🌟',
+        color: 'text-green-600',
+        bgColor: 'bg-green-50',
+        description: 'Spiritual writing consistency'
+      },
+      {
+        title: 'Words Written',
+        value: Math.round((spiritualMetrics.totalWordCount || 0) / 1000 * 10) / 10,
+        unit: 'k words',
+        icon: '✍️',
+        color: 'text-rose-600',
+        bgColor: 'bg-rose-50',
+        description: 'Sacred words of wisdom captured'
       },
       {
         title: 'Sections',
@@ -309,7 +399,7 @@ export default function DashboardPage() {
         className="mb-8"
       >
         <h2 className="mb-6 font-serif text-2xl text-sacred-blue-900">Sacred Growth Metrics</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
           {metrics.map((metric, index) => (
             <motion.div
               key={metric.title}
