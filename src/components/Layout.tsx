@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { useDeepReflection } from '@/hooks/useDeepReflection';
+import { useSpiritualJourney } from '@/contexts/SpiritualJourneyContext';
+import SimplicitySidebar from '@/components/sacred-simplicity/SimplicitySidebar';
 
 // Define interfaces
 interface LayoutProps {
@@ -31,6 +33,9 @@ export default function Layout({ children }: LayoutProps): React.ReactElement {
   
   // Get reflections status for conditional navigation
   const { hasReflections } = useDeepReflection();
+  
+  // Get simplicity mode status
+  const { isSimplicityMode } = useSpiritualJourney();
 
   // Sacred navigation items with spiritual context
   const sacredNavigation = [
@@ -223,8 +228,16 @@ export default function Layout({ children }: LayoutProps): React.ReactElement {
       className="flex min-h-screen flex-col bg-sacred-journey-gradient"
     >
       <div className="flex flex-1">
-        {/* Enhanced Sacred Journey Sidebar */}
-        <motion.aside
+        {/* Conditional Sidebar - Simplicity vs Full */}
+        {isSimplicityMode ? (
+          <SimplicitySidebar
+            isExpanded={isNavExpanded}
+            onToggleExpanded={() => setIsNavExpanded(!isNavExpanded)}
+            currentMindset={currentMindset}
+            spiritualProgress={spiritualProgress}
+          />
+        ) : (
+          <motion.aside
           initial={{ x: -320 }}
           animate={{ x: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
@@ -519,6 +532,7 @@ export default function Layout({ children }: LayoutProps): React.ReactElement {
             )}
           </div>
         </motion.aside>
+        )}
 
         {/* Enhanced Sacred Journey Main Content Area */}
         <motion.main

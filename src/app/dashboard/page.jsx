@@ -6,10 +6,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
+import { useSpiritualJourney } from '@/contexts/SpiritualJourneyContext';
+import SimplifiedDashboard from '@/components/sacred-simplicity/SimplifiedDashboard';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { isSimplicityMode } = useSpiritualJourney();
   const [greeting, setGreeting] = useState('');
   const [currentMindset, setCurrentMindset] = useState('natural'); // natural, transition, spiritual
   const [spiritualMetrics, setSpiritualMetrics] = useState({
@@ -435,6 +438,21 @@ export default function DashboardPage() {
     { title: 'Kingdom Government', slug: '02_kingdom_government', progress: 25, spiritualTheme: 'Transformation' },
     { title: 'Elephant in the Kingdom', slug: '03_elephant_in_the_kingdom', progress: 0, spiritualTheme: 'Integration' },
   ];
+
+  // Conditional rendering based on simplicity mode
+  if (isSimplicityMode) {
+    return (
+      <div className="bg-sacred-journey-gradient min-h-screen p-6 lg:p-8">
+        <div className="mx-auto max-w-6xl">
+          <SimplifiedDashboard 
+            greeting={greeting}
+            currentMindset={currentMindset}
+            user={user}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-sacred-journey-gradient min-h-screen p-6 lg:p-8">
