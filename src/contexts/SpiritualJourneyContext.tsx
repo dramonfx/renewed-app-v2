@@ -127,6 +127,34 @@ const defaultMilestones: SpiritualMilestone[] = [
     }
   },
   {
+    id: 'audio_first_moments',
+    title: 'First Sacred Sounds',
+    description: 'Listen to audio for 3 minutes',
+    stage: 'seed',
+    unlocks: ['audio_volume_control'],
+    requirement: { type: 'audio_time', value: 3 },
+    achieved: false,
+    celebration: {
+      title: '🔊 First Sacred Sounds',
+      message: 'You have begun to attune your ears to divine wisdom. Volume control is now yours.',
+      icon: '🔊'
+    }
+  },
+  {
+    id: 'audio_contemplative_pace',
+    title: 'Finding Your Pace',
+    description: 'Listen to audio for 5 minutes',
+    stage: 'seed',
+    unlocks: ['audio_speed_control'],
+    requirement: { type: 'audio_time', value: 5 },
+    achieved: false,
+    celebration: {
+      title: '⚡ Sacred Pace',
+      message: 'Every soul has its own rhythm of understanding. Speed control unlocked for your contemplative journey.',
+      icon: '⚡'
+    }
+  },
+  {
     id: 'audio_first_session',
     title: 'Sacred Listening',
     description: 'Listen to audio for 10 minutes',
@@ -171,11 +199,39 @@ const defaultMilestones: SpiritualMilestone[] = [
     }
   },
   {
+    id: 'audio_dedicated_listening',
+    title: 'Dedicated Listening',
+    description: 'Listen to audio for 20 minutes',
+    stage: 'growth',
+    unlocks: ['audio_progress_tracking'],
+    requirement: { type: 'audio_time', value: 20 },
+    achieved: false,
+    celebration: {
+      title: '📍 Sacred Memory',
+      message: 'Your dedication is noticed. Your listening progress will now be remembered across sessions.',
+      icon: '📍'
+    }
+  },
+  {
+    id: 'audio_deeper_engagement',
+    title: 'Deeper Audio Engagement',
+    description: 'Listen to audio for 30 minutes',
+    stage: 'growth',
+    unlocks: ['audio_skip_controls'],
+    requirement: { type: 'audio_time', value: 30 },
+    achieved: false,
+    celebration: {
+      title: '⏯️ Precise Navigation',
+      message: 'You seek to understand with precision. Skip controls are now available for your focused study.',
+      icon: '⏯️'
+    }
+  },
+  {
     id: 'audio_hour',
     title: 'Hour of Sacred Sound',
     description: 'Listen to one hour of audio content',
     stage: 'growth',
-    unlocks: ['audio_analytics', 'progress_charts'],
+    unlocks: ['progress_charts'],
     requirement: { type: 'audio_time', value: 60 },
     achieved: false,
     celebration: {
@@ -201,17 +257,45 @@ const defaultMilestones: SpiritualMilestone[] = [
     }
   },
   {
+    id: 'audio_mastery_listening',
+    title: 'Audio Mastery Path',
+    description: 'Listen to audio for 90 minutes total',
+    stage: 'maturity',
+    unlocks: ['audio_track_navigation'],
+    requirement: { type: 'audio_time', value: 90 },
+    achieved: false,
+    celebration: {
+      title: '🗺️ Audio Navigation Master',
+      message: 'You have shown dedication to sacred sound. Navigation between teachings is now yours.',
+      icon: '🗺️'
+    }
+  },
+  {
     id: 'section_completion',
     title: 'Sacred Learning',
     description: 'Complete reading 2 sections',
     stage: 'maturity',
-    unlocks: ['learning_analytics', 'progress_pathways'],
+    unlocks: ['learning_analytics', 'audio_cross_track_bookmarks'],
     requirement: { type: 'sections_read', value: 2 },
     achieved: false,
     celebration: {
       title: '📚 Sacred Learning',
       message: 'Sacred texts are revealing their secrets to your prepared heart.',
       icon: '📚'
+    }
+  },
+  {
+    id: 'audio_deep_analytics',
+    title: 'Audio Wisdom Tracker',
+    description: 'Listen to audio for 2 hours total',
+    stage: 'maturity',
+    unlocks: ['audio_analytics'],
+    requirement: { type: 'audio_time', value: 120 },
+    achieved: false,
+    celebration: {
+      title: '📈 Audio Wisdom Unveiled',
+      message: 'Your listening patterns reveal the depths of your spiritual hunger. Analytics unlocked.',
+      icon: '📈'
     }
   },
   
@@ -221,7 +305,7 @@ const defaultMilestones: SpiritualMilestone[] = [
     title: 'Spiritual Mastery',
     description: 'Achieve comprehensive spiritual engagement',
     stage: 'mastery',
-    unlocks: ['advanced_analytics', 'mentorship_tools', 'sacred_sharing'],
+    unlocks: ['advanced_analytics', 'audio_spiritual_sharing', 'audio_advanced_controls'],
     requirement: { type: 'journal_entries', value: 30 },
     achieved: false,
     celebration: {
@@ -265,7 +349,7 @@ const defaultFeatures: SacredFeature[] = [
     isCore: true
   },
   
-  // UNLOCKABLE FEATURES
+  // SEED STAGE - First unlockable features
   {
     key: 'journal_rich_editor',
     title: 'Enhanced Journal Editor',
@@ -287,14 +371,56 @@ const defaultFeatures: SacredFeature[] = [
     unlockMessage: 'Mindset tracking unlocked! Monitor your spiritual transformation.'
   },
   {
+    key: 'audio_volume_control',
+    title: 'Audio Volume Control',
+    description: 'Adjust audio volume to your comfort',
+    icon: '🔊',
+    stage: 'seed',
+    isUnlocked: false,
+    isCore: false,
+    unlockMessage: 'Volume control unlocked! Create your perfect listening environment.'
+  },
+  {
+    key: 'audio_speed_control',
+    title: 'Audio Speed Control',
+    description: 'Adjust listening speed for deeper contemplation',
+    icon: '⚡',
+    stage: 'seed',
+    isUnlocked: false,
+    isCore: false,
+    unlockMessage: 'Speed control unlocked! Listen at your contemplative pace.'
+  },
+  
+  // GROWTH STAGE - Enhanced spiritual features
+  {
     key: 'audio_bookmarks',
     title: 'Audio Bookmarks',
     description: 'Save meaningful audio moments',
     icon: '🎯',
-    stage: 'seed',
+    stage: 'growth',
     isUnlocked: false,
     isCore: false,
     unlockMessage: 'Audio bookmarks unlocked! Mark sacred moments for reflection.'
+  },
+  {
+    key: 'audio_progress_tracking',
+    title: 'Audio Progress Memory',
+    description: 'Resume listening where you left off',
+    icon: '📍',
+    stage: 'growth',
+    isUnlocked: false,
+    isCore: false,
+    unlockMessage: 'Progress tracking unlocked! Your listening journey is remembered.'
+  },
+  {
+    key: 'audio_skip_controls',
+    title: 'Audio Skip Navigation',
+    description: '10-second forward/backward navigation',
+    icon: '⏯️',
+    stage: 'growth',
+    isUnlocked: false,
+    isCore: false,
+    unlockMessage: 'Skip controls unlocked! Navigate with precision through teachings.'
   },
   {
     key: 'growth_metrics',
@@ -337,6 +463,38 @@ const defaultFeatures: SacredFeature[] = [
     isCore: false,
     unlockMessage: 'Progress charts unlocked! Visualize your sacred journey.'
   },
+  
+  // MATURITY STAGE - Advanced spiritual features
+  {
+    key: 'audio_track_navigation',
+    title: 'Audio Track Navigation',
+    description: 'Navigate between multiple audio sections',
+    icon: '🗺️',
+    stage: 'maturity',
+    isUnlocked: false,
+    isCore: false,
+    unlockMessage: 'Track navigation unlocked! Journey through complete teachings.'
+  },
+  {
+    key: 'audio_cross_track_bookmarks',
+    title: 'Cross-Track Audio Bookmarks',
+    description: 'Save bookmarks across different sections',
+    icon: '🌐',
+    stage: 'maturity',
+    isUnlocked: false,
+    isCore: false,
+    unlockMessage: 'Advanced bookmarks unlocked! Connect insights across all teachings.'
+  },
+  {
+    key: 'audio_analytics',
+    title: 'Audio Analytics',
+    description: 'Track your spiritual audio journey',
+    icon: '📈',
+    stage: 'maturity',
+    isUnlocked: false,
+    isCore: false,
+    unlockMessage: 'Audio analytics unlocked! See your growth through sacred sound.'
+  },
   {
     key: 'milestone_celebrations',
     title: 'Milestone Celebrations',
@@ -356,6 +514,28 @@ const defaultFeatures: SacredFeature[] = [
     isUnlocked: false,
     isCore: false,
     unlockMessage: 'Learning analytics unlocked! Understand your learning journey.'
+  },
+  
+  // MASTERY STAGE - Master-level features
+  {
+    key: 'audio_spiritual_sharing',
+    title: 'Sacred Audio Sharing',
+    description: 'Share meaningful audio moments with others',
+    icon: '🤝',
+    stage: 'mastery',
+    isUnlocked: false,
+    isCore: false,
+    unlockMessage: 'Sacred sharing unlocked! Spread wisdom to fellow seekers.'
+  },
+  {
+    key: 'audio_advanced_controls',
+    title: 'Master Audio Controls',
+    description: 'Complete audio mastery tools',
+    icon: '🎛️',
+    stage: 'mastery',
+    isUnlocked: false,
+    isCore: false,
+    unlockMessage: 'Master controls unlocked! Full dominion over your audio experience.'
   },
   {
     key: 'advanced_analytics',
