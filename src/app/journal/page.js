@@ -9,6 +9,7 @@ import JournalEntryModal from '@/components/journal/JournalEntryModal';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { SparklesIcon, BookOpenIcon, HeartIcon } from '@heroicons/react/24/outline';
 import { useDeepReflection } from '@/hooks/useDeepReflection';
+import { ContemplativeLoading, SpiritualPause } from '@/components/SpiritualPauseSystem';
 import journalStorage from '@/lib/journalStorage';
 
 // Deep Reflections List Component
@@ -362,11 +363,15 @@ export default function JournalPage() {
     );
   }
 
-  // Show loading state
+  // Show contemplative loading state
   if (entriesLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
-        <LoadingSpinner />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        <ContemplativeLoading 
+          text="Gathering your sacred reflections..."
+          category="practice"
+          showQuote={true}
+        />
       </div>
     );
   }
@@ -389,14 +394,27 @@ export default function JournalPage() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <JournalHeader
-              entries={entries}
-              stats={stats}
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              onNewEntry={() => setShowNewEntry(true)}
-              onExportData={handleExportData}
-            />
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex-1">
+                <JournalHeader
+                  entries={entries}
+                  stats={stats}
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  onNewEntry={() => setShowNewEntry(true)}
+                  onExportData={handleExportData}
+                />
+              </div>
+              {/* Spiritual Pause Moment */}
+              <div className="ml-4 flex items-center space-x-2">
+                <SpiritualPause 
+                  trigger="click"
+                  duration={4000}
+                  category="reflection"
+                />
+                <span className="text-xs text-blue-600 hidden sm:block">Take a pause</span>
+              </div>
+            </div>
           </motion.div>
 
           {/* Tab Navigation */}

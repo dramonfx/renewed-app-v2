@@ -1,8 +1,25 @@
 'use client';
 
-import { ClockIcon, TagIcon } from '@heroicons/react/24/outline';
+import { ClockIcon, TagIcon, SpeakerWaveIcon, PlayIcon } from '@heroicons/react/24/outline';
+import { useRouter } from 'next/navigation';
 
 export default function JournalEntryCard({ entry, onClick }) {
+  const router = useRouter();
+
+  // Handle navigation to audio moment
+  const handleAudioNavigation = (e) => {
+    e.stopPropagation(); // Prevent card click
+    
+    if (entry.section_id && entry.audio_timestamp) {
+      // Navigate to the section with timestamp
+      const sectionUrl = `/book/${entry.section_id}?t=${entry.audio_timestamp}`;
+      router.push(sectionUrl);
+    } else if (entry.section_id) {
+      // Navigate to section without timestamp
+      router.push(`/book/${entry.section_id}`);
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -73,6 +90,34 @@ export default function JournalEntryCard({ entry, onClick }) {
               </div>
             )}
           </div>
+
+          {/* Audio Context Information */}
+          {(entry.section_title || entry.audio_title) && (
+            <div className="mb-2 flex items-center justify-between">
+              <div className="flex items-center space-x-2 text-sm text-blue-600">
+                <SpeakerWaveIcon className="h-4 w-4" />
+                <span className="font-medium">
+                  {entry.section_title || entry.audio_title}
+                </span>
+                {entry.formatted_timestamp && (
+                  <span className="font-mono bg-blue-50 px-2 py-0.5 rounded text-xs">
+                    {entry.formatted_timestamp}
+                  </span>
+                )}
+              </div>
+              
+              {entry.section_id && (
+                <button
+                  onClick={handleAudioNavigation}
+                  className="flex items-center space-x-1 text-xs text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded transition-colors"
+                  title="Jump to audio moment"
+                >
+                  <PlayIcon className="h-3 w-3" />
+                  <span>Play</span>
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="ml-4 flex flex-col space-y-2">
