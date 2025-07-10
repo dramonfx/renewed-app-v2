@@ -1,5 +1,5 @@
 // src/components/ui/types.ts
-import { ReactNode, ButtonHTMLAttributes, InputHTMLAttributes, HTMLAttributes } from 'react';
+import React, { ReactNode, ButtonHTMLAttributes, InputHTMLAttributes, HTMLAttributes } from 'react';
 
 // SacredButton types
 export type ButtonVariant = 'primary' | 'gold' | 'ghost';
@@ -12,7 +12,7 @@ export interface SacredButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonE
   disabled?: boolean;
   loading?: boolean;
   className?: string;
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   type?: 'button' | 'submit' | 'reset';
 }
 

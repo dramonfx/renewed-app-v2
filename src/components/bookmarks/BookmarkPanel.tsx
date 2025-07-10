@@ -54,39 +54,6 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
     isPublic: false,
   });
 
-  // Load initial data
-  useEffect(() => {
-    loadBookmarks();
-    loadCategories();
-    loadStats();
-
-    // Setup event listeners
-    const handleBookmarkCreated = () => {
-      loadBookmarks();
-      loadStats();
-    };
-
-    const handleBookmarkUpdated = () => {
-      loadBookmarks();
-      loadStats();
-    };
-
-    const handleBookmarkDeleted = () => {
-      loadBookmarks();
-      loadStats();
-    };
-
-    bookmarkManager.on('bookmarkCreated', handleBookmarkCreated);
-    bookmarkManager.on('bookmarkUpdated', handleBookmarkUpdated);
-    bookmarkManager.on('bookmarkDeleted', handleBookmarkDeleted);
-
-    return () => {
-      bookmarkManager.off('bookmarkCreated', handleBookmarkCreated);
-      bookmarkManager.off('bookmarkUpdated', handleBookmarkUpdated);
-      bookmarkManager.off('bookmarkDeleted', handleBookmarkDeleted);
-    };
-  }, [bookmarkManager]);
-
   // Load bookmarks with current filters
   const loadBookmarks = useCallback(() => {
     const searchOptions: BookmarkSearchOptions = {
@@ -121,6 +88,39 @@ const BookmarkPanel: React.FC<BookmarkPanelProps> = ({
     const statistics = bookmarkManager.getStats();
     setStats(statistics);
   }, [bookmarkManager]);
+
+  // Load initial data and setup event listeners
+  useEffect(() => {
+    loadBookmarks();
+    loadCategories();
+    loadStats();
+
+    // Setup event listeners
+    const handleBookmarkCreated = () => {
+      loadBookmarks();
+      loadStats();
+    };
+
+    const handleBookmarkUpdated = () => {
+      loadBookmarks();
+      loadStats();
+    };
+
+    const handleBookmarkDeleted = () => {
+      loadBookmarks();
+      loadStats();
+    };
+
+    bookmarkManager.on('bookmarkCreated', handleBookmarkCreated);
+    bookmarkManager.on('bookmarkUpdated', handleBookmarkUpdated);
+    bookmarkManager.on('bookmarkDeleted', handleBookmarkDeleted);
+
+    return () => {
+      bookmarkManager.off('bookmarkCreated', handleBookmarkCreated);
+      bookmarkManager.off('bookmarkUpdated', handleBookmarkUpdated);
+      bookmarkManager.off('bookmarkDeleted', handleBookmarkDeleted);
+    };
+  }, [bookmarkManager, loadBookmarks, loadCategories, loadStats]);
 
   // Reload bookmarks when filters change
   useEffect(() => {

@@ -2,6 +2,7 @@
 import './globals.css';
 import Layout from '@/components/Layout';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { SpiritualJourneyProvider } from '@/contexts/SpiritualJourneyContext';
 
 export const metadata = {
   title: 'Renewed: The New Man Story',
@@ -22,7 +23,9 @@ export default function RootLayout({ children }) {
       </head>
       <body className="font-body antialiased">
         <AuthProvider>
-          <Layout>{children}</Layout>
+          <SpiritualJourneyProvider>
+            <Layout>{children}</Layout>
+          </SpiritualJourneyProvider>
         </AuthProvider>
       </body>
     </html>

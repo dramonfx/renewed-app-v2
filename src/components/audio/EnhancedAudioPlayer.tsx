@@ -79,7 +79,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
         onTrackChange?.(track, currentIndex);
       }
     }
-  }, [currentIndex, tracks]);
+  }, [currentIndex, tracks, onTrackChange]);
 
   // Handle playback state changes
   useEffect(() => {
@@ -91,7 +91,7 @@ const EnhancedAudioPlayer: React.FC<EnhancedAudioPlayerProps> = ({
     if (autoPlay && state.currentTrack && !state.isPlaying && !state.isLoading) {
       controls.play().catch(console.error);
     }
-  }, [autoPlay, state.currentTrack, state.isPlaying, state.isLoading]);
+  }, [autoPlay, state.currentTrack, state.isPlaying, state.isLoading, controls]);
 
   const handlePlayPause = useCallback(async () => {
     try {

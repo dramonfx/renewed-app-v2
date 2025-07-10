@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import JournalHeader from '@/components/journal/JournalHeader';
 import JournalEntryList from '@/components/journal/JournalEntryList';
@@ -11,6 +11,7 @@ import { SparklesIcon, BookOpenIcon, HeartIcon } from '@heroicons/react/24/outli
 import { useDeepReflection } from '@/hooks/useDeepReflection';
 import { ContemplativeLoading, SpiritualPause } from '@/components/SpiritualPauseSystem';
 import journalStorage from '@/lib/journalStorage';
+import { JourneyNavigator, ContextualPrompts } from '@/components/infinity-loop';
 
 // Deep Reflections List Component
 function DeepReflectionsList({ reflections, loading, onDeleteReflection }) {
@@ -189,7 +190,7 @@ export default function JournalPage() {
   } = useDeepReflection();
 
   // Load journal entries from localStorage
-  const loadEntries = () => {
+  const loadEntries = useCallback(() => {
     setEntriesLoading(true);
     setError('');
 
@@ -210,7 +211,7 @@ export default function JournalPage() {
     } finally {
       setEntriesLoading(false);
     }
-  };
+  }, [filters]);
 
   // Load journal statistics from localStorage
   const loadStats = () => {
@@ -242,7 +243,7 @@ export default function JournalPage() {
       loadEntries();
       loadStats();
     }
-  }, [filters, storageAvailable]);
+  }, [filters, storageAvailable, loadEntries]);
 
   // Handle new entry creation
   const handleNewEntry = async (entryData) => {
@@ -501,6 +502,15 @@ export default function JournalPage() {
               />
             )}
           </motion.div>
+        </div>
+
+        {/* Infinity Loop Navigation */}
+        <div className="mx-auto max-w-6xl px-4 pb-8">
+          <JourneyNavigator 
+            currentContext="writing"
+            showAsCard={true}
+            className="mt-8"
+          />
         </div>
       </motion.div>
 

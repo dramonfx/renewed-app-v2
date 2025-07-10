@@ -1,15 +1,25 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+
+// Force dynamic rendering since this page uses localStorage
+export const dynamic = 'force-dynamic';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
+import { useSpiritualJourney } from '@/contexts/SpiritualJourneyContext';
+import SimplifiedDashboard from '@/components/sacred-simplicity/SimplifiedDashboard';
+import { JourneyNavigator } from '@/components/infinity-loop';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { ReadinessIndicator } from '@/components/phase2-readiness';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { isSimplicityMode } = useSpiritualJourney();
+  const { trackAction } = useAnalytics();
   const [greeting, setGreeting] = useState('');
   const [currentMindset, setCurrentMindset] = useState('natural'); // natural, transition, spiritual
   const [spiritualMetrics, setSpiritualMetrics] = useState({
@@ -436,6 +446,21 @@ export default function DashboardPage() {
     { title: 'Elephant in the Kingdom', slug: '03_elephant_in_the_kingdom', progress: 0, spiritualTheme: 'Integration' },
   ];
 
+  // Conditional rendering based on simplicity mode
+  if (isSimplicityMode) {
+    return (
+      <div className="bg-sacred-journey-gradient min-h-screen p-6 lg:p-8">
+        <div className="mx-auto max-w-6xl">
+          <SimplifiedDashboard 
+            greeting={greeting}
+            currentMindset={currentMindset}
+            user={user}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-sacred-journey-gradient min-h-screen p-6 lg:p-8">
       <div className="mx-auto max-w-6xl">
@@ -674,6 +699,19 @@ export default function DashboardPage() {
             </motion.div>
           </SacredCard>
         </motion.div>
+
+        {/* Phase 2 Readiness Indicator */}
+        <ReadinessIndicator 
+          showDetails={true}
+          className="mb-8"
+        />
+
+        {/* Infinity Loop Navigation */}
+        <JourneyNavigator 
+          currentContext="dashboard"
+          showAsCard={true}
+          className="mb-8"
+        />
       </div>
     </div>
   );
