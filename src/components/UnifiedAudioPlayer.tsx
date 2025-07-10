@@ -22,6 +22,8 @@ import SacredButton from '@/components/ui/sacred-button';
 import SacredCard from '@/components/ui/sacred-card';
 import { useAudioPlayerFixed } from '@/hooks/useAudioPlayerFixed';
 import type { SimpleBookmark } from '@/hooks/useSimpleBookmarks';
+import { AudioFeatureGate, ProgressiveAudioPlayer } from '@/components/audio/AudioFeatureGate';
+import { SpiritualPauseEngine, SacredBreathMoments, ContextualReflectionPrompts } from '@/components/audio';
 
 export type AudioPlayerMode = 'full' | 'single';
 
@@ -284,6 +286,23 @@ export default function UnifiedAudioPlayerFixed({
     saveBookmark(currentTime);
   };
 
+  // Handle spiritual pause requests
+  const handleSpiritualPauseRequest = (): void => {
+    if (isPlaying && audioRef.current) {
+      audioRef.current.pause();
+      // The hook will handle updating isPlaying state via event listeners
+    }
+  };
+
+  const handleSpiritualResumeRequest = (): void => {
+    if (!isPlaying && audioRef.current && currentTrack) {
+      audioRef.current.play().catch((e) => {
+        console.error('Error resuming from spiritual pause:', e);
+      });
+      // The hook will handle updating isPlaying state via event listeners
+    }
+  };
+
   // Determine what controls to show based on mode
   const showTrackNavigation = mode === 'full' && tracks.length > 1;
   const canGoBack = currentTrackIndex > 0;
@@ -336,163 +355,209 @@ export default function UnifiedAudioPlayerFixed({
   }
 
   return (
-    <SacredCard variant="glass" className={`overflow-hidden ${className}`}>
-      {/* Hidden audio element */}
-      <audio ref={audioRef} preload="metadata" className="hidden" aria-label="Audio player" />
+    <ProgressiveAudioPlayer mode={mode} className={className}>
+      <SacredCard variant="glass" className="overflow-hidden">
+        {/* Hidden audio element */}
+        <audio ref={audioRef} preload="metadata" className="hidden" aria-label="Audio player" />
 
-      <div className="space-y-6 p-6">
-        {/* Current Track Info */}
-        {currentTrack && (
-          <div className="text-center">
-            <h3 className="mb-1 text-lg font-semibold text-sacred-blue-900">
-              {currentTrack.title}
-            </h3>
-            {mode === 'full' && tracks.length > 1 && (
-              <p className="text-sm text-sacred-blue-600">
-                Track {currentTrackIndex + 1} of {tracks.length}
-              </p>
-            )}
-          </div>
-        )}
-
-        {/* Progress Bar */}
-        <div className="space-y-2">
-          <div
-            className="h-2 w-full cursor-pointer overflow-hidden rounded-full bg-sacred-blue-200"
-            onClick={handleProgressClick}
-            role="progressbar"
-            aria-valuemin={0}
-            aria-valuemax={duration}
-            aria-valuenow={currentTime}
-            aria-label="Audio progress"
-          >
-            <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-sacred-blue-500 to-sacred-blue-600"
-              style={{ width: `${progressPercent}%` }}
-              initial={{ width: 0 }}
-              animate={{ width: `${progressPercent}%` }}
-              transition={{ duration: 0.1 }}
-            />
-          </div>
-
-          <div className="flex justify-between text-xs text-sacred-blue-600">
-            <span>{formatTime(currentTime)}</span>
-            <span>{formatTime(duration)}</span>
-          </div>
-        </div>
-
-        {/* Main Controls */}
-        <div className="flex items-center justify-center space-x-6">
-          <SacredButton
-            variant="ghost"
-            size="sm"
-            onClick={skipBackward10}
-            disabled={!currentTrack}
-            className="opacity-80 hover:opacity-100"
-            aria-label="Skip backward 10 seconds"
-          >
-            <RotateCcw className="h-5 w-5" />
-          </SacredButton>
-
-          <SacredButton
-            variant="primary"
-            size="lg"
-            onClick={playPause}
-            disabled={!currentTrack}
-            loading={isLoading}
-            className="relative"
-            aria-label={isPlaying ? 'Pause' : 'Play'}
-          >
-            {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="ml-1 h-6 w-6" />}
-          </SacredButton>
-
-          <SacredButton
-            variant="ghost"
-            size="sm"
-            onClick={skipForward10}
-            disabled={!currentTrack}
-            className="opacity-80 hover:opacity-100"
-            aria-label="Skip forward 10 seconds"
-          >
-            <RotateCw className="h-5 w-5" />
-          </SacredButton>
-        </div>
-
-        {/* Additional Controls */}
-        <div className="flex items-center justify-between text-sm">
-          <VolumeControl
-            volume={volume}
-            isMuted={isMuted}
-            onVolumeChange={setVolume}
-            onToggleMute={toggleMute}
-          />
-
-          <SpeedControl speed={speed} onSpeedChange={changeSpeed} />
-
-          <SacredButton
-            variant="ghost"
-            size="sm"
-            onClick={handleSaveBookmark}
-            disabled={!currentTrack || !currentTime || !canSaveBookmark}
-            className="opacity-80 hover:opacity-100"
-            aria-label="Save bookmark"
-            title={
-              !canSaveBookmark 
-                ? `Maximum ${mode === 'single' ? '1' : '2'} bookmark${mode === 'single' ? '' : 's'} reached`
-                : 'Save bookmark'
-            }
-          >
-            <Bookmark className="h-4 w-4" />
-          </SacredButton>
-        </div>
-
-        {/* Track Navigation */}
-        {showTrackNavigation && (
-          <TrackNavigation
-            tracks={tracks}
-            currentTrackIndex={currentTrackIndex}
-            onTrackSelect={playTrackAtIndex}
-            canGoBack={canGoBack}
-            canGoForward={canGoForward}
-            onPrevious={previousTrack}
-            onNext={nextTrack}
-          />
-        )}
-
-        {/* Bookmarks */}
-        {bookmarks && bookmarks.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-semibold text-sacred-blue-700">
-                Bookmarks ({bookmarks.length}/{mode === 'single' ? '1' : '2'})
-              </h4>
-              {bookmarks.length > 0 && (
-                <SacredButton
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearBookmarks}
-                  className="text-xs opacity-70 hover:opacity-100"
-                >
-                  Clear All
-                </SacredButton>
+        <div className="space-y-6 p-6">
+          {/* Current Track Info */}
+          {currentTrack && (
+            <div className="text-center">
+              <h3 className="mb-1 text-lg font-semibold text-sacred-blue-900">
+                {currentTrack.title}
+              </h3>
+              {mode === 'full' && tracks.length > 1 && (
+                <p className="text-sm text-sacred-blue-600">
+                  Track {currentTrackIndex + 1} of {tracks.length}
+                </p>
               )}
             </div>
+          )}
 
-            <div className="max-h-32 space-y-1 overflow-y-auto">
-              {bookmarks.map((bookmark) => (
-                <BookmarkItem
-                  key={bookmark.id}
-                  bookmark={bookmark}
-                  onJump={jumpToBookmark}
-                  onDelete={deleteBookmark}
-                  formatTime={formatTime}
-                />
-              ))}
+          {/* Progress Bar */}
+          <div className="space-y-2">
+            <div
+              className="h-2 w-full cursor-pointer overflow-hidden rounded-full bg-sacred-blue-200"
+              onClick={handleProgressClick}
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={duration}
+              aria-valuenow={currentTime}
+              aria-label="Audio progress"
+            >
+              <motion.div
+                className="h-full rounded-full bg-gradient-to-r from-sacred-blue-500 to-sacred-blue-600"
+                style={{ width: `${progressPercent}%` }}
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPercent}%` }}
+                transition={{ duration: 0.1 }}
+              />
+            </div>
+
+            <div className="flex justify-between text-xs text-sacred-blue-600">
+              <span>{formatTime(currentTime)}</span>
+              <span>{formatTime(duration)}</span>
             </div>
           </div>
-        )}
-      </div>
-    </SacredCard>
+
+          {/* Main Controls */}
+          <div className="flex items-center justify-center space-x-6">
+            <AudioFeatureGate feature="skip_controls">
+              <SacredButton
+                variant="ghost"
+                size="sm"
+                onClick={skipBackward10}
+                disabled={!currentTrack}
+                className="opacity-80 hover:opacity-100"
+                aria-label="Skip backward 10 seconds"
+              >
+                <RotateCcw className="h-5 w-5" />
+              </SacredButton>
+            </AudioFeatureGate>
+
+            <SacredButton
+              variant="primary"
+              size="lg"
+              onClick={playPause}
+              disabled={!currentTrack}
+              loading={isLoading}
+              className="relative"
+              aria-label={isPlaying ? 'Pause' : 'Play'}
+            >
+              {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="ml-1 h-6 w-6" />}
+            </SacredButton>
+
+            <AudioFeatureGate feature="skip_controls">
+              <SacredButton
+                variant="ghost"
+                size="sm"
+                onClick={skipForward10}
+                disabled={!currentTrack}
+                className="opacity-80 hover:opacity-100"
+                aria-label="Skip forward 10 seconds"
+              >
+                <RotateCw className="h-5 w-5" />
+              </SacredButton>
+            </AudioFeatureGate>
+          </div>
+
+          {/* Additional Controls */}
+          <div className="flex items-center justify-between text-sm">
+            <AudioFeatureGate feature="volume_control">
+              <VolumeControl
+                volume={volume}
+                isMuted={isMuted}
+                onVolumeChange={setVolume}
+                onToggleMute={toggleMute}
+              />
+            </AudioFeatureGate>
+
+            <AudioFeatureGate feature="speed_control">
+              <SpeedControl speed={speed} onSpeedChange={changeSpeed} />
+            </AudioFeatureGate>
+
+            <AudioFeatureGate feature="bookmark_system">
+              <SacredButton
+                variant="ghost"
+                size="sm"
+                onClick={handleSaveBookmark}
+                disabled={!currentTrack || !currentTime || !canSaveBookmark}
+                className="opacity-80 hover:opacity-100"
+                aria-label="Save bookmark"
+                title={
+                  !canSaveBookmark 
+                    ? `Maximum ${mode === 'single' ? '1' : '2'} bookmark${mode === 'single' ? '' : 's'} reached`
+                    : 'Save bookmark'
+                }
+              >
+                <Bookmark className="h-4 w-4" />
+              </SacredButton>
+            </AudioFeatureGate>
+          </div>
+
+          {/* Track Navigation */}
+          <AudioFeatureGate feature="track_navigation">
+            {showTrackNavigation && (
+              <TrackNavigation
+                tracks={tracks}
+                currentTrackIndex={currentTrackIndex}
+                onTrackSelect={playTrackAtIndex}
+                canGoBack={canGoBack}
+                canGoForward={canGoForward}
+                onPrevious={previousTrack}
+                onNext={nextTrack}
+              />
+            )}
+          </AudioFeatureGate>
+
+          {/* Bookmarks */}
+          <AudioFeatureGate feature="bookmark_system">
+            {bookmarks && bookmarks.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-semibold text-sacred-blue-700">
+                    Bookmarks ({bookmarks.length}/{mode === 'single' ? '1' : '2'})
+                  </h4>
+                  {bookmarks.length > 0 && (
+                    <SacredButton
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearBookmarks}
+                      className="text-xs opacity-70 hover:opacity-100"
+                    >
+                      Clear All
+                    </SacredButton>
+                  )}
+                </div>
+
+                <div className="max-h-32 space-y-1 overflow-y-auto">
+                  {bookmarks.map((bookmark) => (
+                    <BookmarkItem
+                      key={bookmark.id}
+                      bookmark={bookmark}
+                      onJump={jumpToBookmark}
+                      onDelete={deleteBookmark}
+                      formatTime={formatTime}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </AudioFeatureGate>
+        </div>
+
+        {/* Spiritual Pause Engine - monitors playback for contemplative moments */}
+        <SpiritualPauseEngine
+          currentTime={currentTime}
+          isPlaying={isPlaying}
+          duration={duration}
+          trackTitle={currentTrack?.title}
+          onPauseRequested={handleSpiritualPauseRequest}
+          onResumeRequested={handleSpiritualResumeRequest}
+        />
+
+        {/* Sacred Breath Moments - natural breathing invitations */}
+        <SacredBreathMoments
+          currentTime={currentTime}
+          isPlaying={isPlaying}
+          trackProgress={duration > 0 ? currentTime / duration : 0}
+          trackTitle={currentTrack?.title}
+          showBreathGuide={true}
+        />
+
+        {/* Contextual Reflection Prompts - thoughtful questions during listening */}
+        <ContextualReflectionPrompts
+          currentTime={currentTime}
+          isPlaying={isPlaying}
+          duration={duration}
+          trackProgress={duration > 0 ? currentTime / duration : 0}
+          trackTitle={currentTrack?.title}
+          isPaused={!isPlaying}
+          enableAutoPrompts={true}
+        />
+      </SacredCard>
+    </ProgressiveAudioPlayer>
   );
 }
 
