@@ -1,12 +1,10 @@
 // src/app/layout.js
+'use client';
 import './globals.css';
 import Layout from '@/components/Layout';
 import { AuthProvider } from '@/contexts/AuthContext';
-
-export const metadata = {
-  title: 'Renewed: The New Man Story',
-  description: 'An interactive guidebook for spiritual transformation.',
-};
+import { SpiritualJourneyProvider, SacredCelebrationManager } from '@/components/sacred-simplicity';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 export default function RootLayout({ children }) {
   return (
@@ -19,11 +17,18 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        <title>Renewed: The New Man Story</title>
+        <meta name="description" content="An interactive guidebook for spiritual transformation." />
       </head>
       <body className="font-body antialiased">
-        <AuthProvider>
-          <Layout>{children}</Layout>
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <SpiritualJourneyProvider>
+              <Layout>{children}</Layout>
+              <SacredCelebrationManager />
+            </SpiritualJourneyProvider>
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );
